@@ -10,6 +10,7 @@ import { VAULT_CURRICULUM, Level } from '../data/curriculum';
 import { PedagogicalLabel } from '../components/ui/PedagogicalLabel';
 import { useNotebook } from '../contexts/NotebookContext';
 import { NotebookBridge } from '../components/vault/NotebookBridge';
+import { LessonIntro } from '../components/ui/LessonIntro';
 
 interface VaultRoomProps {
     onNavigate: (room: RoomType) => void;
@@ -20,39 +21,61 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
     const { isIdle, resetTimer } = useIdleScaffold();
     const { addMessage, setMessages, setIsOpen } = useNotebook();
 
-    // --- Progression State ---
     const [levelIndex, setLevelIndex] = useState(0);
     const currentLevel: Level = VAULT_CURRICULUM[levelIndex];
 
-    // --- Logic State ---
     const [minuend, setMinuend] = useState<number[]>([]);
     const [userAnswers, setUserAnswers] = useState<number[]>([]);
     const [isVaultOpen, setIsVaultOpen] = useState(false);
     
-    // --- UI/Animation State ---
+    // Intro State
+    const [showIntro, setShowIntro] = useState(true);
+
     const [hoveredCol, setHoveredCol] = useState<number | null>(null);
     const [borrowingState, setBorrowingState] = useState<{from: number, to: number} | null>(null);
     const [flashCol, setFlashCol] = useState<number | null>(null);
 
-    // --- Initialization Effect ---
+    // Level-specific educational content
+    const LEVEL_INTROS: Record<string, { title: string; explanation: string; exampleBefore: string; exampleAfter: string; tip: string }> = {
+        'lvl_zero_1': {
+            title: 'מלכודת האפס',
+            explanation: 'כשכותבים מספר, כל ספרה יושבת במקום שלה. אם אין עשרות או מאות - שמים אפס!',
+            exampleBefore: 'שלושת אלפים וחמישים',
+            exampleAfter: '3050',
+            tip: 'שים לב: "חמישים" זה 50, לא 500. האפס במאות שומר על המקום!'
+        },
+        'lvl_zero_2': {
+            title: 'מלכודת האפס - שלב 2',
+            explanation: 'עכשיו עם מספרים יותר גדולים! זכור - כל מקום ריק צריך אפס.',
+            exampleBefore: 'ארבעים אלף וארבע',
+            exampleAfter: '40004',
+            tip: 'ספור את האפסים באמצע - יש שלושה!'
+        },
+        'lvl_sub_1': {
+            title: 'חיסור עם פריטה',
+            explanation: 'כשהספרה למעלה קטנה מהספרה למטה - צריך "לשאול" מהשכן.',
+            exampleBefore: '452 - 138',
+            exampleAfter: '314',
+            tip: 'לחץ על הספרה כדי לפרוט - היא תיתן 10 לשכן!'
+        }
+    };
+
     useEffect(() => {
         initializeLevel(currentLevel);
     }, [currentLevel]);
 
     const initializeLevel = (level: Level) => {
         setIsVaultOpen(false);
-        // Reset and set initial notebook state
         setMessages([level.notebookHint]);
-        setIsOpen(true); 
+        setIsOpen(true);
+        setShowIntro(true); // Trigger intro on level load
 
         if (level.mode === 'vertical_math') {
             setMinuend([...level.top]);
-            // Create wheels matching the width of the problem
             setUserAnswers(new Array(level.top.length).fill(0));
         } else if (level.mode === 'number_input') {
-            // For Number Input, we need as many wheels as the target length
             setUserAnswers(new Array(level.target.length).fill(0));
-            setMinuend([]); // Not used in this mode
+            setMinuend([]); 
         }
     };
 
@@ -66,16 +89,12 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
     const handleBorrow = (colIndex: number) => {
         resetTimer();
         if (currentLevel.mode !== 'vertical_math') return;
-        
-        // 1. Validation Logic
         if (isVaultOpen) return;
         if (colIndex >= minuend.length - 1) return; 
         if (minuend[colIndex] <= 0) return; 
         
-        // 2. Trigger Animation
         setBorrowingState({ from: colIndex, to: colIndex + 1 });
 
-        // 3. Execute Math Logic
         setTimeout(() => {
             const newMinuend = [...minuend];
             newMinuend[colIndex] -= 1;      
@@ -85,8 +104,6 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
             setBorrowingState(null);
             setFlashCol(colIndex + 1);
             setTimeout(() => setFlashCol(null), 500);
-
-            // Add Note to Global Notebook
             addMessage(`פרטנו ${1} מאות ל-${10} עשרות`);
         }, 600); 
     };
@@ -98,6 +115,7 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
     const nextLevel = () => {
         if (levelIndex < VAULT_CURRICULUM.length - 1) {
             setLevelIndex(prev => prev + 1);
+            // Intro is triggered by useEffect when currentLevel changes
         } else {
             onNavigate(RoomType.LOBBY);
         }
@@ -115,7 +133,6 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
         else if (currentLevel.mode === 'number_input') {
             isCorrect = userAnswers.every((val, i) => val === currentLevel.target[i]);
 
-            // ZERO TRAP DETECTION
             if (!isCorrect) {
                 const targetDigits = currentLevel.target.filter(d => d !== 0);
                 const userDigits = userAnswers.filter(d => d !== 0);
@@ -134,7 +151,6 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
         }
     };
 
-    // Render Helpers
     const getColumnLabel = (totalCols: number, index: number) => {
         const power = totalCols - 1 - index;
         switch(power) {
@@ -150,14 +166,41 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
     const getColumnPower = (totalCols: number, index: number) => {
         return totalCols - 1 - index;
     }
-    
-    // Determine if we should show the bridge
-    const showNotebookBridge = currentLevel.mode === 'vertical_math';
+
+    // Prepare safe props for NotebookBridge
+    const notebookProblem = {
+        top: currentLevel.mode === 'vertical_math' ? currentLevel.top : [],
+        bottom: currentLevel.mode === 'vertical_math' ? currentLevel.bottom : []
+    };
+
+    // Safe access for Intro Data
+    const introData = LEVEL_INTROS[currentLevel.id] || {
+        title: currentLevel.mode === 'number_input' ? 'כתיבת מספרים' : 'חיסור במאונך',
+        explanation: 'בוא נלמד משהו חדש!',
+        exampleBefore: 'Start',
+        exampleAfter: 'End',
+        tip: 'בהצלחה!'
+    };
 
     return (
         <div className="relative w-full h-full flex flex-col items-center bg-neutral-900 overflow-hidden select-none font-mono text-amber-500" dir="rtl">
             
-            {/* --- LAYOUT: TREASURE LAYER --- */}
+            {/* --- LESSON INTRO OVERLAY --- */}
+            <AnimatePresence>
+                {showIntro && (
+                    <LessonIntro
+                        levelType={currentLevel.mode}
+                        levelTitle={introData.title}
+                        explanation={introData.explanation}
+                        exampleBefore={introData.exampleBefore}
+                        exampleAfter={introData.exampleAfter}
+                        tip={introData.tip}
+                        onStart={() => setShowIntro(false)}
+                    />
+                )}
+            </AnimatePresence>
+
+            {/* TREASURE LAYER */}
             <div className="absolute inset-0 flex items-center justify-center z-0">
                 <div className="flex flex-col items-center gap-6 animate-pulse">
                      <div className="relative">
@@ -175,33 +218,19 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                 </div>
             </div>
 
-            {/* --- LAYOUT: MAIN MACHINE --- */}
+            {/* MAIN MACHINE */}
             <motion.div 
                 className="relative z-10 w-full h-full flex flex-col items-center"
                 animate={isVaultOpen ? { x: "-100%", opacity: 0, rotateY: -20 } : { x: 0, opacity: 1, rotateY: 0 }}
                 transition={{ duration: 1.2, ease: "easeInOut" }}
             >
-                {/* Background Ambience */}
                 <div className="absolute inset-0 bg-neutral-900 pointer-events-none" />
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(251,191,36,0.15),transparent_70%)] pointer-events-none" />
                 <div className="absolute inset-0 opacity-20 pointer-events-none" 
                      style={{ backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.5) 10px, rgba(0,0,0,0.5) 20px)` }} 
                 />
 
-                <GhostHand show={isIdle && !isVaultOpen} />
-
-                {/* THE NOTEBOOK BRIDGE (Visual Scaffolding) */}
-                {/* We render this absolute to the right side of the machine */}
-                <NotebookBridge 
-                    problem={{
-                        top: currentLevel.mode === 'vertical_math' ? currentLevel.top : [],
-                        bottom: currentLevel.mode === 'vertical_math' ? currentLevel.bottom : []
-                    }}
-                    currentMinuend={minuend}
-                    borrowingEvent={borrowingState}
-                    userAnswers={userAnswers}
-                    show={showNotebookBridge}
-                />
+                <GhostHand show={isIdle && !isVaultOpen && !showIntro} />
 
                 {/* Header Nav */}
                 <div className="absolute top-6 left-6 z-50 flex gap-4">
@@ -216,11 +245,9 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                 {/* Main Content */}
                 <div className="z-10 w-full max-w-4xl h-full flex flex-col items-center justify-center p-6 gap-8">
                     
-                    {/* Header Info */}
                     <div className="flex flex-col items-center gap-2 mb-2 opacity-90 text-center w-full">
                         <div className="text-amber-500/60 text-xs tracking-[0.3em] uppercase border-b border-amber-500/30 pb-1">Secure Vault Access - Level {levelIndex + 1}</div>
                         
-                        {/* INSTRUCTION PLATE */}
                         {currentLevel.mode === 'number_input' ? (
                             <div className="bg-gradient-to-b from-amber-700 to-amber-900 border-4 border-amber-600 rounded-xl px-12 py-6 shadow-[0_10px_30px_rgba(0,0,0,0.5)] transform -rotate-1 max-w-2xl">
                                 <h1 className="text-white font-handwriting font-bold text-5xl md:text-6xl drop-shadow-[0_2px_0_rgba(0,0,0,0.8)] text-center leading-tight">
@@ -241,7 +268,6 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
 
                         <div className="flex gap-4 md:gap-6 relative justify-center" dir="ltr">
                             
-                            {/* Particle Animation */}
                             <AnimatePresence>
                                 {borrowingState && (
                                     <motion.div 
@@ -257,7 +283,6 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                             </AnimatePresence>
 
                             {userAnswers.map((_, colIndex) => {
-                                // Determine visual states for Vertical Math
                                 let originalValue = 0;
                                 let currentValue = 0;
                                 let isLender = false;
@@ -277,10 +302,8 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                                         {getColumnLabel(userAnswers.length, colIndex)}
                                     </div>
 
-                                    {/* --- VERTICAL MATH: TOP & MIDDLE ROWS --- */}
                                     {currentLevel.mode === 'vertical_math' && (
                                         <>
-                                            {/* Row 1: Top Number */}
                                             <div 
                                                 className="relative w-full flex justify-center"
                                                 onMouseEnter={() => setHoveredCol(colIndex)}
@@ -296,19 +319,16 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                                                         ${colIndex < userAnswers.length - 1 && minuend[colIndex] > 0 ? 'border-neutral-700 hover:border-amber-500/50 cursor-pointer' : 'border-neutral-800 cursor-default opacity-80'}
                                                     `}
                                                 >
-                                                    {/* Pulse Ring */}
                                                     {colIndex < userAnswers.length - 1 && minuend[colIndex] > 0 && !isLender && (
                                                         <div className="absolute inset-0 rounded-xl ring-2 ring-amber-500/50 animate-ping opacity-0 group-hover:opacity-30" />
                                                     )}
                                                     
-                                                    {/* Main Digit */}
                                                     <span className={`${originalValue > 9 ? 'text-3xl tracking-tighter' : 'text-5xl'} ${isLender ? 'opacity-50' : 'opacity-100'}`}>
                                                         {originalValue}
                                                     </span>
                                                 </motion.button>
                                             </div>
 
-                                            {/* Row 2: Subtrahend */}
                                             <div className="w-16 h-16 flex items-center justify-center text-4xl font-bold text-neutral-500 font-mono relative">
                                                 {colIndex === 0 && <span className="absolute -left-10 text-neutral-400 text-5xl font-black">-</span>}
                                                 {currentLevel.bottom[colIndex]}
@@ -318,9 +338,7 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                                         </>
                                     )}
 
-                                    {/* --- INPUT WHEELS (Used in both modes) --- */}
                                     <div className="pt-2 relative overflow-visible">
-                                        {/* Pedagogical Layer: Place Value & Zero Trap */}
                                         {userAnswers[colIndex] > 0 && (
                                             <PedagogicalLabel 
                                                 text={(userAnswers[colIndex] * Math.pow(10, getColumnPower(userAnswers.length, colIndex))).toString()} 
@@ -333,7 +351,7 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                                             <PedagogicalLabel 
                                                 text="שומר מקום" 
                                                 position="bottom-[-30px] left-1/2 -translate-x-1/2" 
-                                                color="text-white/50"
+                                                color="text-white/50" 
                                                 arrowDirection="top"
                                             />
                                         )}
@@ -358,6 +376,14 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                 </div>
             </motion.div>
 
+            {/* NOTEBOOK BRIDGE - Only visible in vertical math mode */}
+            <NotebookBridge 
+                problem={notebookProblem}
+                currentMinuend={currentLevel.mode === 'vertical_math' ? minuend : []}
+                borrowingEvent={borrowingState}
+                userAnswers={userAnswers}
+                show={currentLevel.mode === 'vertical_math'}
+            />
         </div>
     );
 };
