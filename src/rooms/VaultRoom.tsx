@@ -10,7 +10,6 @@ import { VAULT_CURRICULUM, Level } from '../data/curriculum';
 import { PedagogicalLabel } from '../components/ui/PedagogicalLabel';
 import { useNotebook } from '../contexts/NotebookContext';
 import { NotebookBridge } from '../components/vault/NotebookBridge';
-import { LessonIntro } from '../components/ui/LessonIntro';
 
 interface VaultRoomProps {
     onNavigate: (room: RoomType) => void;
@@ -29,46 +28,20 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
     const [isVaultOpen, setIsVaultOpen] = useState(false);
     
     // Intro State
-    const [showIntro, setShowIntro] = useState(true);
+
 
     const [hoveredCol, setHoveredCol] = useState<number | null>(null);
     const [borrowingState, setBorrowingState] = useState<{from: number, to: number} | null>(null);
     const [flashCol, setFlashCol] = useState<number | null>(null);
 
     // Level-specific educational content
-    const LEVEL_INTROS: Record<string, { title: string; explanation: string; exampleBefore: string; exampleAfter: string; tip: string }> = {
-        'lvl_zero_1': {
-            title: 'מלכודת האפס',
-            explanation: 'כשכותבים מספר, כל ספרה יושבת במקום שלה. אם אין עשרות או מאות - שמים אפס!',
-            exampleBefore: 'שלושת אלפים וחמישים',
-            exampleAfter: '3050',
-            tip: 'שים לב: "חמישים" זה 50, לא 500. האפס במאות שומר על המקום!'
-        },
-        'lvl_zero_2': {
-            title: 'מלכודת האפס - שלב 2',
-            explanation: 'עכשיו עם מספרים יותר גדולים! זכור - כל מקום ריק צריך אפס.',
-            exampleBefore: 'ארבעים אלף וארבע',
-            exampleAfter: '40004',
-            tip: 'ספור את האפסים באמצע - יש שלושה!'
-        },
-        'lvl_sub_1': {
-            title: 'חיסור עם פריטה',
-            explanation: 'כשהספרה למעלה קטנה מהספרה למטה - צריך "לשאול" מהשכן.',
-            exampleBefore: '452 - 138',
-            exampleAfter: '314',
-            tip: 'לחץ על הספרה כדי לפרוט - היא תיתן 10 לשכן!'
-        }
-    };
-
-    useEffect(() => {
-        initializeLevel(currentLevel);
-    }, [currentLevel]);
 
     const initializeLevel = (level: Level) => {
         setIsVaultOpen(false);
         setMessages([level.notebookHint]);
         setIsOpen(true);
-        setShowIntro(true); // Trigger intro on level load
+  
+    
 
         if (level.mode === 'vertical_math') {
             setMinuend([...level.top]);
@@ -173,32 +146,11 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
         bottom: currentLevel.mode === 'vertical_math' ? currentLevel.bottom : []
     };
 
-    // Safe access for Intro Data
-    const introData = LEVEL_INTROS[currentLevel.id] || {
-        title: currentLevel.mode === 'number_input' ? 'כתיבת מספרים' : 'חיסור במאונך',
-        explanation: 'בוא נלמד משהו חדש!',
-        exampleBefore: 'Start',
-        exampleAfter: 'End',
-        tip: 'בהצלחה!'
-    };
+
 
     return (
         <div className="relative w-full h-full flex flex-col items-center bg-neutral-900 overflow-hidden select-none font-mono text-amber-500" dir="rtl">
-            
-            {/* --- LESSON INTRO OVERLAY --- */}
-            <AnimatePresence>
-                {showIntro && (
-                    <LessonIntro
-                        levelType={currentLevel.mode}
-                        levelTitle={introData.title}
-                        explanation={introData.explanation}
-                        exampleBefore={introData.exampleBefore}
-                        exampleAfter={introData.exampleAfter}
-                        tip={introData.tip}
-                        onStart={() => setShowIntro(false)}
-                    />
-                )}
-            </AnimatePresence>
+ 
 
             {/* TREASURE LAYER */}
             <div className="absolute inset-0 flex items-center justify-center z-0">
@@ -230,8 +182,7 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                      style={{ backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.5) 10px, rgba(0,0,0,0.5) 20px)` }} 
                 />
 
-                <GhostHand show={isIdle && !isVaultOpen && !showIntro} />
-
+<GhostHand show={isIdle && !isVaultOpen} />
                 {/* Header Nav */}
                 <div className="absolute top-6 left-6 z-50 flex gap-4">
                     <button onClick={handleReset} className="p-3 rounded-full bg-neutral-800 border border-amber-500/20 text-amber-500/50 hover:bg-neutral-800 hover:text-amber-400 hover:rotate-180 transition-all shadow-lg">
