@@ -357,6 +357,13 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                     </motion.button>
                 </div>
             </motion.div>
+            <NotebookBridge 
+  problem={INITIAL_PROBLEM}
+  currentMinuend={minuend}
+  borrowingEvent={borrowingState}
+  userAnswers={userAnswers}
+  show={!isVaultOpen}
+/>
         </div>
     );
 };
