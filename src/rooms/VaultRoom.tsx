@@ -10,10 +10,35 @@ import { VAULT_CURRICULUM, Level } from '../data/curriculum';
 import { PedagogicalLabel } from '../components/ui/PedagogicalLabel';
 import { useNotebook } from '../contexts/NotebookContext';
 import { NotebookBridge } from '../components/vault/NotebookBridge';
+import { LessonIntro } from '../components/ui/LessonIntro';
 
 interface VaultRoomProps {
     onNavigate: (room: RoomType) => void;
 }
+
+const LEVEL_INTROS: Record<string, { title: string; explanation: string; exampleBefore: string; exampleAfter: string; tip: string }> = {
+    'lvl_zero_1': {
+        title: 'מלכודת האפס',
+        explanation: 'כשכותבים מספר, כל ספרה יושבת במקום שלה. אם אין מאות - שמים אפס!',
+        exampleBefore: 'שלושת אלפים וחמישים',
+        exampleAfter: '3050',
+        tip: 'שים לב: "חמישים" זה 50. האפס במאות שומר על המקום!'
+    },
+    'lvl_zero_2': {
+        title: 'מלכודת האפס - שלב 2',
+        explanation: 'עכשיו עם מספרים יותר גדולים! כל מקום ריק צריך אפס.',
+        exampleBefore: 'ארבעים אלף וארבע',
+        exampleAfter: '40004',
+        tip: 'ספור את האפסים באמצע - יש שלושה!'
+    },
+    'lvl_sub_1': {
+        title: 'חיסור עם פריטה',
+        explanation: 'כשהספרה למעלה קטנה מלמטה - לוחצים עליה כדי לפרוט מהשכן.',
+        exampleBefore: '452 - 138',
+        exampleAfter: '314',
+        tip: 'לחץ על הספרה כדי לפרוט - היא תיתן 10 לשכן!'
+    }
+};
 
 export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
     const { user } = useUser();
@@ -26,22 +51,21 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
     const [minuend, setMinuend] = useState<number[]>([]);
     const [userAnswers, setUserAnswers] = useState<number[]>([]);
     const [isVaultOpen, setIsVaultOpen] = useState(false);
-    
-    // Intro State
-
+    const [showIntro, setShowIntro] = useState(true);
 
     const [hoveredCol, setHoveredCol] = useState<number | null>(null);
     const [borrowingState, setBorrowingState] = useState<{from: number, to: number} | null>(null);
     const [flashCol, setFlashCol] = useState<number | null>(null);
 
-    // Level-specific educational content
+    useEffect(() => {
+        initializeLevel(currentLevel);
+    }, [currentLevel]);
 
     const initializeLevel = (level: Level) => {
         setIsVaultOpen(false);
         setMessages([level.notebookHint]);
         setIsOpen(true);
-  
-    
+        setShowIntro(true);
 
         if (level.mode === 'vertical_math') {
             setMinuend([...level.top]);
@@ -88,7 +112,6 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
     const nextLevel = () => {
         if (levelIndex < VAULT_CURRICULUM.length - 1) {
             setLevelIndex(prev => prev + 1);
-            // Intro is triggered by useEffect when currentLevel changes
         } else {
             onNavigate(RoomType.LOBBY);
         }
@@ -140,19 +163,36 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
         return totalCols - 1 - index;
     }
 
-    // Prepare safe props for NotebookBridge
     const notebookProblem = {
         top: currentLevel.mode === 'vertical_math' ? currentLevel.top : [],
         bottom: currentLevel.mode === 'vertical_math' ? currentLevel.bottom : []
     };
 
-
+    const introData = LEVEL_INTROS[currentLevel.id] || {
+        title: 'שלב חדש',
+        explanation: 'בוא נלמד משהו חדש!',
+        exampleBefore: '',
+        exampleAfter: '',
+        tip: 'בהצלחה!'
+    };
 
     return (
         <div className="relative w-full h-full flex flex-col items-center bg-neutral-900 overflow-hidden select-none font-mono text-amber-500" dir="rtl">
- 
+            
+            <AnimatePresence>
+                {showIntro && (
+                    <LessonIntro
+                        levelType={currentLevel.mode}
+                        levelTitle={introData.title}
+                        explanation={introData.explanation}
+                        exampleBefore={introData.exampleBefore}
+                        exampleAfter={introData.exampleAfter}
+                        tip={introData.tip}
+                        onStart={() => setShowIntro(false)}
+                    />
+                )}
+            </AnimatePresence>
 
-            {/* TREASURE LAYER */}
             <div className="absolute inset-0 flex items-center justify-center z-0">
                 <div className="flex flex-col items-center gap-6 animate-pulse">
                      <div className="relative">
@@ -170,7 +210,6 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                 </div>
             </div>
 
-            {/* MAIN MACHINE */}
             <motion.div 
                 className="relative z-10 w-full h-full flex flex-col items-center"
                 animate={isVaultOpen ? { x: "-100%", opacity: 0, rotateY: -20 } : { x: 0, opacity: 1, rotateY: 0 }}
@@ -182,8 +221,8 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                      style={{ backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.5) 10px, rgba(0,0,0,0.5) 20px)` }} 
                 />
 
-<GhostHand show={isIdle && !isVaultOpen} />
-                {/* Header Nav */}
+                <GhostHand show={isIdle && !isVaultOpen && !showIntro} />
+
                 <div className="absolute top-6 left-6 z-50 flex gap-4">
                     <button onClick={handleReset} className="p-3 rounded-full bg-neutral-800 border border-amber-500/20 text-amber-500/50 hover:bg-neutral-800 hover:text-amber-400 hover:rotate-180 transition-all shadow-lg">
                         <RefreshCw size={24} />
@@ -193,7 +232,6 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                     </button>
                 </div>
 
-                {/* Main Content */}
                 <div className="z-10 w-full max-w-4xl h-full flex flex-col items-center justify-center p-6 gap-8">
                     
                     <div className="flex flex-col items-center gap-2 mb-2 opacity-90 text-center w-full">
@@ -212,7 +250,6 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                         )}
                     </div>
 
-                    {/* MACHINE GRID */}
                     <div className="relative p-8 rounded-3xl bg-[#1a1a1a] border-4 border-neutral-700 shadow-[0_20px_50px_rgba(0,0,0,0.8),inset_0_0_60px_rgba(0,0,0,0.8)]">
                         <div className="absolute inset-0 rounded-[20px] pointer-events-none border border-white/10 opacity-50" />
                         <div className="absolute -top-[2px] left-10 right-10 h-[2px] bg-amber-400/50 shadow-[0_0_15px_rgba(251,191,36,0.8)]" />
@@ -327,7 +364,6 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                 </div>
             </motion.div>
 
-            {/* NOTEBOOK BRIDGE - Only visible in vertical math mode */}
             <NotebookBridge 
                 problem={notebookProblem}
                 currentMinuend={currentLevel.mode === 'vertical_math' ? minuend : []}
