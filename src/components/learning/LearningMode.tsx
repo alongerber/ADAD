@@ -114,7 +114,7 @@ export const LearningMode: React.FC<LearningModeProps> = ({
       </div>
 
       {/* Main content area */}
-      <div className="flex-1 w-full max-w-3xl px-4 py-6 relative z-10 overflow-hidden flex items-center justify-center">
+      <div className="flex-1 w-full max-w-3xl px-4 py-4 md:py-6 relative z-10 overflow-y-auto flex items-center justify-center">
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
             key={slide.id}
@@ -126,7 +126,7 @@ export const LearningMode: React.FC<LearningModeProps> = ({
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className="w-full"
           >
-            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl md:rounded-3xl p-6 md:p-8 min-h-[400px] flex flex-col items-center justify-center">
+            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 md:p-8 flex flex-col items-center justify-center">
               {slide.content}
             </div>
           </motion.div>
@@ -208,7 +208,7 @@ export const AnimatedBeaker: React.FC<AnimatedBeakerProps> = ({
   animate = true
 }) => {
   return (
-    <div className="relative w-32 h-48 md:w-40 md:h-60">
+    <div className="relative w-24 h-36 md:w-32 md:h-48">
       {/* Beaker outline */}
       <svg viewBox="0 0 100 140" className="w-full h-full">
         {/* Beaker body */}
@@ -302,7 +302,7 @@ export const AnimatedPizza: React.FC<AnimatedPizzaProps> = ({
   };
 
   return (
-    <div className="relative w-36 h-36 md:w-44 md:h-44">
+    <div className="relative w-28 h-28 md:w-36 md:h-36">
       <svg viewBox="0 0 140 140" className="w-full h-full">
         {/* Pizza slices */}
         {Array.from({ length: slices }).map((_, i) => (
@@ -341,9 +341,9 @@ export const FractionDisplay: React.FC<FractionDisplayProps> = ({
   highlight = false
 }) => {
   const sizes = {
-    sm: { num: 'text-2xl', denom: 'text-2xl', line: 'w-8 h-0.5', label: 'text-xs' },
-    md: { num: 'text-4xl', denom: 'text-4xl', line: 'w-12 h-1', label: 'text-sm' },
-    lg: { num: 'text-6xl', denom: 'text-6xl', line: 'w-16 h-1', label: 'text-base' }
+    sm: { num: 'text-xl md:text-2xl', denom: 'text-xl md:text-2xl', line: 'w-6 md:w-8 h-0.5', label: 'text-xs', padding: 'p-2 md:p-3' },
+    md: { num: 'text-2xl md:text-4xl', denom: 'text-2xl md:text-4xl', line: 'w-8 md:w-12 h-0.5 md:h-1', label: 'text-sm', padding: 'p-3 md:p-4' },
+    lg: { num: 'text-3xl md:text-5xl', denom: 'text-3xl md:text-5xl', line: 'w-10 md:w-14 h-0.5 md:h-1', label: 'text-base', padding: 'p-4 md:p-5' }
   };
 
   const s = sizes[size];
@@ -352,12 +352,16 @@ export const FractionDisplay: React.FC<FractionDisplayProps> = ({
     <motion.div
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      className={`flex flex-col items-center gap-1 ${highlight ? 'p-4 bg-amber-500/20 rounded-xl border-2 border-amber-500/50' : ''}`}
+      className={`flex flex-col items-center gap-1 ${s.padding} rounded-xl border ${
+        highlight
+          ? 'bg-purple-500/20 border-purple-500/50'
+          : 'bg-white/5 border-white/10'
+      }`}
     >
       {label && <span className={`${s.label} text-white/60 mb-1`}>{label}</span>}
       <div className="flex flex-col items-center">
         <span className={`${s.num} font-mono font-black text-white`}>{numerator}</span>
-        <div className={`${s.line} bg-white/70 rounded-full my-1`} />
+        <div className={`${s.line} bg-white/50 rounded-full my-1`} />
         <span className={`${s.denom} font-mono font-black text-white`}>{denominator}</span>
       </div>
     </motion.div>
@@ -463,13 +467,13 @@ export const createFractionLearningSlides = (topicNumber: number): LearningSlide
           id: 'half',
           title: 'חצי - ½',
           content: (
-            <div className="flex flex-col items-center gap-6 text-center">
-              <h2 className="text-2xl md:text-3xl font-bold text-white">חצי = ½</h2>
-              <div className="flex items-center gap-8">
+            <div className="flex flex-col items-center gap-4 md:gap-6 text-center">
+              <h2 className="text-xl md:text-2xl font-bold text-white">חצי = ½</h2>
+              <div className="flex items-center gap-4 md:gap-8">
+                <FractionDisplay numerator={1} denominator={2} size="md" highlight />
                 <AnimatedBeaker fillLevel={0.5} showDivisions={2} />
-                <FractionDisplay numerator={1} denominator={2} size="lg" highlight />
               </div>
-              <p className="text-lg text-white/80 max-w-md">
+              <p className="text-sm md:text-base text-white/80 max-w-sm">
                 <span className="text-amber-400 font-bold">חצי</span> זה כשמחלקים משהו ל-<span className="text-cyan-400">2</span> חלקים שווים ולוקחים <span className="text-purple-400">1</span>.
               </p>
             </div>
@@ -479,16 +483,16 @@ export const createFractionLearningSlides = (topicNumber: number): LearningSlide
           id: 'quarter',
           title: 'רבע - ¼',
           content: (
-            <div className="flex flex-col items-center gap-6 text-center">
-              <h2 className="text-2xl md:text-3xl font-bold text-white">רבע = ¼</h2>
-              <div className="flex items-center gap-8">
+            <div className="flex flex-col items-center gap-4 md:gap-6 text-center">
+              <h2 className="text-xl md:text-2xl font-bold text-white">רבע = ¼</h2>
+              <div className="flex items-center gap-4 md:gap-8">
+                <FractionDisplay numerator={1} denominator={4} size="md" highlight />
                 <AnimatedPizza slices={4} filledSlices={1} />
-                <FractionDisplay numerator={1} denominator={4} size="lg" highlight />
               </div>
-              <p className="text-lg text-white/80 max-w-md">
+              <p className="text-sm md:text-base text-white/80 max-w-sm">
                 <span className="text-amber-400 font-bold">רבע</span> זה כשמחלקים משהו ל-<span className="text-cyan-400">4</span> חלקים שווים ולוקחים <span className="text-purple-400">1</span>.
               </p>
-              <p className="text-white/60">רבע קטן מחצי!</p>
+              <p className="text-xs md:text-sm text-white/60">רבע קטן מחצי!</p>
             </div>
           )
         },
@@ -496,16 +500,16 @@ export const createFractionLearningSlides = (topicNumber: number): LearningSlide
           id: 'three_quarters',
           title: 'שלושה רבעים - ¾',
           content: (
-            <div className="flex flex-col items-center gap-6 text-center">
-              <h2 className="text-2xl md:text-3xl font-bold text-white">שלושה רבעים = ¾</h2>
-              <div className="flex items-center gap-8">
+            <div className="flex flex-col items-center gap-4 md:gap-6 text-center">
+              <h2 className="text-xl md:text-2xl font-bold text-white">שלושה רבעים = ¾</h2>
+              <div className="flex items-center gap-4 md:gap-8">
+                <FractionDisplay numerator={3} denominator={4} size="md" highlight />
                 <AnimatedPizza slices={4} filledSlices={3} />
-                <FractionDisplay numerator={3} denominator={4} size="lg" highlight />
               </div>
-              <p className="text-lg text-white/80 max-w-md">
+              <p className="text-sm md:text-base text-white/80 max-w-sm">
                 <span className="text-amber-400 font-bold">שלושה רבעים</span> זה <span className="text-purple-400">3</span> חלקים מתוך <span className="text-cyan-400">4</span>.
               </p>
-              <p className="text-white/60">זה יותר מחצי, אבל פחות משלם!</p>
+              <p className="text-xs md:text-sm text-white/60">זה יותר מחצי, אבל פחות משלם!</p>
             </div>
           )
         },
