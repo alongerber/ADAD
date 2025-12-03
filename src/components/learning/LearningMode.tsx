@@ -114,7 +114,7 @@ export const LearningMode: React.FC<LearningModeProps> = ({
       </div>
 
       {/* Main content area */}
-      <div className="flex-1 w-full max-w-3xl px-4 py-6 relative z-10 overflow-hidden flex items-center justify-center">
+      <div className="flex-1 w-full max-w-3xl px-4 py-4 md:py-6 relative z-10 overflow-y-auto flex items-center justify-center">
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
             key={slide.id}
@@ -126,7 +126,7 @@ export const LearningMode: React.FC<LearningModeProps> = ({
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className="w-full"
           >
-            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl md:rounded-3xl p-6 md:p-8 min-h-[400px] flex flex-col items-center justify-center">
+            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 md:p-8 flex flex-col items-center justify-center">
               {slide.content}
             </div>
           </motion.div>
@@ -208,7 +208,7 @@ export const AnimatedBeaker: React.FC<AnimatedBeakerProps> = ({
   animate = true
 }) => {
   return (
-    <div className="relative w-32 h-48 md:w-40 md:h-60">
+    <div className="relative w-24 h-36 md:w-32 md:h-48">
       {/* Beaker outline */}
       <svg viewBox="0 0 100 140" className="w-full h-full">
         {/* Beaker body */}
@@ -302,7 +302,7 @@ export const AnimatedPizza: React.FC<AnimatedPizzaProps> = ({
   };
 
   return (
-    <div className="relative w-36 h-36 md:w-44 md:h-44">
+    <div className="relative w-28 h-28 md:w-36 md:h-36">
       <svg viewBox="0 0 140 140" className="w-full h-full">
         {/* Pizza slices */}
         {Array.from({ length: slices }).map((_, i) => (
@@ -341,9 +341,9 @@ export const FractionDisplay: React.FC<FractionDisplayProps> = ({
   highlight = false
 }) => {
   const sizes = {
-    sm: { num: 'text-2xl', denom: 'text-2xl', line: 'w-8 h-0.5', label: 'text-xs' },
-    md: { num: 'text-4xl', denom: 'text-4xl', line: 'w-12 h-1', label: 'text-sm' },
-    lg: { num: 'text-6xl', denom: 'text-6xl', line: 'w-16 h-1', label: 'text-base' }
+    sm: { num: 'text-xl md:text-2xl', denom: 'text-xl md:text-2xl', line: 'w-6 md:w-8 h-0.5', label: 'text-xs', padding: 'p-2 md:p-3' },
+    md: { num: 'text-2xl md:text-4xl', denom: 'text-2xl md:text-4xl', line: 'w-8 md:w-12 h-0.5 md:h-1', label: 'text-sm', padding: 'p-3 md:p-4' },
+    lg: { num: 'text-3xl md:text-5xl', denom: 'text-3xl md:text-5xl', line: 'w-10 md:w-14 h-0.5 md:h-1', label: 'text-base', padding: 'p-4 md:p-5' }
   };
 
   const s = sizes[size];
@@ -352,12 +352,16 @@ export const FractionDisplay: React.FC<FractionDisplayProps> = ({
     <motion.div
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      className={`flex flex-col items-center gap-1 ${highlight ? 'p-4 bg-amber-500/20 rounded-xl border-2 border-amber-500/50' : ''}`}
+      className={`flex flex-col items-center gap-1 ${s.padding} rounded-xl border ${
+        highlight
+          ? 'bg-purple-500/20 border-purple-500/50'
+          : 'bg-white/5 border-white/10'
+      }`}
     >
       {label && <span className={`${s.label} text-white/60 mb-1`}>{label}</span>}
       <div className="flex flex-col items-center">
         <span className={`${s.num} font-mono font-black text-white`}>{numerator}</span>
-        <div className={`${s.line} bg-white/70 rounded-full my-1`} />
+        <div className={`${s.line} bg-white/50 rounded-full my-1`} />
         <span className={`${s.denom} font-mono font-black text-white`}>{denominator}</span>
       </div>
     </motion.div>
@@ -463,13 +467,13 @@ export const createFractionLearningSlides = (topicNumber: number): LearningSlide
           id: 'half',
           title: 'חצי - ½',
           content: (
-            <div className="flex flex-col items-center gap-6 text-center">
-              <h2 className="text-2xl md:text-3xl font-bold text-white">חצי = ½</h2>
-              <div className="flex items-center gap-8">
+            <div className="flex flex-col items-center gap-4 md:gap-6 text-center">
+              <h2 className="text-xl md:text-2xl font-bold text-white">חצי = ½</h2>
+              <div className="flex items-center gap-4 md:gap-8">
+                <FractionDisplay numerator={1} denominator={2} size="md" highlight />
                 <AnimatedBeaker fillLevel={0.5} showDivisions={2} />
-                <FractionDisplay numerator={1} denominator={2} size="lg" highlight />
               </div>
-              <p className="text-lg text-white/80 max-w-md">
+              <p className="text-sm md:text-base text-white/80 max-w-sm">
                 <span className="text-amber-400 font-bold">חצי</span> זה כשמחלקים משהו ל-<span className="text-cyan-400">2</span> חלקים שווים ולוקחים <span className="text-purple-400">1</span>.
               </p>
             </div>
@@ -479,16 +483,16 @@ export const createFractionLearningSlides = (topicNumber: number): LearningSlide
           id: 'quarter',
           title: 'רבע - ¼',
           content: (
-            <div className="flex flex-col items-center gap-6 text-center">
-              <h2 className="text-2xl md:text-3xl font-bold text-white">רבע = ¼</h2>
-              <div className="flex items-center gap-8">
+            <div className="flex flex-col items-center gap-4 md:gap-6 text-center">
+              <h2 className="text-xl md:text-2xl font-bold text-white">רבע = ¼</h2>
+              <div className="flex items-center gap-4 md:gap-8">
+                <FractionDisplay numerator={1} denominator={4} size="md" highlight />
                 <AnimatedPizza slices={4} filledSlices={1} />
-                <FractionDisplay numerator={1} denominator={4} size="lg" highlight />
               </div>
-              <p className="text-lg text-white/80 max-w-md">
+              <p className="text-sm md:text-base text-white/80 max-w-sm">
                 <span className="text-amber-400 font-bold">רבע</span> זה כשמחלקים משהו ל-<span className="text-cyan-400">4</span> חלקים שווים ולוקחים <span className="text-purple-400">1</span>.
               </p>
-              <p className="text-white/60">רבע קטן מחצי!</p>
+              <p className="text-xs md:text-sm text-white/60">רבע קטן מחצי!</p>
             </div>
           )
         },
@@ -496,16 +500,16 @@ export const createFractionLearningSlides = (topicNumber: number): LearningSlide
           id: 'three_quarters',
           title: 'שלושה רבעים - ¾',
           content: (
-            <div className="flex flex-col items-center gap-6 text-center">
-              <h2 className="text-2xl md:text-3xl font-bold text-white">שלושה רבעים = ¾</h2>
-              <div className="flex items-center gap-8">
+            <div className="flex flex-col items-center gap-4 md:gap-6 text-center">
+              <h2 className="text-xl md:text-2xl font-bold text-white">שלושה רבעים = ¾</h2>
+              <div className="flex items-center gap-4 md:gap-8">
+                <FractionDisplay numerator={3} denominator={4} size="md" highlight />
                 <AnimatedPizza slices={4} filledSlices={3} />
-                <FractionDisplay numerator={3} denominator={4} size="lg" highlight />
               </div>
-              <p className="text-lg text-white/80 max-w-md">
+              <p className="text-sm md:text-base text-white/80 max-w-sm">
                 <span className="text-amber-400 font-bold">שלושה רבעים</span> זה <span className="text-purple-400">3</span> חלקים מתוך <span className="text-cyan-400">4</span>.
               </p>
-              <p className="text-white/60">זה יותר מחצי, אבל פחות משלם!</p>
+              <p className="text-xs md:text-sm text-white/60">זה יותר מחצי, אבל פחות משלם!</p>
             </div>
           )
         },
@@ -686,97 +690,116 @@ export const createFractionLearningSlides = (topicNumber: number): LearningSlide
                 transition={{ type: "spring", delay: 0.2 }}
                 className="text-6xl"
               >
-                ➕
+                🧃➕🧃
               </motion.div>
-              <h2 className="text-2xl md:text-3xl font-bold text-white">חיבור שברים</h2>
+              <h2 className="text-2xl md:text-3xl font-bold text-white">מחברים שברים!</h2>
               <p className="text-lg text-white/80 max-w-md">
-                עכשיו נלמד לחבר שברים ביחד!
+                תארו לכם שיש לכם שני כוסות מיץ.<br/>
+                <span className="text-amber-400">מה קורה כששופכים אחת לשנייה?</span>
               </p>
             </div>
           )
         },
         {
-          id: 'same_denom',
-          title: 'אותו מכנה',
+          id: 'visual_add',
+          title: 'שופכים ביחד!',
           content: (
-            <div className="flex flex-col items-center gap-6 text-center">
-              <h2 className="text-xl md:text-2xl font-bold text-white">כשהמכנה שווה - קל!</h2>
-              <div className="flex items-center gap-4">
-                <FractionDisplay numerator={1} denominator={4} size="md" />
-                <span className="text-2xl text-white">+</span>
-                <FractionDisplay numerator={1} denominator={4} size="md" />
-                <span className="text-2xl text-white">=</span>
-                <FractionDisplay numerator={2} denominator={4} size="md" highlight />
+            <div className="flex flex-col items-center gap-4 text-center">
+              <h2 className="text-xl md:text-2xl font-bold text-white">רבע + רבע = ?</h2>
+              <div className="flex items-center gap-2 md:gap-4">
+                <div className="flex flex-col items-center">
+                  <AnimatedPizza slices={4} filledSlices={1} />
+                  <span className="text-sm text-white/60">רבע</span>
+                </div>
+                <span className="text-2xl md:text-3xl text-amber-400">+</span>
+                <div className="flex flex-col items-center">
+                  <AnimatedPizza slices={4} filledSlices={1} />
+                  <span className="text-sm text-white/60">רבע</span>
+                </div>
+                <span className="text-2xl md:text-3xl text-white">=</span>
+                <div className="flex flex-col items-center">
+                  <AnimatedPizza slices={4} filledSlices={2} />
+                  <span className="text-sm text-amber-400 font-bold">שני רבעים!</span>
+                </div>
               </div>
-              <div className="p-4 bg-green-500/20 rounded-xl border border-green-500/30 max-w-md">
-                <p className="text-green-300">
-                  פשוט מחברים את המונים (למעלה)!<br/>
+              <div className="p-4 bg-green-500/20 rounded-xl border border-green-500/30 max-w-sm">
+                <p className="text-green-300 text-lg">
                   <span className="font-bold">1 + 1 = 2</span><br/>
-                  המכנה נשאר אותו דבר.
+                  חלק אחד + עוד חלק = שני חלקים! 🎉
                 </p>
               </div>
             </div>
           )
         },
         {
-          id: 'example',
-          title: 'דוגמה נוספת',
+          id: 'same_size',
+          title: 'חלקים שווים',
           content: (
-            <div className="flex flex-col items-center gap-6 text-center">
-              <h2 className="text-xl font-bold text-white">¼ + ½ = ?</h2>
-              <div className="space-y-4 text-right max-w-md">
-                <div className="p-3 bg-white/5 rounded-lg">
-                  <p className="text-white/80">שלב 1: הופכים לאותו מכנה</p>
-                  <p className="text-amber-400 font-mono">½ = 2/4</p>
-                </div>
-                <div className="p-3 bg-white/5 rounded-lg">
-                  <p className="text-white/80">שלב 2: מחברים את המונים</p>
-                  <p className="text-amber-400 font-mono">¼ + 2/4 = 3/4</p>
-                </div>
-              </div>
+            <div className="flex flex-col items-center gap-4 text-center">
+              <motion.div
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+                className="text-4xl"
+              >
+                💡
+              </motion.div>
+              <h2 className="text-xl md:text-2xl font-bold text-amber-400">הסוד הגדול!</h2>
+              <p className="text-white/80 max-w-md text-lg">
+                אפשר לחבר רק כשהחלקים <span className="text-amber-400 font-bold">באותו גודל</span>!
+              </p>
               <div className="flex items-center gap-4 mt-2">
-                <FractionDisplay numerator={1} denominator={4} size="sm" />
-                <span className="text-xl text-white">+</span>
-                <FractionDisplay numerator={2} denominator={4} size="sm" />
-                <span className="text-xl text-white">=</span>
-                <FractionDisplay numerator={3} denominator={4} size="md" highlight />
+                <div className="p-3 bg-green-500/20 rounded-xl border border-green-500/30 text-center">
+                  <div className="text-2xl">🍕 + 🍕</div>
+                  <div className="text-green-400 text-sm font-bold mt-1">אותו גודל ✓</div>
+                </div>
+                <div className="p-3 bg-red-500/20 rounded-xl border border-red-500/30 text-center">
+                  <div className="text-2xl">🍕 + 🎂</div>
+                  <div className="text-red-400 text-sm font-bold mt-1">לא מתאים ✗</div>
+                </div>
               </div>
+              <p className="text-white/60 text-sm mt-2">
+                לכן המספר למטה (כמה חלקים יש בסך הכל) צריך להיות שווה!
+              </p>
             </div>
           )
         },
         {
-          id: 'whole',
-          title: 'יוצא שלם!',
+          id: 'beaker_add',
+          title: 'בבקבוק שלנו',
           content: (
-            <div className="flex flex-col items-center gap-6 text-center">
-              <h2 className="text-xl md:text-2xl font-bold text-white">½ + ½ = ?</h2>
-              <div className="flex items-center gap-8">
+            <div className="flex flex-col items-center gap-4 text-center">
+              <h2 className="text-xl md:text-2xl font-bold text-white">חצי + חצי = ?</h2>
+              <div className="flex items-center gap-4 md:gap-6">
                 <AnimatedBeaker fillLevel={0.5} showDivisions={2} />
-                <span className="text-3xl text-white">+</span>
+                <span className="text-3xl text-amber-400">+</span>
                 <AnimatedBeaker fillLevel={0.5} showDivisions={2} />
                 <span className="text-3xl text-white">=</span>
                 <AnimatedBeaker fillLevel={1} showDivisions={2} />
               </div>
               <p className="text-2xl text-amber-400 font-bold">
-                ½ + ½ = 1 (שלם!)
+                שני חצאים = בקבוק מלא! 🎉
               </p>
-              <p className="text-white/60">שני חצאים = אחד שלם</p>
+              <p className="text-white/60">½ + ½ = 1</p>
             </div>
           )
         },
         {
-          id: 'summary',
-          title: 'סיכום',
+          id: 'practice_hint',
+          title: 'בתרגול',
           content: (
             <div className="flex flex-col items-center gap-6 text-center">
-              <span className="text-5xl">🧮</span>
-              <h2 className="text-2xl font-bold text-white">כללי החיבור</h2>
-              <div className="text-right space-y-3 bg-white/5 p-4 rounded-xl max-w-md">
-                <p className="text-white/80">1. וודא שהמכנים שווים</p>
-                <p className="text-white/80">2. חבר את המונים (למעלה)</p>
-                <p className="text-white/80">3. המכנה נשאר אותו דבר</p>
+              <span className="text-5xl">🎯</span>
+              <h2 className="text-2xl font-bold text-white">איך נתרגל?</h2>
+              <div className="text-right space-y-3 bg-white/5 p-4 rounded-xl max-w-sm">
+                <p className="text-white/80">1️⃣ תראו את התרגיל (למשל: ¼ + ¼)</p>
+                <p className="text-white/80">2️⃣ תחשבו בראש כמה יוצא</p>
+                <p className="text-white/80">3️⃣ תמלאו את הבקבוק לתשובה!</p>
               </div>
-              <p className="text-amber-400 font-bold">בוא נתרגל!</p>
+              <div className="p-4 bg-amber-500/20 rounded-xl border border-amber-500/30">
+                <p className="text-amber-300 font-bold">
+                  זכרו: סופרים כמה חלקים יש בסך הכל!
+                </p>
+              </div>
             </div>
           )
         }
@@ -795,73 +818,93 @@ export const createFractionLearningSlides = (topicNumber: number): LearningSlide
                 transition={{ type: "spring", delay: 0.2 }}
                 className="text-6xl"
               >
-                ➖
+                🥤➖
               </motion.div>
-              <h2 className="text-2xl md:text-3xl font-bold text-white">חיסור שברים</h2>
+              <h2 className="text-2xl md:text-3xl font-bold text-white">מחסרים שברים!</h2>
               <p className="text-lg text-white/80 max-w-md">
-                אחרי שלמדנו לחבר, עכשיו נלמד לחסר!
+                תארו לכם כוס מיץ.<br/>
+                <span className="text-amber-400">שותים חלק - כמה נשאר?</span>
               </p>
             </div>
           )
         },
         {
-          id: 'subtract',
-          title: 'חיסור פשוט',
+          id: 'visual_sub',
+          title: 'שותים חלק!',
           content: (
-            <div className="flex flex-col items-center gap-6 text-center">
-              <h2 className="text-xl md:text-2xl font-bold text-white">¾ - ¼ = ?</h2>
-              <div className="flex items-center gap-4">
-                <FractionDisplay numerator={3} denominator={4} size="md" />
-                <span className="text-2xl text-white">-</span>
-                <FractionDisplay numerator={1} denominator={4} size="md" />
-                <span className="text-2xl text-white">=</span>
-                <FractionDisplay numerator={2} denominator={4} size="md" highlight />
+            <div className="flex flex-col items-center gap-4 text-center">
+              <h2 className="text-xl md:text-2xl font-bold text-white">שלושה רבעים פחות רבע = ?</h2>
+              <div className="flex items-center gap-2 md:gap-4">
+                <div className="flex flex-col items-center">
+                  <AnimatedPizza slices={4} filledSlices={3} />
+                  <span className="text-sm text-white/60">¾</span>
+                </div>
+                <span className="text-2xl md:text-3xl text-red-400">−</span>
+                <div className="flex flex-col items-center">
+                  <AnimatedPizza slices={4} filledSlices={1} />
+                  <span className="text-sm text-white/60">¼</span>
+                </div>
+                <span className="text-2xl md:text-3xl text-white">=</span>
+                <div className="flex flex-col items-center">
+                  <AnimatedPizza slices={4} filledSlices={2} />
+                  <span className="text-sm text-amber-400 font-bold">חצי!</span>
+                </div>
               </div>
-              <div className="p-4 bg-purple-500/20 rounded-xl border border-purple-500/30">
-                <p className="text-purple-300">
-                  בדיוק כמו חיבור!<br/>
+              <div className="p-4 bg-purple-500/20 rounded-xl border border-purple-500/30 max-w-sm">
+                <p className="text-purple-300 text-lg">
                   <span className="font-bold">3 - 1 = 2</span><br/>
-                  המכנה נשאר 4.
+                  היו 3 חלקים, לקחנו 1, נשארו 2! 🎉
                 </p>
               </div>
-              <p className="text-white/60">2/4 = ½</p>
             </div>
           )
         },
         {
           id: 'from_whole',
-          title: 'חיסור משלם',
+          title: 'מתוך שלם',
           content: (
-            <div className="flex flex-col items-center gap-6 text-center">
-              <h2 className="text-xl md:text-2xl font-bold text-white">1 - ¾ = ?</h2>
-              <div className="space-y-4 text-right max-w-md">
-                <div className="p-3 bg-white/5 rounded-lg">
-                  <p className="text-white/80">שלם = כמה רבעים?</p>
-                  <p className="text-amber-400 font-mono">1 = 4/4</p>
+            <div className="flex flex-col items-center gap-4 text-center">
+              <h2 className="text-xl md:text-2xl font-bold text-white">שלם פחות שלושה רבעים = ?</h2>
+              <div className="flex items-center gap-4 md:gap-6">
+                <div className="flex flex-col items-center">
+                  <AnimatedBeaker fillLevel={1} showDivisions={4} />
+                  <span className="text-sm text-white/60">מלא = 4/4</span>
                 </div>
-                <div className="p-3 bg-white/5 rounded-lg">
-                  <p className="text-white/80">עכשיו מחסרים:</p>
-                  <p className="text-amber-400 font-mono">4/4 - 3/4 = 1/4</p>
+                <span className="text-2xl text-red-400">−</span>
+                <div className="flex flex-col items-center">
+                  <AnimatedBeaker fillLevel={0.75} showDivisions={4} />
+                  <span className="text-sm text-white/60">¾</span>
+                </div>
+                <span className="text-2xl text-white">=</span>
+                <div className="flex flex-col items-center">
+                  <AnimatedBeaker fillLevel={0.25} showDivisions={4} />
+                  <span className="text-sm text-amber-400 font-bold">¼</span>
                 </div>
               </div>
-              <FractionDisplay numerator={1} denominator={4} size="lg" highlight />
+              <div className="p-3 bg-amber-500/20 rounded-xl border border-amber-500/30 max-w-sm">
+                <p className="text-amber-300">
+                  <span className="font-bold">טיפ:</span> שלם = 4 רבעים!<br/>
+                  4 - 3 = 1 → נשאר רבע אחד
+                </p>
+              </div>
             </div>
           )
         },
         {
-          id: 'summary',
-          title: 'סיכום',
+          id: 'practice_hint',
+          title: 'בתרגול',
           content: (
             <div className="flex flex-col items-center gap-6 text-center">
               <span className="text-5xl">🏆</span>
-              <h2 className="text-2xl font-bold text-white">אלוף/ה!</h2>
-              <p className="text-white/80 max-w-md">
-                עכשיו את/ה יודע/ת לחבר ולחסר שברים.
-                זה הבסיס לכל מה שנלמד בהמשך!
-              </p>
-              <div className="p-4 bg-amber-500/20 rounded-xl border border-amber-500/30">
-                <p className="text-amber-300 font-bold">
-                  בוא נראה מה למדת באתגרים!
+              <h2 className="text-2xl font-bold text-white">שלב האתגרים!</h2>
+              <div className="text-right space-y-3 bg-white/5 p-4 rounded-xl max-w-sm">
+                <p className="text-white/80">1️⃣ קראו את התרגיל (חיבור או חיסור)</p>
+                <p className="text-white/80">2️⃣ חשבו כמה יוצא</p>
+                <p className="text-white/80">3️⃣ מלאו את הבקבוק לתשובה!</p>
+              </div>
+              <div className="p-4 bg-green-500/20 rounded-xl border border-green-500/30">
+                <p className="text-green-300 font-bold">
+                  את/ה מוכן/ה לאתגר! 💪
                 </p>
               </div>
             </div>

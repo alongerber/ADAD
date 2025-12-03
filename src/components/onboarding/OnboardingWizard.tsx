@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { UserProfile, GenderType, ThemeType } from '../../types';
+import { UserProfile, GenderType, ThemeType, GradeType } from '../../types';
 import { useUser } from '../../contexts/UserContext';
 import { THEME_CONFIG } from '../../constants';
-import { User, Sparkles, Rocket, Trophy, Check, GraduationCap, TreePine, Fish, Candy } from 'lucide-react';
+import { User, Sparkles, Rocket, Trophy, Check, GraduationCap, TreePine, Fish, Candy, Lock } from 'lucide-react';
 
 export const OnboardingWizard: React.FC = () => {
   const { updateUser } = useUser();
@@ -14,12 +14,18 @@ export const OnboardingWizard: React.FC = () => {
     name: '',
     gender: 'boy', // Default
     theme: 'scifi', // Default
+    grade: 4, // Default - only grade 4 available for now
     progress: {
       completedLevels: [],
       currentVaultLevel: 0,
       totalScore: 0,
       streak: 0,
+      maxStreak: 0,
       lastPlayedAt: null,
+      unlockedAchievements: [],
+      daysPlayed: 0,
+      lastPlayDate: null,
+      learnedTopics: [],
     }
   });
 
@@ -41,17 +47,68 @@ export const OnboardingWizard: React.FC = () => {
       
       {/* Progress Bar */}
       <div className="absolute top-10 w-64 h-2 bg-black/30 rounded-full overflow-hidden z-20">
-        <motion.div 
+        <motion.div
           className={`h-full ${tempProfile.theme === 'scifi' ? 'bg-cyan-400' : tempProfile.theme === 'pop' ? 'bg-yellow-400' : 'bg-green-400'}`}
           initial={{ width: "0%" }}
-          animate={{ width: `${((step + 1) / 3) * 100}%` }}
+          animate={{ width: `${((step + 1) / 4) * 100}%` }}
         />
       </div>
 
       <AnimatePresence mode="wait">
-        
-        {/* STEP 1: GENDER */}
+
+        {/* STEP 0: GRADE SELECTION */}
         {step === 0 && (
+          <motion.div
+            key="step0"
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 50 }}
+            className="z-10 flex flex-col items-center gap-6 md:gap-10 w-full max-w-4xl"
+          >
+            <div className="text-center">
+              <h1 className="text-3xl md:text-5xl font-black text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] tracking-tight">באיזו כיתה את/ה?</h1>
+              <p className="text-white/60 mt-2 text-sm md:text-base">בחר/י את הכיתה שלך כדי לקבל תוכן מותאם</p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 w-full px-2">
+              <GradeCard
+                grade={3}
+                label="כיתה ג׳"
+                selected={tempProfile.grade === 3}
+                available={false}
+                onClick={() => {}}
+              />
+              <GradeCard
+                grade={4}
+                label="כיתה ד׳"
+                selected={tempProfile.grade === 4}
+                available={true}
+                onClick={() => setTempProfile(p => ({ ...p, grade: 4 }))}
+              />
+              <GradeCard
+                grade={5}
+                label="כיתה ה׳"
+                selected={tempProfile.grade === 5}
+                available={false}
+                onClick={() => {}}
+              />
+              <GradeCard
+                grade={6}
+                label="כיתה ו׳"
+                selected={tempProfile.grade === 6}
+                available={false}
+                onClick={() => {}}
+              />
+            </div>
+
+            <div className="w-full max-w-md mt-2 md:mt-4 px-2">
+              <NavButton onClick={handleNext} active={tempProfile.grade === 4} theme={tempProfile.theme} label="המשך" />
+            </div>
+          </motion.div>
+        )}
+
+        {/* STEP 1: GENDER */}
+        {step === 1 && (
           <motion.div
             key="step1"
             initial={{ opacity: 0, x: -50 }}
@@ -78,14 +135,15 @@ export const OnboardingWizard: React.FC = () => {
               />
             </div>
 
-            <div className="w-full max-w-md mt-2 md:mt-4 px-2">
-               <NavButton onClick={handleNext} active={true} theme={tempProfile.theme} label="המשך" />
+            <div className="flex gap-4 w-full max-w-md mt-2 md:mt-4 px-2">
+              <NavButton onClick={handleBack} active={true} theme={tempProfile.theme} label="חזור" secondary />
+              <NavButton onClick={handleNext} active={true} theme={tempProfile.theme} label="המשך" />
             </div>
           </motion.div>
         )}
 
         {/* STEP 2: NAME */}
-        {step === 1 && (
+        {step === 2 && (
           <motion.div 
             key="step2"
             initial={{ opacity: 0, x: -50 }}
@@ -114,7 +172,7 @@ export const OnboardingWizard: React.FC = () => {
         )}
 
         {/* STEP 3: THEME */}
-        {step === 2 && (
+        {step === 3 && (
           <motion.div
             key="step3"
             initial={{ opacity: 0, x: -50 }}
@@ -277,6 +335,62 @@ const ThemeCard = ({ id, label, icon, colors, selected, onClick }: any) => {
       <span className="text-white font-bold text-lg drop-shadow-md mt-2">{label}</span>
       {selected && (
         <motion.div layoutId="selection-ring" className="absolute inset-0 border-4 border-white rounded-xl" />
+      )}
+    </motion.button>
+  );
+};
+
+interface GradeCardProps {
+  grade: number;
+  label: string;
+  selected: boolean;
+  available: boolean;
+  onClick: () => void;
+}
+
+const GradeCard: React.FC<GradeCardProps> = ({ grade, label, selected, available, onClick }) => {
+  return (
+    <motion.button
+      whileHover={available ? { scale: 1.05 } : {}}
+      whileTap={available ? { scale: 0.95 } : {}}
+      onClick={available ? onClick : undefined}
+      className={`
+        relative h-32 md:h-40 rounded-2xl border-2 flex flex-col items-center justify-center gap-2 overflow-hidden transition-all duration-300
+        ${available
+          ? selected
+            ? 'bg-gradient-to-br from-amber-600 to-orange-600 border-amber-400 shadow-[0_0_30px_rgba(251,191,36,0.4)]'
+            : 'bg-slate-800/60 border-white/20 hover:border-amber-500/50 hover:bg-slate-700/60 cursor-pointer'
+          : 'bg-slate-900/60 border-white/5 opacity-50 cursor-not-allowed'
+        }
+      `}
+    >
+      {/* Grade Number */}
+      <div className={`text-4xl md:text-5xl font-black ${available ? 'text-white' : 'text-white/30'}`}>
+        {grade}
+      </div>
+
+      {/* Label */}
+      <span className={`text-sm md:text-base font-bold ${available ? 'text-white/90' : 'text-white/30'}`}>
+        {label}
+      </span>
+
+      {/* Coming Soon Badge */}
+      {!available && (
+        <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-slate-700/80 rounded-full">
+          <Lock size={12} className="text-white/50" />
+          <span className="text-[10px] text-white/50 font-bold">בקרוב</span>
+        </div>
+      )}
+
+      {/* Selection Checkmark */}
+      {selected && available && (
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          className="absolute top-2 left-2 p-1 rounded-full bg-white text-amber-600"
+        >
+          <Check size={16} strokeWidth={4} />
+        </motion.div>
       )}
     </motion.button>
   );
