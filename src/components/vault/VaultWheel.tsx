@@ -61,7 +61,7 @@ export const VaultWheel: React.FC<VaultWheelProps> = ({ value, onChange, disable
   };
 
   return (
-    <div className={`relative w-20 h-32 rounded-lg overflow-hidden border-4 border-neutral-800 shadow-[inset_0_0_20px_rgba(0,0,0,1)] bg-neutral-900 select-none ${disabled ? 'opacity-50 pointer-events-none' : 'cursor-grab active:cursor-grabbing'}`}>
+    <div className={`relative w-14 h-24 md:w-20 md:h-32 rounded-lg overflow-hidden border-2 md:border-4 border-neutral-800 shadow-[inset_0_0_20px_rgba(0,0,0,1)] bg-neutral-900 select-none ${disabled ? 'opacity-50 pointer-events-none' : 'cursor-grab active:cursor-grabbing'}`}>
       
       {/* Glossy Overlay (Cylinder effect) */}
       <div className="absolute inset-0 z-20 pointer-events-none bg-gradient-to-b from-black/80 via-transparent to-black/80" />
@@ -78,17 +78,17 @@ export const VaultWheel: React.FC<VaultWheelProps> = ({ value, onChange, disable
         className="absolute inset-0 flex flex-col items-center justify-center z-10"
       >
         {/* Previous Number (Faded) */}
-        <div className={`absolute -top-12 text-4xl font-mono font-bold text-amber-700/30 blur-[1px] transform scale-75`}>
+        <div className={`absolute -top-8 md:-top-12 text-2xl md:text-4xl font-mono font-bold text-amber-700/30 blur-[1px] transform scale-75`}>
           {prev}
         </div>
 
         {/* Current Number (Active) */}
-        <div className="text-6xl font-mono font-black text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]">
+        <div className="text-4xl md:text-6xl font-mono font-black text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]">
           {value}
         </div>
 
         {/* Next Number (Faded) */}
-        <div className={`absolute -bottom-12 text-4xl font-mono font-bold text-amber-700/30 blur-[1px] transform scale-75`}>
+        <div className={`absolute -bottom-8 md:-bottom-12 text-2xl md:text-4xl font-mono font-bold text-amber-700/30 blur-[1px] transform scale-75`}>
           {next}
         </div>
       </motion.div>

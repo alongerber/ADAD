@@ -33,7 +33,7 @@ export const NotebookBridge: React.FC<NotebookBridgeProps> = ({
           animate={{ x: 0, opacity: 1, rotate: -2 }}
           exit={{ x: 100, opacity: 0 }}
           transition={{ type: "spring", stiffness: 120, damping: 20 }}
-          className="absolute right-4 top-1/2 -translate-y-1/2 w-64 md:w-80 h-96 z-40 origin-bottom-right pointer-events-none"
+          className="absolute right-4 top-1/2 -translate-y-1/2 w-64 md:w-80 h-96 z-40 origin-bottom-right pointer-events-none hidden md:block"
         >
           {/* --- PAPER CONTAINER --- */}
           <div 

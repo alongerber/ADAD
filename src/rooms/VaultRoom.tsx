@@ -372,19 +372,19 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                 />
             )}
 
-            <div className="absolute inset-0 flex items-center justify-center z-0">
-                <div className="flex flex-col items-center gap-6 animate-pulse">
+            <div className="absolute inset-0 flex items-center justify-center z-0 p-4">
+                <div className="flex flex-col items-center gap-4 md:gap-6 animate-pulse">
                      <div className="relative">
                         <div className="absolute inset-0 bg-amber-400 blur-[80px] opacity-40" />
-                        <Star size={120} className="text-amber-300 fill-amber-400 drop-shadow-[0_0_50px_rgba(251,191,36,1)]" />
+                        <Star size={80} className="md:w-[120px] md:h-[120px] text-amber-300 fill-amber-400 drop-shadow-[0_0_50px_rgba(251,191,36,1)]" />
                      </div>
-                     <h2 className="text-4xl font-black text-amber-200 uppercase tracking-widest drop-shadow-md">הכספת נפרצה!</h2>
-                     <button 
+                     <h2 className="text-2xl md:text-4xl font-black text-amber-200 uppercase tracking-widest drop-shadow-md text-center">הכספת נפרצה!</h2>
+                     <button
                         onClick={nextLevel}
-                        className="bg-neutral-800/80 hover:bg-neutral-700 px-8 py-4 rounded-full border border-amber-500 text-amber-400 font-bold backdrop-blur-md flex gap-2 items-center transition-all"
+                        className="bg-neutral-800/80 hover:bg-neutral-700 px-6 py-3 md:px-8 md:py-4 rounded-full border border-amber-500 text-amber-400 font-bold backdrop-blur-md flex gap-2 items-center transition-all text-sm md:text-base"
                      >
                         <span>לשלב הבא</span>
-                        <ArrowLeft />
+                        <ArrowLeft size={18} className="md:w-6 md:h-6" />
                      </button>
                 </div>
             </div>
@@ -432,19 +432,19 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                     </div>
                 </div>
 
-                <div className="z-10 w-full max-w-4xl h-full flex flex-col items-center justify-center p-6 gap-8">
+                <div className="z-10 w-full max-w-4xl h-full flex flex-col items-center justify-center p-3 md:p-6 gap-4 md:gap-8">
                     
                     <div className="flex flex-col items-center gap-2 mb-2 opacity-90 text-center w-full">
                         <div className="text-amber-500/60 text-xs tracking-[0.3em] uppercase border-b border-amber-500/30 pb-1">Secure Vault Access - Level {levelIndex + 1}</div>
                         
                         {currentLevel.mode === 'number_input' ? (
-                            <div className="flex flex-col items-center gap-4">
-                                <div className="bg-gradient-to-b from-amber-700 to-amber-900 border-4 border-amber-600 rounded-xl px-12 py-6 shadow-[0_10px_30px_rgba(0,0,0,0.5)] transform -rotate-1 max-w-2xl">
-                                    <h1 className="text-white font-handwriting font-bold text-5xl md:text-6xl drop-shadow-[0_2px_0_rgba(0,0,0,0.8)] text-center leading-tight">
+                            <div className="flex flex-col items-center gap-2 md:gap-4 px-2">
+                                <div className="bg-gradient-to-b from-amber-700 to-amber-900 border-2 md:border-4 border-amber-600 rounded-xl px-4 py-3 md:px-12 md:py-6 shadow-[0_10px_30px_rgba(0,0,0,0.5)] transform -rotate-1 max-w-full md:max-w-2xl">
+                                    <h1 className="text-white font-handwriting font-bold text-2xl md:text-5xl lg:text-6xl drop-shadow-[0_2px_0_rgba(0,0,0,0.8)] text-center leading-tight">
                                         "{currentLevel.instruction}"
                                     </h1>
                                 </div>
-                                <p className="text-amber-300 text-xl font-bold animate-pulse">
+                                <p className="text-amber-300 text-sm md:text-xl font-bold animate-pulse">
                                     👆 סובב את הגלגלים וכתוב את המספר!
                                 </p>
                             </div>
@@ -455,11 +455,11 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                         )}
                     </div>
 
-                    <div className="relative p-8 rounded-3xl bg-[#1a1a1a] border-4 border-neutral-700 shadow-[0_20px_50px_rgba(0,0,0,0.8),inset_0_0_60px_rgba(0,0,0,0.8)]">
+                    <div className="relative p-3 md:p-8 rounded-2xl md:rounded-3xl bg-[#1a1a1a] border-2 md:border-4 border-neutral-700 shadow-[0_20px_50px_rgba(0,0,0,0.8),inset_0_0_60px_rgba(0,0,0,0.8)]">
                         <div className="absolute inset-0 rounded-[20px] pointer-events-none border border-white/10 opacity-50" />
                         <div className="absolute -top-[2px] left-10 right-10 h-[2px] bg-amber-400/50 shadow-[0_0_15px_rgba(251,191,36,0.8)]" />
 
-                        <div className="flex gap-4 md:gap-6 relative justify-center" dir="ltr">
+                        <div className="flex gap-1 md:gap-6 relative justify-center overflow-x-auto" dir="ltr">
                             
                             <AnimatePresence>
                                 {borrowingState && (
@@ -491,14 +491,14 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                                 return (
                                 <div
                                     key={colIndex}
-                                    className={`flex flex-col items-center gap-4 relative w-[80px] rounded-xl p-2 transition-all duration-300 ${
+                                    className={`flex flex-col items-center gap-2 md:gap-4 relative w-[60px] md:w-[80px] rounded-xl p-1 md:p-2 transition-all duration-300 ${
                                         flashCol === colIndex
                                             ? 'bg-red-500/20 ring-2 ring-red-500 animate-pulse'
                                             : ''
                                     }`}
                                 >
 
-                                    <div className={`text-sm font-bold tracking-widest uppercase mb-2 transition-colors ${
+                                    <div className={`text-[10px] md:text-sm font-bold tracking-widest uppercase mb-1 md:mb-2 transition-colors ${
                                         flashCol === colIndex ? 'text-red-400' : 'text-neutral-500'
                                     }`}>
                                         {getColumnLabel(userAnswers.length, colIndex)}
@@ -517,7 +517,7 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                                                     transition={{ duration: 0.3 }}
                                                     disabled={colIndex >= userAnswers.length - 1 || minuend[colIndex] === 0}
                                                     className={`
-                                                        w-16 h-16 rounded-xl bg-neutral-800 border-2 shadow-[inset_0_2px_5px_rgba(255,255,255,0.05)] flex items-center justify-center font-black text-amber-400 relative overflow-visible group transition-colors z-20
+                                                        w-12 h-12 md:w-16 md:h-16 rounded-lg md:rounded-xl bg-neutral-800 border-2 shadow-[inset_0_2px_5px_rgba(255,255,255,0.05)] flex items-center justify-center font-black text-amber-400 relative overflow-visible group transition-colors z-20
                                                         ${colIndex < userAnswers.length - 1 && minuend[colIndex] > 0 ? 'border-neutral-700 hover:border-amber-500/50 cursor-pointer' : 'border-neutral-800 cursor-default opacity-80'}
                                                     `}
                                                 >
@@ -525,14 +525,14 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                                                         <div className="absolute inset-0 rounded-xl ring-2 ring-amber-500/50 animate-ping opacity-0 group-hover:opacity-30" />
                                                     )}
                                                     
-                                                    <span className={`${originalValue > 9 ? 'text-3xl tracking-tighter' : 'text-5xl'} ${isLender ? 'opacity-50' : 'opacity-100'}`}>
+                                                    <span className={`${originalValue > 9 ? 'text-xl md:text-3xl tracking-tighter' : 'text-3xl md:text-5xl'} ${isLender ? 'opacity-50' : 'opacity-100'}`}>
                                                         {originalValue}
                                                     </span>
                                                 </motion.button>
                                             </div>
 
-                                            <div className="w-16 h-16 flex items-center justify-center text-4xl font-bold text-neutral-500 font-mono relative">
-                                                {colIndex === 0 && <span className="absolute -left-10 text-neutral-400 text-5xl font-black">-</span>}
+                                            <div className="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center text-2xl md:text-4xl font-bold text-neutral-500 font-mono relative">
+                                                {colIndex === 0 && <span className="absolute -left-6 md:-left-10 text-neutral-400 text-3xl md:text-5xl font-black">-</span>}
                                                 {currentLevel.bottom[colIndex]}
                                             </div>
 
@@ -570,9 +570,9 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                     <motion.button
                         whileTap={{ scale: 0.95 }}
                         onClick={checkUnlock}
-                        className="mt-4 w-full max-w-[200px] h-16 rounded-full bg-gradient-to-r from-amber-600 to-amber-500 shadow-[0_5px_0_#92400e,0_10px_20px_rgba(0,0,0,0.5)] flex items-center justify-center gap-3 text-amber-950 font-black text-xl tracking-wider uppercase border-t border-amber-400 hover:brightness-110 active:shadow-none active:translate-y-[5px] transition-all"
+                        className="mt-2 md:mt-4 w-full max-w-[180px] md:max-w-[200px] h-12 md:h-16 rounded-full bg-gradient-to-r from-amber-600 to-amber-500 shadow-[0_5px_0_#92400e,0_10px_20px_rgba(0,0,0,0.5)] flex items-center justify-center gap-2 md:gap-3 text-amber-950 font-black text-lg md:text-xl tracking-wider uppercase border-t border-amber-400 hover:brightness-110 active:shadow-none active:translate-y-[5px] transition-all"
                     >
-                        {isVaultOpen ? <Unlock size={24} strokeWidth={2.5} /> : <Lock size={24} strokeWidth={2.5} />}
+                        {isVaultOpen ? <Unlock size={20} className="md:w-6 md:h-6" strokeWidth={2.5} /> : <Lock size={20} className="md:w-6 md:h-6" strokeWidth={2.5} />}
                         <span>פתח כספת</span>
                     </motion.button>
                 </div>
