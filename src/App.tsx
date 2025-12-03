@@ -10,6 +10,7 @@ import { OnboardingWizard } from './components/onboarding/OnboardingWizard';
 import { NotebookPanel } from './components/ui/NotebookPanel';
 import { SplashScreen } from './components/ui/SplashScreen';
 import { AchievementToast } from './components/ui/AchievementToast';
+import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { Analytics } from '@vercel/analytics/react';
 import { initAudio } from './hooks/useSound';
 
@@ -111,12 +112,14 @@ const GameContainer: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <UserProvider>
-      <NotebookProvider>
-        <GameContainer />
-        <Analytics />
-      </NotebookProvider>
-    </UserProvider>
+    <ErrorBoundary>
+      <UserProvider>
+        <NotebookProvider>
+          <GameContainer />
+          <Analytics />
+        </NotebookProvider>
+      </UserProvider>
+    </ErrorBoundary>
   );
 };
 
