@@ -308,10 +308,15 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                         <div className="text-amber-500/60 text-xs tracking-[0.3em] uppercase border-b border-amber-500/30 pb-1">Secure Vault Access - Level {levelIndex + 1}</div>
                         
                         {currentLevel.mode === 'number_input' ? (
-                            <div className="bg-gradient-to-b from-amber-700 to-amber-900 border-4 border-amber-600 rounded-xl px-12 py-6 shadow-[0_10px_30px_rgba(0,0,0,0.5)] transform -rotate-1 max-w-2xl">
-                                <h1 className="text-white font-handwriting font-bold text-5xl md:text-6xl drop-shadow-[0_2px_0_rgba(0,0,0,0.8)] text-center leading-tight">
-                                    "{currentLevel.instruction}"
-                                </h1>
+                            <div className="flex flex-col items-center gap-4">
+                                <div className="bg-gradient-to-b from-amber-700 to-amber-900 border-4 border-amber-600 rounded-xl px-12 py-6 shadow-[0_10px_30px_rgba(0,0,0,0.5)] transform -rotate-1 max-w-2xl">
+                                    <h1 className="text-white font-handwriting font-bold text-5xl md:text-6xl drop-shadow-[0_2px_0_rgba(0,0,0,0.8)] text-center leading-tight">
+                                        "{currentLevel.instruction}"
+                                    </h1>
+                                </div>
+                                <p className="text-amber-300 text-xl font-bold animate-pulse">
+                                    👆 סובב את הגלגלים וכתוב את המספר!
+                                </p>
                             </div>
                         ) : (
                             <h1 className="text-amber-400 font-black text-3xl md:text-4xl drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]">
