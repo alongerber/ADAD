@@ -1,10 +1,42 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Lock } from 'lucide-react';
 
 interface SplashScreenProps {
   onComplete: () => void;
 }
+
+// Custom Logo Component - Circle with bite and ½
+const BiteLogo: React.FC<{ className?: string }> = ({ className }) => (
+  <svg viewBox="0 0 100 100" className={className}>
+    <defs>
+      <linearGradient id="splashBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style={{ stopColor: '#f59e0b' }} />
+        <stop offset="100%" style={{ stopColor: '#ea580c' }} />
+      </linearGradient>
+      <linearGradient id="splashShineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style={{ stopColor: '#fbbf24', stopOpacity: 0.6 }} />
+        <stop offset="100%" style={{ stopColor: '#f59e0b', stopOpacity: 0 }} />
+      </linearGradient>
+      <mask id="splashBiteMask">
+        <rect width="100" height="100" fill="white" />
+        <circle cx="85" cy="15" r="18" fill="black" />
+      </mask>
+    </defs>
+    <g mask="url(#splashBiteMask)">
+      <circle cx="50" cy="50" r="45" fill="url(#splashBgGrad)" />
+      <ellipse cx="35" cy="35" rx="20" ry="15" fill="url(#splashShineGrad)" opacity="0.5" />
+    </g>
+    <path d="M 70 5 Q 67 15, 72 28" stroke="#fcd34d" strokeWidth="2" fill="none" strokeLinecap="round" />
+    <g fill="#1e1b4b" fontFamily="Arial, sans-serif" fontWeight="bold">
+      <text x="50" y="42" fontSize="24" textAnchor="middle">1</text>
+      <line x1="35" y1="50" x2="65" y2="50" stroke="#1e1b4b" strokeWidth="3" strokeLinecap="round" />
+      <text x="50" y="72" fontSize="24" textAnchor="middle">2</text>
+    </g>
+    <circle cx="78" cy="8" r="2" fill="#fef3c7" />
+    <circle cx="92" cy="22" r="1.5" fill="#fef3c7" />
+    <circle cx="88" cy="32" r="1" fill="#fef3c7" />
+  </svg>
+);
 
 export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
   return (
@@ -31,22 +63,22 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
         transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.2 }}
         className="relative z-10"
       >
-        {/* Vault circle */}
+        {/* Bite Logo */}
         <div className="relative">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-amber-500 flex items-center justify-center bg-neutral-900/80 shadow-[0_0_60px_rgba(251,191,36,0.3)]"
+            className="w-32 h-32 md:w-40 md:h-40 flex items-center justify-center"
           >
-            <Lock size={48} className="md:w-16 md:h-16 text-amber-400" strokeWidth={2.5} />
+            <BiteLogo className="w-full h-full drop-shadow-[0_0_30px_rgba(251,191,36,0.5)]" />
           </motion.div>
 
           {/* Spinning ring */}
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-            className="absolute inset-0 rounded-full border-2 border-dashed border-amber-500/30"
+            className="absolute inset-[-8px] rounded-full border-2 border-dashed border-amber-500/30"
           />
         </div>
       </motion.div>
