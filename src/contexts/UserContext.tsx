@@ -66,6 +66,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (!parsed.progress.daysPlayed) parsed.progress.daysPlayed = 0;
         if (!parsed.progress.lastPlayDate) parsed.progress.lastPlayDate = null;
         if (!parsed.progress.learnedTopics) parsed.progress.learnedTopics = [];
+        if (!parsed.grade) parsed.grade = 4; // Default to grade 4 for existing users
         setUser(parsed);
       } catch (e) {
         console.error("Failed to parse user profile", e);

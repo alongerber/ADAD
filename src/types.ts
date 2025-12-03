@@ -18,6 +18,7 @@ export interface LabState {
 
 export type ThemeType = 'scifi' | 'pop' | 'sports' | 'nature' | 'ocean' | 'candy';
 export type GenderType = 'boy' | 'girl';
+export type GradeType = 3 | 4 | 5 | 6;
 
 export interface UserProgress {
   completedLevels: string[];     // Array of completed level IDs
@@ -36,5 +37,6 @@ export interface UserProfile {
   name: string;
   gender: GenderType;
   theme: ThemeType;
+  grade: GradeType;
   progress: UserProgress;
 }
