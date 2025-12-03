@@ -6,7 +6,7 @@ import { useIdleScaffold } from '../hooks/useIdleScaffold';
 import { GhostHand } from '../components/ui/GhostHand';
 import { ParticleSystem } from '../components/systems/ParticleSystem';
 import { LabState, RoomType } from '../types';
-import { X, Home, Beaker as BeakerIcon, Lock, CheckCircle, Play, Volume2, VolumeX, GraduationCap } from 'lucide-react';
+import { X, Home, Beaker as BeakerIcon, Lock, CheckCircle, Play, Volume2, VolumeX, GraduationCap, ArrowRight } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
 import { PedagogicalLabel } from '../components/ui/PedagogicalLabel';
 import { useSound } from '../hooks/useSound';
@@ -26,6 +26,17 @@ const getTopicFromLevelIndex = (levelIndex: number): number => {
   if (levelIndex < 12) return 2;
   if (levelIndex < 18) return 3;
   return 4;
+};
+
+// Helper to get the first level index for a topic
+const getFirstLevelOfTopic = (topicNumber: number): number => {
+  switch (topicNumber) {
+    case 1: return 0;   // Basic fractions: levels 0-5
+    case 2: return 6;   // Practice & comparison: levels 6-11
+    case 3: return 12;  // Adding fractions: levels 12-17
+    case 4: return 18;  // Challenges: levels 18-23
+    default: return 0;
+  }
 };
 
 export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
@@ -142,10 +153,13 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
     playClick();
 
     // If they were re-watching, go back to level select
-    // Otherwise, proceed to lesson intro for their first time
+    // Otherwise, proceed to lesson intro for the FIRST LEVEL of this topic
     if (wasAlreadyLearned) {
       setShowLevelSelect(true);
     } else {
+      // Set to the first level of the topic they just learned
+      const firstLevelOfTopic = getFirstLevelOfTopic(currentLearningTopic);
+      setCurrentLevelIndex(firstLevelOfTopic);
       setShowLessonIntro(true);
     }
   };
@@ -162,10 +176,13 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
     setShowLearningMode(false);
 
     // If they were re-watching (already learned), go back to level select
-    // Otherwise, proceed to lesson intro for their first time
+    // Otherwise, proceed to lesson intro for the FIRST LEVEL of this topic
     if (wasAlreadyLearned) {
       setShowLevelSelect(true);
     } else {
+      // Set to the first level of the topic they just learned
+      const firstLevelOfTopic = getFirstLevelOfTopic(currentLearningTopic);
+      setCurrentLevelIndex(firstLevelOfTopic);
       setShowLessonIntro(true);
     }
   };
@@ -571,6 +588,14 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
           <button
             onClick={() => setShowLevelSelect(true)}
             className="p-3 rounded-full bg-white/5 border border-white/10 text-white/50 hover:bg-white/10 hover:text-white transition-all shadow-lg backdrop-blur-md"
+            title="חזרה לשלבים"
+          >
+             <ArrowRight size={24} />
+          </button>
+          <button
+            onClick={() => onNavigate(RoomType.LOBBY)}
+            className="p-3 rounded-full bg-white/5 border border-white/10 text-white/50 hover:bg-white/10 hover:text-white transition-all shadow-lg backdrop-blur-md"
+            title="חזרה לבית"
           >
              <Home size={24} />
           </button>
@@ -615,15 +640,15 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
       </header>
 
       {/* --- Main Game Area --- */}
-      <div className="w-full max-w-5xl flex-1 flex flex-col-reverse md:flex-row items-center justify-center gap-6 md:gap-16 relative z-0 min-h-0 overflow-visible md:overflow-hidden">
-        
+      <div className="w-full max-w-5xl flex-1 flex flex-col-reverse md:flex-row items-center justify-center gap-4 md:gap-16 relative z-0 min-h-0 pb-4 md:pb-0">
+
         {/* --- RIGHT COL: Beaker --- */}
-        <motion.div 
-            className="flex-[2] flex justify-center items-center h-full relative"
+        <motion.div
+            className="flex-[2] flex justify-center items-center relative shrink-0"
             animate={{ x: shake % 2 === 0 ? 0 : [-8, 8, -8, 8, 0] }}
             transition={{ duration: 0.4 }}
         >
-            <div className="relative scale-75 md:scale-100">
+            <div className="relative scale-[0.6] md:scale-100">
                 <div className="hidden md:block">
                     <PedagogicalLabel
                         text="שיקוי מלא"

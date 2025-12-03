@@ -47,8 +47,8 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
       onAnimationComplete={() => {
-        // Auto-dismiss after animation
-        setTimeout(onComplete, 2000);
+        // Auto-dismiss after animation - give users time to read
+        setTimeout(onComplete, 3500);
       }}
     >
       {/* Background glow */}
