@@ -20,14 +20,18 @@ interface LabRoomProps {
 const SNAP_TOLERANCE = 0.05; // 5% tolerance for "Radio Tuning"
 
 export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
-  const { user, theme } = useUser();
+  const { user, theme, completeLevel } = useUser();
   const { playSuccess, playError, playTick, playClick } = useSound();
 
   // --- Level Selection State ---
   const [showLevelSelect, setShowLevelSelect] = useState(true);
   const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
   const [showLessonIntro, setShowLessonIntro] = useState(false);
-  const [completedLevels, setCompletedLevels] = useState<string[]>([]);
+
+  // Get completed levels from user progress (persisted in localStorage)
+  // Filter to only include lab levels (those starting with 'frac_')
+  const allCompletedLevels = user?.progress?.completedLevels || [];
+  const completedLabLevels = allCompletedLevels.filter(id => id.startsWith('frac_'));
 
   // Get current level from curriculum
   const currentLevel = LAB_CURRICULUM[currentLevelIndex];
@@ -63,8 +67,8 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
   // --- Logic ---
 
   const handleLevelComplete = useCallback(() => {
-    // Mark level as completed
-    setCompletedLevels(prev => [...prev, currentLevel.id]);
+    // Mark level as completed in global context (saves to localStorage)
+    completeLevel(currentLevel.id, 10);
 
     // Check if there's a next level
     if (currentLevelIndex < LAB_CURRICULUM.length - 1) {
@@ -86,7 +90,7 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
         setShowParticles(false);
       }, 2500);
     }
-  }, [currentLevelIndex, currentLevel.id]);
+  }, [currentLevelIndex, currentLevel.id, completeLevel]);
 
   const selectLevel = (index: number) => {
     setCurrentLevelIndex(index);
@@ -241,9 +245,9 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
         {/* Level Grid */}
         <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 w-full max-w-3xl px-2">
           {LAB_CURRICULUM.map((level, idx) => {
-            const isCompleted = completedLevels.includes(level.id);
-            const isLocked = idx > 0 && !completedLevels.includes(LAB_CURRICULUM[idx - 1].id) && idx > completedLevels.length;
-            const isNext = idx === completedLevels.length;
+            const isCompleted = completedLabLevels.includes(level.id);
+            const isLocked = idx > 0 && !completedLabLevels.includes(LAB_CURRICULUM[idx - 1].id) && idx > completedLabLevels.length;
+            const isNext = idx === completedLabLevels.length;
 
             return (
               <motion.button
@@ -286,7 +290,7 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
           transition={{ delay: 0.5 }}
           className="relative z-10 mt-8 text-center text-white/50 text-sm"
         >
-          {completedLevels.length} / {LAB_CURRICULUM.length} שלבים הושלמו
+          {completedLabLevels.length} / {LAB_CURRICULUM.length} שלבים הושלמו
         </motion.div>
       </div>
     );
