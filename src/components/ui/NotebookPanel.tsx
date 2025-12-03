@@ -16,7 +16,7 @@ export const NotebookPanel: React.FC<NotebookPanelProps> = ({ show, messages, ti
           animate={{ x: 0, rotate: -2 }}
           exit={{ x: 600, rotate: 10 }}
           transition={{ type: "spring", stiffness: 100, damping: 20 }}
-          className="fixed right-4 top-24 bottom-24 w-72 md:w-96 bg-[#f8fafc] shadow-2xl z-[9999] rounded-sm overflow-hidden transform origin-bottom-right"
+          className="fixed right-4 top-24 bottom-24 w-72 md:w-96 bg-[#f8fafc] shadow-2xl z-[150] rounded-sm overflow-hidden transform origin-bottom-right hidden md:block"
           style={{
             // Graph Paper Pattern
             backgroundImage: `
