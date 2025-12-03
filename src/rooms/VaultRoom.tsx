@@ -19,24 +19,24 @@ interface VaultRoomProps {
 const LEVEL_INTROS: Record<string, { title: string; explanation: string; exampleBefore: string; exampleAfter: string; tip: string }> = {
     'lvl_zero_1': {
         title: 'מלכודת האפס',
-        explanation: 'כשכותבים מספר, כל ספרה יושבת במקום שלה. אם אין מאות - שמים אפס!',
+        explanation: 'יש מספרים שמנסים לבלבל אותנו! הם מחביאים אפסים באמצע.',
         exampleBefore: 'שלושת אלפים וחמישים',
         exampleAfter: '3050',
-        tip: 'שים לב: "חמישים" זה 50. האפס במאות שומר על המקום!'
+        tip: 'חמישים = 50 (חמש עשרות). אז איפה המאות? אין! לכן שמים 0.'
     },
     'lvl_zero_2': {
         title: 'מלכודת האפס - שלב 2',
-        explanation: 'עכשיו עם מספרים יותר גדולים! כל מקום ריק צריך אפס.',
+        explanation: 'המספרים הערמומיים חוזרים! הפעם הם מחביאים עוד יותר אפסים.',
         exampleBefore: 'ארבעים אלף וארבע',
         exampleAfter: '40004',
-        tip: 'ספור את האפסים באמצע - יש שלושה!'
+        tip: 'ארבעים אלף = 40,000. וארבע = 4. מה באמצע? שלושה אפסים!'
     },
     'lvl_sub_1': {
         title: 'חיסור עם פריטה',
-        explanation: 'כשהספרה למעלה קטנה מלמטה - לוחצים עליה כדי לפרוט מהשכן.',
+        explanation: 'לפעמים הספרה למעלה קטנה מדי. אז היא צריכה ללוות מהשכן!',
         exampleBefore: '452 - 138',
         exampleAfter: '314',
-        tip: 'לחץ על הספרה כדי לפרוט - היא תיתן 10 לשכן!'
+        tip: '2 פחות 8? לא מספיק! לחץ על ה-5 והוא ייתן 10 לשכן שלו.'
     }
 };
 
@@ -175,9 +175,6 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
         exampleAfter: '',
         tip: 'בהצלחה!'
     };
-
-    // DEBUG: Log state
-    console.log('🔍 VaultRoom Debug:', { showIntro, isVaultOpen, levelId: currentLevel.id, introData });
 
     return (
         <div className="relative w-full h-full flex flex-col items-center bg-neutral-900 overflow-hidden select-none font-mono text-amber-500" dir="rtl">
