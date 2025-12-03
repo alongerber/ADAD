@@ -127,12 +127,15 @@ const LEVEL_INTROS: Record<string, { title: string; narrative: string; explanati
 };
 
 export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
-    const { user } = useUser();
+    const { user, completeLevel, updateProgress } = useUser();
     const { isIdle, resetTimer } = useIdleScaffold();
     const { addMessage, setMessages, setIsOpen } = useNotebook();
     const { playSuccess, playError, playTick, playBorrow, playCelebrate, playClick } = useSound();
 
-    const [levelIndex, setLevelIndex] = useState(0);
+    // Load saved progress or start from beginning
+    const [levelIndex, setLevelIndex] = useState(() => {
+        return user?.progress?.currentVaultLevel || 0;
+    });
     const currentLevel: Level = VAULT_CURRICULUM[levelIndex];
 
     const [minuend, setMinuend] = useState<number[]>([]);
@@ -242,8 +245,12 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
 
     const nextLevel = () => {
         if (levelIndex < VAULT_CURRICULUM.length - 1) {
-            setLevelIndex(prev => prev + 1);
+            const nextIndex = levelIndex + 1;
+            setLevelIndex(nextIndex);
+            // Save progress
+            updateProgress({ currentVaultLevel: nextIndex });
         } else {
+            // Completed all levels - return to lobby
             onNavigate(RoomType.LOBBY);
         }
     };
@@ -300,6 +307,8 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
             setIsVaultOpen(true);
             const gender = user?.gender || 'boy';
             addMessage(getCodeCrackedMessage(gender, user?.name));
+            // Save level completion
+            completeLevel(currentLevel.id, 10);
         }
     };
 

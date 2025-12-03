@@ -8,12 +8,19 @@ import { User, Sparkles, Rocket, Trophy, Check, GraduationCap, TreePine, Fish, C
 export const OnboardingWizard: React.FC = () => {
   const { updateUser } = useUser();
   const [step, setStep] = useState(0);
-  
+
   // Temporary state before saving
   const [tempProfile, setTempProfile] = useState<UserProfile>({
     name: '',
     gender: 'boy', // Default
-    theme: 'scifi' // Default
+    theme: 'scifi', // Default
+    progress: {
+      completedLevels: [],
+      currentVaultLevel: 0,
+      totalScore: 0,
+      streak: 0,
+      lastPlayedAt: null,
+    }
   });
 
   const handleNext = () => setStep(prev => prev + 1);
