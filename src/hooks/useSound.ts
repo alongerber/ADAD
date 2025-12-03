@@ -33,18 +33,22 @@ export const initAudio = (): void => {
   const ctx = getAudioContext();
   if (!ctx) return;
 
-  // Create and immediately stop a silent oscillator to unlock audio
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  gain.gain.value = 0; // Silent
-  osc.connect(gain);
-  gain.connect(ctx.destination);
-  osc.start();
-  osc.stop(ctx.currentTime + 0.001);
-
-  // Resume if suspended
+  // Resume context first (important for iOS Safari)
   if (ctx.state === 'suspended') {
-    ctx.resume();
+    ctx.resume().catch(() => {});
+  }
+
+  // Create and immediately stop a silent oscillator to unlock audio
+  try {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    gain.gain.value = 0.001; // Nearly silent but not zero (some browsers ignore zero)
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.01);
+  } catch (e) {
+    console.warn('Failed to unlock audio:', e);
   }
 
   isInitialized = true;
@@ -233,20 +237,33 @@ export const playSound = (type: SoundType): void => {
 
     // Resume context if suspended (browser autoplay policy)
     if (ctx.state === 'suspended') {
-      ctx.resume();
+      ctx.resume().then(() => {
+        // Play sound after resuming
+        playSoundInternal(ctx, type);
+      }).catch(() => {});
+      return;
     }
 
-    // Throttle tick sounds
-    if (type === 'tick') {
-      const now = Date.now();
-      if (now - lastTickTime < TICK_THROTTLE) return;
-      lastTickTime = now;
-    }
-
-    sounds[type](ctx);
+    playSoundInternal(ctx, type);
   } catch (e) {
     // Silently fail - sound is not critical
     console.warn('Sound playback failed:', e);
+  }
+};
+
+// Internal function to actually play the sound
+const playSoundInternal = (ctx: AudioContext, type: SoundType): void => {
+  // Throttle tick sounds
+  if (type === 'tick') {
+    const now = Date.now();
+    if (now - lastTickTime < TICK_THROTTLE) return;
+    lastTickTime = now;
+  }
+
+  try {
+    sounds[type](ctx);
+  } catch (e) {
+    console.warn('Sound synthesis failed:', e);
   }
 };
 

@@ -24,6 +24,7 @@ interface UserContextType {
   completeTopic: (topicId: string) => void;
   hasLearnedTopic: (topicId: string) => boolean;
   clearUser: () => void;
+  resetProgress: () => void;
   theme: typeof THEME_CONFIG['scifi']; // Helper to get current theme config
   newlyUnlockedAchievements: Achievement[];
   clearNewAchievements: () => void;
@@ -175,11 +176,23 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('biss_user_profile');
   };
 
+  const resetProgress = useCallback(() => {
+    if (!user) return;
+
+    const newUser = {
+      ...user,
+      progress: DEFAULT_PROGRESS,
+    };
+    setUser(newUser);
+    localStorage.setItem('biss_user_profile', JSON.stringify(newUser));
+    setNewlyUnlockedAchievements([]);
+  }, [user]);
+
   // Default to SciFi if no user or weird state
   const currentThemeConfig = user && THEME_CONFIG[user.theme] ? THEME_CONFIG[user.theme] : THEME_CONFIG['scifi'];
 
   return (
-    <UserContext.Provider value={{ user, updateUser, updateProgress, completeLevel, completeTopic, hasLearnedTopic, clearUser, theme: currentThemeConfig, newlyUnlockedAchievements, clearNewAchievements, isMuted, toggleMute }}>
+    <UserContext.Provider value={{ user, updateUser, updateProgress, completeLevel, completeTopic, hasLearnedTopic, clearUser, resetProgress, theme: currentThemeConfig, newlyUnlockedAchievements, clearNewAchievements, isMuted, toggleMute }}>
       {children}
     </UserContext.Provider>
   );

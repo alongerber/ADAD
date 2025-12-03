@@ -1,8 +1,9 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   X, Star, Flame, Trophy, Calendar, Target, Beaker, Lock,
-  TrendingUp, Award, Clock, CheckCircle, AlertCircle
+  TrendingUp, Award, Clock, CheckCircle, AlertCircle,
+  MessageCircle, RotateCcw, HelpCircle, ExternalLink
 } from 'lucide-react';
 import { useUser } from '../../contexts/UserContext';
 import { LAB_CURRICULUM, VAULT_CURRICULUM, LAB_TOPICS, VAULT_TOPICS } from '../../data/curriculum';
@@ -13,8 +14,10 @@ interface ParentDashboardProps {
 }
 
 export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onClose }) => {
-  const { user } = useUser();
+  const { user, resetProgress } = useUser();
   const progress = user?.progress;
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showHowToUse, setShowHowToUse] = useState(false);
 
   if (!progress) {
     return null;
@@ -310,8 +313,173 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onClose }) => 
               <li>• השתמשו בכפתור ההשתקה אם יש צורך בסביבה שקטה</li>
             </ul>
           </div>
+
+          {/* Action Buttons */}
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-3">
+            {/* How to Use */}
+            <button
+              onClick={() => setShowHowToUse(true)}
+              className="flex items-center justify-center gap-3 p-4 bg-blue-500/20 border border-blue-500/30 rounded-xl hover:bg-blue-500/30 transition-all"
+            >
+              <HelpCircle size={20} className="text-blue-400" />
+              <span className="text-blue-300 font-bold">איך משתמשים?</span>
+            </button>
+
+            {/* Feedback Button */}
+            <a
+              href="mailto:feedback@matmati-bis.app?subject=משוב על מתמטי-ביס"
+              className="flex items-center justify-center gap-3 p-4 bg-green-500/20 border border-green-500/30 rounded-xl hover:bg-green-500/30 transition-all"
+            >
+              <MessageCircle size={20} className="text-green-400" />
+              <span className="text-green-300 font-bold">שלח משוב</span>
+              <ExternalLink size={14} className="text-green-400/50" />
+            </a>
+
+            {/* Reset Progress */}
+            <button
+              onClick={() => setShowResetConfirm(true)}
+              className="flex items-center justify-center gap-3 p-4 bg-red-500/20 border border-red-500/30 rounded-xl hover:bg-red-500/30 transition-all"
+            >
+              <RotateCcw size={20} className="text-red-400" />
+              <span className="text-red-300 font-bold">אפס התקדמות</span>
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Reset Confirmation Modal */}
+      <AnimatePresence>
+        {showResetConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[300] bg-black/80 flex items-center justify-center p-4"
+            onClick={() => setShowResetConfirm(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-slate-800 border border-red-500/30 rounded-2xl p-6 max-w-md w-full"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-3 rounded-full bg-red-500/20">
+                  <AlertCircle size={24} className="text-red-400" />
+                </div>
+                <h3 className="text-xl font-bold text-white">לאפס התקדמות?</h3>
+              </div>
+              <p className="text-white/70 mb-6">
+                פעולה זו תמחק את כל ההתקדמות, הניקוד וההישגים של {user?.name}.
+                <br />
+                <span className="text-red-400 font-bold">לא ניתן לבטל פעולה זו!</span>
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowResetConfirm(false)}
+                  className="flex-1 py-3 px-4 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold transition-all"
+                >
+                  ביטול
+                </button>
+                <button
+                  onClick={() => {
+                    resetProgress();
+                    setShowResetConfirm(false);
+                    onClose();
+                  }}
+                  className="flex-1 py-3 px-4 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold transition-all"
+                >
+                  כן, אפס הכל
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* How to Use Modal */}
+      <AnimatePresence>
+        {showHowToUse && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[300] bg-black/80 flex items-center justify-center p-4 overflow-y-auto"
+            onClick={() => setShowHowToUse(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-slate-800 border border-blue-500/30 rounded-2xl p-6 max-w-lg w-full my-8"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-full bg-blue-500/20">
+                    <HelpCircle size={24} className="text-blue-400" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">איך משתמשים?</h3>
+                </div>
+                <button
+                  onClick={() => setShowHowToUse(false)}
+                  className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all"
+                >
+                  <X size={20} className="text-white" />
+                </button>
+              </div>
+
+              <div className="space-y-4 text-white/80">
+                <div className="p-4 bg-white/5 rounded-xl">
+                  <h4 className="font-bold text-cyan-300 mb-2 flex items-center gap-2">
+                    <Beaker size={18} /> מעבדת השברים
+                  </h4>
+                  <p className="text-sm">
+                    תרגול שברים עם כלי מעבדה חזותי. הילד לומד על ידי מילוי כוס מדידה
+                    ומסדר ספרות לתוך תשובות. יש לימוד מונפש לפני כל נושא חדש.
+                  </p>
+                </div>
+
+                <div className="p-4 bg-white/5 rounded-xl">
+                  <h4 className="font-bold text-amber-300 mb-2 flex items-center gap-2">
+                    <Lock size={18} /> הכספת
+                  </h4>
+                  <p className="text-sm">
+                    תרגול מספרים גדולים וחיסור עם פריטה. הילד פותח כספת על ידי
+                    הכנסת ספרות בסדר הנכון. מאתגר את הזיכרון והבנת ערך המקום.
+                  </p>
+                </div>
+
+                <div className="p-4 bg-white/5 rounded-xl">
+                  <h4 className="font-bold text-purple-300 mb-2">טיפים חשובים</h4>
+                  <ul className="text-sm space-y-2">
+                    <li>• <span className="text-green-400">לימוד מונפש</span> - לפני כל נושא חדש יש הסבר חזותי. מומלץ לצפות יחד!</li>
+                    <li>• <span className="text-amber-400">רצף יומי</span> - עודדו משחק של כמה דקות כל יום</li>
+                    <li>• <span className="text-cyan-400">הישגים</span> - חגגו יחד כשנפתחים הישגים</li>
+                    <li>• <span className="text-red-400">השתקה</span> - לחצו על כפתור הרמקול בפינה למצב שקט</li>
+                  </ul>
+                </div>
+
+                <div className="p-4 bg-gradient-to-r from-pink-500/20 to-purple-500/20 border border-pink-500/30 rounded-xl">
+                  <h4 className="font-bold text-pink-300 mb-2">מתקשים? נתקעים?</h4>
+                  <p className="text-sm">
+                    אם הילד מתקשה בשלב מסוים, אל דאגה! עברו לנושא אחר וחזרו מאוחר יותר.
+                    ניתן גם לאפס התקדמות ולהתחיל מחדש בכל עת.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowHowToUse(false)}
+                className="w-full mt-6 py-3 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-bold transition-all"
+              >
+                הבנתי!
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

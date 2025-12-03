@@ -873,3 +873,407 @@ export const createFractionLearningSlides = (topicNumber: number): LearningSlide
       return [];
   }
 };
+
+// =============================================
+// Pre-built Learning Content for Vault (Numbers & Subtraction)
+// =============================================
+
+// Animated number display component
+const AnimatedNumber: React.FC<{ number: string; highlight?: number[] }> = ({ number, highlight = [] }) => {
+  return (
+    <div className="flex gap-1 justify-center" dir="ltr">
+      {number.split('').map((digit, i) => (
+        <motion.div
+          key={i}
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: i * 0.1, type: "spring" }}
+          className={`w-12 h-14 md:w-16 md:h-18 flex items-center justify-center rounded-lg text-3xl md:text-4xl font-mono font-black ${
+            highlight.includes(i)
+              ? 'bg-amber-500/30 border-2 border-amber-500 text-amber-400'
+              : 'bg-white/10 border-2 border-white/20 text-white'
+          }`}
+        >
+          {digit}
+        </motion.div>
+      ))}
+    </div>
+  );
+};
+
+// Place value labels
+const PlaceValueLabels: React.FC<{ length: number }> = ({ length }) => {
+  const labels = ['יחידות', 'עשרות', 'מאות', 'אלפים', 'עשרות אלפים'];
+  const relevantLabels = labels.slice(0, length).reverse();
+
+  return (
+    <div className="flex gap-1 justify-center text-xs text-white/50" dir="ltr">
+      {relevantLabels.map((label, i) => (
+        <div key={i} className="w-12 md:w-16 text-center">
+          {label}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// Subtraction visualization
+const SubtractionDisplay: React.FC<{ top: number[]; bottom: number[]; result?: number[]; borrowFrom?: number }> = ({
+  top, bottom, result, borrowFrom
+}) => {
+  return (
+    <div className="flex flex-col items-center gap-2 font-mono" dir="ltr">
+      {/* Top number */}
+      <div className="flex gap-1">
+        {top.map((digit, i) => (
+          <motion.div
+            key={`top-${i}`}
+            className={`w-10 h-12 flex items-center justify-center rounded-lg text-2xl font-black ${
+              borrowFrom === i
+                ? 'bg-red-500/30 border-2 border-red-500 text-red-400'
+                : 'bg-white/10 border border-white/20 text-white'
+            }`}
+          >
+            {digit}
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Minus sign and bottom number */}
+      <div className="flex gap-1 items-center">
+        <span className="text-2xl text-white/50 w-6">−</span>
+        {bottom.map((digit, i) => (
+          <div
+            key={`bottom-${i}`}
+            className="w-10 h-12 flex items-center justify-center rounded-lg text-2xl font-black bg-white/5 border border-white/10 text-white/80"
+          >
+            {digit}
+          </div>
+        ))}
+      </div>
+
+      {/* Line */}
+      <div className="w-full h-0.5 bg-white/30 my-1" />
+
+      {/* Result */}
+      {result && (
+        <div className="flex gap-1">
+          <span className="w-6" />
+          {result.map((digit, i) => (
+            <motion.div
+              key={`result-${i}`}
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: i * 0.1 }}
+              className="w-10 h-12 flex items-center justify-center rounded-lg text-2xl font-black bg-green-500/30 border-2 border-green-500 text-green-400"
+            >
+              {digit}
+            </motion.div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export const createVaultLearningSlides = (topicNumber: number): LearningSlide[] => {
+  switch (topicNumber) {
+    case 1: // כתיבת מספרים
+      return [
+        {
+          id: 'intro',
+          title: 'מספרים מסביבנו',
+          content: (
+            <div className="flex flex-col items-center gap-6 text-center">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", delay: 0.2 }}
+                className="text-6xl"
+              >
+                🔢
+              </motion.div>
+              <h2 className="text-2xl md:text-3xl font-bold text-white">מספרים מסביבנו</h2>
+              <p className="text-lg text-white/80 max-w-md">
+                מספרים נמצאים בכל מקום! בטלפון, בכתובת, במחיר של ממתק...
+              </p>
+              <p className="text-base text-white/60">
+                בוא נלמד איך לכתוב מספרים בספרות!
+              </p>
+            </div>
+          )
+        },
+        {
+          id: 'place_value',
+          title: 'ערך מקום',
+          content: (
+            <div className="flex flex-col items-center gap-6 text-center">
+              <h2 className="text-2xl md:text-3xl font-bold text-white">כל ספרה יושבת במקום שלה</h2>
+              <AnimatedNumber number="425" />
+              <PlaceValueLabels length={3} />
+              <div className="grid grid-cols-3 gap-2 mt-4 text-sm">
+                <div className="p-2 bg-white/5 rounded-lg">
+                  <div className="text-amber-400 font-bold">4</div>
+                  <div className="text-white/60">מאות</div>
+                </div>
+                <div className="p-2 bg-white/5 rounded-lg">
+                  <div className="text-amber-400 font-bold">2</div>
+                  <div className="text-white/60">עשרות</div>
+                </div>
+                <div className="p-2 bg-white/5 rounded-lg">
+                  <div className="text-amber-400 font-bold">5</div>
+                  <div className="text-white/60">יחידות</div>
+                </div>
+              </div>
+            </div>
+          )
+        },
+        {
+          id: 'reading',
+          title: 'קוראים מילים',
+          content: (
+            <div className="flex flex-col items-center gap-6 text-center">
+              <h2 className="text-xl md:text-2xl font-bold text-white">איך כותבים "ארבע מאות עשרים וחמש"?</h2>
+              <div className="space-y-4 text-right max-w-md">
+                <motion.div
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="p-3 bg-white/5 rounded-lg flex items-center gap-3"
+                >
+                  <span className="text-2xl font-mono font-bold text-amber-400">4</span>
+                  <span className="text-white/80">← ארבע מאות</span>
+                </motion.div>
+                <motion.div
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="p-3 bg-white/5 rounded-lg flex items-center gap-3"
+                >
+                  <span className="text-2xl font-mono font-bold text-amber-400">2</span>
+                  <span className="text-white/80">← עשרים</span>
+                </motion.div>
+                <motion.div
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.6 }}
+                  className="p-3 bg-white/5 rounded-lg flex items-center gap-3"
+                >
+                  <span className="text-2xl font-mono font-bold text-amber-400">5</span>
+                  <span className="text-white/80">← וחמש</span>
+                </motion.div>
+              </div>
+              <AnimatedNumber number="425" />
+            </div>
+          )
+        },
+        {
+          id: 'thousands',
+          title: 'אלפים',
+          content: (
+            <div className="flex flex-col items-center gap-6 text-center">
+              <h2 className="text-2xl md:text-3xl font-bold text-white">מספרים גדולים יותר!</h2>
+              <p className="text-white/80">עכשיו יש לנו גם אלפים:</p>
+              <AnimatedNumber number="1836" />
+              <PlaceValueLabels length={4} />
+              <div className="p-4 bg-purple-500/20 rounded-xl border border-purple-500/30">
+                <p className="text-purple-300 text-sm">
+                  <span className="font-bold">אלף שמונה מאות שלושים ושש</span><br/>
+                  1 אלף + 8 מאות + 3 עשרות + 6 יחידות
+                </p>
+              </div>
+            </div>
+          )
+        },
+        {
+          id: 'zero_trap',
+          title: 'מלכודת האפס!',
+          content: (
+            <div className="flex flex-col items-center gap-6 text-center">
+              <motion.div
+                animate={{ rotate: [0, 10, -10, 0] }}
+                transition={{ duration: 0.5, repeat: 2 }}
+                className="text-5xl"
+              >
+                ⚠️
+              </motion.div>
+              <h2 className="text-2xl md:text-3xl font-bold text-white">זהירות מהאפס!</h2>
+              <p className="text-white/80 max-w-md">
+                כשאין ספרה במקום מסוים, שמים <span className="text-amber-400 font-bold">0</span>!
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center gap-4 justify-center">
+                  <span className="text-white/60">שלושת אלפים וחמישים =</span>
+                  <AnimatedNumber number="3050" highlight={[1, 3]} />
+                </div>
+                <p className="text-amber-400 text-sm">
+                  אין מאות! אין יחידות! שמים 0 במקומם.
+                </p>
+              </div>
+            </div>
+          )
+        },
+        {
+          id: 'summary',
+          title: 'סיכום',
+          content: (
+            <div className="flex flex-col items-center gap-6 text-center">
+              <span className="text-5xl">🎓</span>
+              <h2 className="text-2xl font-bold text-white">מעולה!</h2>
+              <div className="text-right space-y-2 bg-white/5 p-4 rounded-xl max-w-md">
+                <p className="text-white/80">✓ כל ספרה יושבת במקום שלה</p>
+                <p className="text-white/80">✓ קוראים מימין לשמאל: אלפים → מאות → עשרות → יחידות</p>
+                <p className="text-white/80">✓ אין ספרה? שמים 0!</p>
+              </div>
+              <p className="text-amber-400 font-bold">בוא נתרגל בכספת!</p>
+            </div>
+          )
+        }
+      ];
+
+    case 2: // חיסור במאונך
+      return [
+        {
+          id: 'intro',
+          title: 'חיסור במאונך',
+          content: (
+            <div className="flex flex-col items-center gap-6 text-center">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", delay: 0.2 }}
+                className="text-6xl"
+              >
+                ➖
+              </motion.div>
+              <h2 className="text-2xl md:text-3xl font-bold text-white">חיסור במאונך</h2>
+              <p className="text-lg text-white/80 max-w-md">
+                נלמד לחסר מספרים גדולים בעזרת טכניקה מיוחדת!
+              </p>
+            </div>
+          )
+        },
+        {
+          id: 'simple',
+          title: 'חיסור פשוט',
+          content: (
+            <div className="flex flex-col items-center gap-6 text-center">
+              <h2 className="text-xl md:text-2xl font-bold text-white">מתחילים פשוט</h2>
+              <SubtractionDisplay
+                top={[8, 9]}
+                bottom={[3, 4]}
+                result={[5, 5]}
+              />
+              <div className="p-4 bg-green-500/20 rounded-xl border border-green-500/30 max-w-md">
+                <p className="text-green-300">
+                  מחסרים כל עמודה בנפרד!<br/>
+                  <span className="font-mono">9 - 4 = 5</span> ואז <span className="font-mono">8 - 3 = 5</span>
+                </p>
+              </div>
+            </div>
+          )
+        },
+        {
+          id: 'problem',
+          title: 'בעיה...',
+          content: (
+            <div className="flex flex-col items-center gap-6 text-center">
+              <h2 className="text-xl md:text-2xl font-bold text-white">אבל מה עושים פה?</h2>
+              <SubtractionDisplay
+                top={[4, 3]}
+                bottom={[1, 5]}
+                borrowFrom={1}
+              />
+              <div className="p-4 bg-red-500/20 rounded-xl border border-red-500/30 max-w-md">
+                <p className="text-red-300">
+                  <span className="font-mono">3 - 5 = ?</span><br/>
+                  אי אפשר! 3 קטן מ-5!<br/>
+                  <span className="text-amber-300 font-bold">מה עושים?</span>
+                </p>
+              </div>
+            </div>
+          )
+        },
+        {
+          id: 'borrowing',
+          title: 'פריטה!',
+          content: (
+            <div className="flex flex-col items-center gap-6 text-center">
+              <motion.div
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 1, repeat: Infinity }}
+                className="text-5xl"
+              >
+                💡
+              </motion.div>
+              <h2 className="text-2xl md:text-3xl font-bold text-amber-400">פריטה!</h2>
+              <p className="text-white/80 max-w-md">
+                "לווים" 10 מהשכן השמאלי!
+              </p>
+              <div className="space-y-2 text-right bg-white/5 p-4 rounded-xl max-w-md">
+                <p className="text-white/80">
+                  <span className="text-red-400">4</span>3 פחות 15
+                </p>
+                <p className="text-white/80">
+                  לוקחים 1 מה-4 (נשאר <span className="text-amber-400">3</span>)
+                </p>
+                <p className="text-white/80">
+                  נותנים 10 ל-3 (הופך ל-<span className="text-green-400">13</span>)
+                </p>
+                <p className="text-amber-400 font-bold mt-2">
+                  עכשיו: 13 - 5 = 8 ✓
+                </p>
+              </div>
+            </div>
+          )
+        },
+        {
+          id: 'result',
+          title: 'התוצאה',
+          content: (
+            <div className="flex flex-col items-center gap-6 text-center">
+              <h2 className="text-xl md:text-2xl font-bold text-white">43 - 15 = ?</h2>
+              <div className="space-y-3 text-right max-w-md">
+                <div className="p-3 bg-white/5 rounded-lg">
+                  <span className="text-white/80">שלב 1: </span>
+                  <span className="text-amber-400">פורטים - 4 הופך ל-3, 3 הופך ל-13</span>
+                </div>
+                <div className="p-3 bg-white/5 rounded-lg">
+                  <span className="text-white/80">שלב 2: </span>
+                  <span className="text-green-400">13 - 5 = 8</span>
+                </div>
+                <div className="p-3 bg-white/5 rounded-lg">
+                  <span className="text-white/80">שלב 3: </span>
+                  <span className="text-green-400">3 - 1 = 2</span>
+                </div>
+              </div>
+              <SubtractionDisplay
+                top={[4, 3]}
+                bottom={[1, 5]}
+                result={[2, 8]}
+              />
+            </div>
+          )
+        },
+        {
+          id: 'summary',
+          title: 'סיכום',
+          content: (
+            <div className="flex flex-col items-center gap-6 text-center">
+              <span className="text-5xl">🏆</span>
+              <h2 className="text-2xl font-bold text-white">למדת פריטה!</h2>
+              <div className="text-right space-y-2 bg-white/5 p-4 rounded-xl max-w-md">
+                <p className="text-white/80">✓ מחסרים עמודה עמודה מימין לשמאל</p>
+                <p className="text-white/80">✓ אם לא מספיק - פורטים מהשכן!</p>
+                <p className="text-white/80">✓ השכן נותן 10 ומאבד 1</p>
+              </div>
+              <p className="text-amber-400 font-bold">בוא נתרגל בכספת!</p>
+            </div>
+          )
+        }
+      ];
+
+    default:
+      return [];
+  }
+};
