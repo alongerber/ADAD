@@ -1,10 +1,147 @@
-export type LevelMode = 'vertical_math' | 'number_input';
+export type LevelMode = 'vertical_math' | 'number_input' | 'fraction_fill';
 
 export interface BaseLevel {
   id: string;
   mode: LevelMode;
   difficulty: number;
 }
+
+// ========================================
+// שברים - מעבדת השברים
+// ========================================
+
+export interface FractionLevel extends BaseLevel {
+  mode: 'fraction_fill';
+  targetNumerator: number;
+  targetDenominator: number;
+  title: string;
+  narrative: string;
+  explanation: string;
+  tip: string;
+  notebookHint: string;
+}
+
+export const LAB_CURRICULUM: FractionLevel[] = [
+  // ========================================
+  // שלב 1: הכרת שברים בסיסיים
+  // ========================================
+  {
+    id: 'frac_half',
+    mode: 'fraction_fill',
+    difficulty: 1,
+    targetNumerator: 1,
+    targetDenominator: 2,
+    title: 'חצי שיקוי',
+    narrative: '🧪 המדען צריך בדיוק חצי בקבוק שיקוי!',
+    explanation: 'חצי זה כשמחלקים משהו ל-2 חלקים שווים ולוקחים חלק אחד.',
+    tip: 'חצי = ½ = חלק אחד מתוך שניים',
+    notebookHint: 'מלא את הבקבוק עד לחצי!'
+  },
+  {
+    id: 'frac_quarter',
+    mode: 'fraction_fill',
+    difficulty: 2,
+    targetNumerator: 1,
+    targetDenominator: 4,
+    title: 'רבע שיקוי',
+    narrative: '🔬 המתכון דורש רק רבע מהבקבוק!',
+    explanation: 'רבע זה כשמחלקים משהו ל-4 חלקים שווים ולוקחים חלק אחד.',
+    tip: 'רבע = ¼ = חלק אחד מתוך ארבעה',
+    notebookHint: 'רבע זה פחות מחצי!'
+  },
+  {
+    id: 'frac_three_quarters',
+    mode: 'fraction_fill',
+    difficulty: 3,
+    targetNumerator: 3,
+    targetDenominator: 4,
+    title: 'שלושה רבעים',
+    narrative: '⚗️ כמעט מלא! צריך שלושה רבעים!',
+    explanation: 'שלושה רבעים זה 3 חלקים מתוך 4.',
+    tip: '¾ = שלושה חלקים מתוך ארבעה = יותר מחצי!',
+    notebookHint: 'שלושה רבעים זה יותר מחצי אבל פחות משלם.'
+  },
+  {
+    id: 'frac_whole',
+    mode: 'fraction_fill',
+    difficulty: 4,
+    targetNumerator: 1,
+    targetDenominator: 1,
+    title: 'שיקוי מלא!',
+    narrative: '🌟 המשימה הגדולה: למלא את כל הבקבוק!',
+    explanation: 'שלם זה כשלוקחים את הכל - כל החלקים.',
+    tip: '1 שלם = כל הבקבוק מלא!',
+    notebookHint: 'מלא עד הסוף!'
+  },
+
+  // ========================================
+  // שלב 2: השוואת שברים
+  // ========================================
+  {
+    id: 'frac_compare_half_quarter',
+    mode: 'fraction_fill',
+    difficulty: 5,
+    targetNumerator: 1,
+    targetDenominator: 2,
+    title: 'מי יותר גדול?',
+    narrative: '🤔 חצי או רבע - מה יותר?',
+    explanation: 'כשהמכנה (למטה) יותר גדול, החלקים יותר קטנים!',
+    tip: '½ > ¼ כי חצי יותר גדול מרבע',
+    notebookHint: 'תחשוב: עוגה חתוכה ל-2 או ל-4?'
+  },
+  {
+    id: 'frac_two_quarters',
+    mode: 'fraction_fill',
+    difficulty: 6,
+    targetNumerator: 1,
+    targetDenominator: 2,
+    title: 'שברים שווים!',
+    narrative: '🎯 גלה את הסוד: שני רבעים שווים ל...',
+    explanation: '2/4 = 1/2 - שברים שונים יכולים להיות שווים!',
+    tip: 'שני רבעים = חצי = ½ = 2/4',
+    notebookHint: 'תמלא חצי - זה גם שני רבעים!'
+  },
+
+  // ========================================
+  // שלב 3: חיבור שברים פשוט
+  // ========================================
+  {
+    id: 'frac_add_quarters_1',
+    mode: 'fraction_fill',
+    difficulty: 7,
+    targetNumerator: 1,
+    targetDenominator: 2,
+    title: 'חיבור רבעים',
+    narrative: '➕ רבע ועוד רבע = ?',
+    explanation: 'כשמחברים שברים עם אותו מכנה, מחברים רק את המונים!',
+    tip: '¼ + ¼ = 2/4 = ½',
+    notebookHint: 'רבע + רבע = שני רבעים = חצי!'
+  },
+  {
+    id: 'frac_add_quarters_2',
+    mode: 'fraction_fill',
+    difficulty: 8,
+    targetNumerator: 3,
+    targetDenominator: 4,
+    title: 'עוד חיבור!',
+    narrative: '➕ חצי ועוד רבע = ?',
+    explanation: '½ = 2/4, אז ½ + ¼ = 2/4 + 1/4 = 3/4',
+    tip: 'קודם הופכים לאותו מכנה, אחר כך מחברים!',
+    notebookHint: 'חצי = שני רבעים. שני רבעים + רבע = ?'
+  }
+];
+
+// Topic descriptions for display
+export const VAULT_TOPICS = [
+  { icon: '🔢', title: 'כתיבת מספרים', levels: '1-6', description: 'ללמוד לכתוב מספרים במילים ובספרות' },
+  { icon: '➖', title: 'חיסור במאונך', levels: '7-12', description: 'חיסור עם פריטה ובלי פריטה' }
+];
+
+export const LAB_TOPICS = [
+  { icon: '½', title: 'הכרת שברים', levels: '1-4', description: 'חצי, רבע, שלושה רבעים ושלם' },
+  { icon: '⚖️', title: 'השוואת שברים', levels: '5-6', description: 'מי יותר גדול? שברים שווים' },
+  { icon: '➕', title: 'חיבור שברים', levels: '7-8', description: 'לחבר שברים עם אותו מכנה' }
+];
 
 export interface VerticalMathLevel extends BaseLevel {
   mode: 'vertical_math';

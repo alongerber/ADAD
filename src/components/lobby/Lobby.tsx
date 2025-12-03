@@ -4,7 +4,7 @@ import { useUser } from '../../contexts/UserContext';
 import { RoomType } from '../../types';
 import { Beaker, Lock, Calculator, Component, LogOut, Star, Flame, Trophy } from 'lucide-react';
 import { getTimeGreeting } from '../../utils/messages';
-import { VAULT_CURRICULUM } from '../../data/curriculum';
+import { VAULT_CURRICULUM, VAULT_TOPICS, LAB_TOPICS, LAB_CURRICULUM } from '../../data/curriculum';
 
 interface LobbyProps {
   onNavigate: (room: RoomType) => void;
@@ -33,7 +33,7 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
   };
 
   const getCardStyle = (isActive: boolean) => {
-    const base = "relative overflow-hidden rounded-3xl border-2 transition-all duration-300 flex flex-col items-center justify-center gap-4 p-6 h-64 w-full";
+    const base = "relative overflow-hidden rounded-2xl md:rounded-3xl border-2 transition-all duration-300 flex flex-col items-center justify-center gap-3 md:gap-4 p-4 md:p-6 h-44 md:h-64 w-full";
 
     if (!isActive) {
       return `${base} bg-black/40 border-white/5 opacity-50 grayscale cursor-not-allowed`;
@@ -59,7 +59,7 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
 
   // Specific style overrides for the Vault card (Gold/Amber theme)
   const getVaultCardStyle = () => {
-    const base = "relative overflow-hidden rounded-3xl border-2 transition-all duration-300 flex flex-col items-center justify-center gap-4 p-6 h-64 w-full";
+    const base = "relative overflow-hidden rounded-2xl md:rounded-3xl border-2 transition-all duration-300 flex flex-col items-center justify-center gap-3 md:gap-4 p-4 md:p-6 h-44 md:h-64 w-full";
     // Always Amber/Gold regardless of user theme, or blend it?
     // Let's stick to the prompt's implied "Vault" aesthetic but keep it cohesive. 
     // Actually, making it "Gold" distincts it as a special room.
@@ -95,7 +95,7 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
       </motion.div>
 
       {/* Cards Grid */}
-      <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl">
+      <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 w-full max-w-5xl">
         
         {/* CARD 1: FRACTIONS (Active) */}
         <motion.button
@@ -105,7 +105,7 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
           onClick={() => onNavigate(RoomType.LAB)}
           className={getCardStyle(true)}
         >
-           <div className={`p-6 rounded-full bg-white/10 backdrop-blur-md border border-white/20 ${
+           <div className={`p-3 md:p-6 rounded-full bg-white/10 backdrop-blur-md border border-white/20 ${
              user?.theme === 'pop' ? 'text-yellow-300' :
              user?.theme === 'sports' ? 'text-white' :
              user?.theme === 'nature' ? 'text-lime-300' :
@@ -113,10 +113,18 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
              user?.theme === 'candy' ? 'text-rose-300' :
              'text-cyan-400'
            }`}>
-              <Beaker size={48} strokeWidth={1.5} />
+              <Beaker size={28} className="md:w-12 md:h-12" strokeWidth={1.5} />
            </div>
-           <h3 className={`text-2xl font-bold text-white`}>מעבדת השברים</h3>
-           <div className={`px-3 py-1 rounded-full text-xs font-bold bg-white/10 text-white/70`}>שלב 1</div>
+           <h3 className={`text-lg md:text-2xl font-bold text-white`}>מעבדת השברים</h3>
+           {/* Topic list */}
+           <div className="flex flex-wrap justify-center gap-1 md:gap-2 max-w-full px-2">
+             {LAB_TOPICS.map((topic, idx) => (
+               <span key={idx} className="text-[10px] md:text-xs px-2 py-0.5 rounded-full bg-white/10 text-white/70">
+                 {topic.icon} {topic.title}
+               </span>
+             ))}
+           </div>
+           <div className={`px-3 py-1 rounded-full text-xs font-bold bg-white/10 text-white/70`}>{LAB_CURRICULUM.length} שלבים</div>
         </motion.button>
 
         {/* CARD 2: VAULT (Now Unlocked) */}
@@ -127,12 +135,20 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
           onClick={() => onNavigate(RoomType.VAULT)}
           className={getVaultCardStyle()}
         >
-           <div className="p-6 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400">
-              <Lock size={48} strokeWidth={1.5} />
+           <div className="p-3 md:p-6 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400">
+              <Lock size={28} className="md:w-12 md:h-12" strokeWidth={1.5} />
            </div>
-           <h3 className="text-2xl font-bold text-amber-100">הכספת</h3>
+           <h3 className="text-lg md:text-2xl font-bold text-amber-100">הכספת</h3>
+           {/* Topic list */}
+           <div className="flex flex-wrap justify-center gap-1 md:gap-2 max-w-full px-2">
+             {VAULT_TOPICS.map((topic, idx) => (
+               <span key={idx} className="text-[10px] md:text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400/70">
+                 {topic.icon} {topic.title}
+               </span>
+             ))}
+           </div>
            {/* Progress indicator */}
-           <div className="w-full max-w-[180px] flex flex-col items-center gap-2">
+           <div className="w-full max-w-[180px] flex flex-col items-center gap-1">
              <div className="w-full h-2 bg-black/40 rounded-full overflow-hidden">
                <motion.div
                  initial={{ width: 0 }}
@@ -154,10 +170,10 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
           transition={{ delay: 0.3 }}
           className={getCardStyle(false)}
         >
-           <div className="p-6 rounded-full bg-black/20 border border-white/5 text-white/20">
-              <Component size={48} strokeWidth={1.5} />
+           <div className="p-4 md:p-6 rounded-full bg-black/20 border border-white/5 text-white/20">
+              <Component size={32} className="md:w-12 md:h-12" strokeWidth={1.5} />
            </div>
-           <h3 className="text-2xl font-bold text-white/40">הקוקפיט</h3>
+           <h3 className="text-lg md:text-2xl font-bold text-white/40">הקוקפיט</h3>
            <div className="px-3 py-1 rounded-full text-xs font-bold bg-black/20 text-white/30">נעול</div>
         </motion.div>
 

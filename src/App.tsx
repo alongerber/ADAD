@@ -8,12 +8,23 @@ import { UserProvider, useUser } from './contexts/UserContext';
 import { NotebookProvider, useNotebook } from './contexts/NotebookContext';
 import { OnboardingWizard } from './components/onboarding/OnboardingWizard';
 import { NotebookPanel } from './components/ui/NotebookPanel';
+import { SplashScreen } from './components/ui/SplashScreen';
 import { Analytics } from '@vercel/analytics/react';
 
 const GameContainer: React.FC = () => {
   const { user, theme } = useUser();
   const { isOpen, messages } = useNotebook();
   const [currentRoom, setCurrentRoom] = useState<RoomType>(RoomType.LOBBY);
+  const [showSplash, setShowSplash] = useState(true);
+
+  // Show splash screen first (only for new users)
+  if (showSplash && !user) {
+    return (
+      <AnimatePresence>
+        <SplashScreen onComplete={() => setShowSplash(false)} />
+      </AnimatePresence>
+    );
+  }
 
   // If no user profile exists, show the Onboarding Wizard
   if (!user) {
@@ -23,14 +34,14 @@ const GameContainer: React.FC = () => {
   // Lobby / Main Game
   return (
     <div className={`w-screen h-screen ${theme.bg} text-white relative overflow-hidden transition-colors duration-1000`}>
-        
+
         {/* GLOBAL NOTEBOOK OVERLAY */}
         <NotebookPanel show={isOpen} messages={messages} />
 
         {/* Main Content Area */}
         <AnimatePresence mode="wait">
             {currentRoom === RoomType.LOBBY && (
-                <motion.div 
+                <motion.div
                     key="lobby"
                     className="w-full h-full"
                     initial={{ opacity: 0 }}
@@ -43,7 +54,7 @@ const GameContainer: React.FC = () => {
             )}
 
             {currentRoom === RoomType.LAB && (
-                <motion.div 
+                <motion.div
                     key="lab"
                     className="w-full h-full"
                     initial={{ opacity: 0, x: 100 }}
@@ -56,7 +67,7 @@ const GameContainer: React.FC = () => {
             )}
 
             {currentRoom === RoomType.VAULT && (
-                <motion.div 
+                <motion.div
                     key="vault"
                     className="w-full h-full"
                     initial={{ opacity: 0, x: 100 }}
@@ -67,7 +78,7 @@ const GameContainer: React.FC = () => {
                     <VaultRoom onNavigate={setCurrentRoom} />
                 </motion.div>
             )}
-            
+
             {/* Future rooms */}
             {currentRoom === RoomType.COCKPIT && <div className="p-10">Cockpit Locked</div>}
         </AnimatePresence>
