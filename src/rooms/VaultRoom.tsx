@@ -242,13 +242,26 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
             isCorrect = userAnswers.every((val, i) => val === currentLevel.target[i]);
 
             if (!isCorrect) {
-                const targetDigits = currentLevel.target.filter(d => d !== 0);
-                const userDigits = userAnswers.filter(d => d !== 0);
-                
-                if (targetDigits.join('') === userDigits.join('')) {
-                     addMessage("אופס! נראה ששכחת אפס שומר מקום.");
+                // Find the first wrong digit and give specific feedback
+                const firstWrongIndex = userAnswers.findIndex((val, i) => val !== currentLevel.target[i]);
+                const columnLabel = getColumnLabel(currentLevel.target.length, firstWrongIndex);
+                const expectedDigit = currentLevel.target[firstWrongIndex];
+                const userDigit = userAnswers[firstWrongIndex];
+
+                // Flash the wrong column
+                setFlashCol(firstWrongIndex);
+                setTimeout(() => setFlashCol(null), 1000);
+
+                // Give specific feedback based on error type
+                if (expectedDigit === 0 && userDigit !== 0) {
+                    // User put a digit where there should be 0
+                    addMessage(`🤔 ב${columnLabel}: שים לב - האם יש ${columnLabel} במספר? אם לא, שים 0!`);
+                } else if (expectedDigit !== 0 && userDigit === 0) {
+                    // User put 0 where there should be a digit
+                    addMessage(`🤔 ב${columnLabel}: יש פה ספרה, לא 0! קרא שוב את המספר.`);
                 } else {
-                     addMessage("נסה לקרוא את המספר בקול רם.");
+                    // Wrong digit
+                    addMessage(`🤔 ב${columnLabel}: בדוק שוב - מה הספרה הנכונה?`);
                 }
             }
         }
@@ -400,9 +413,18 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                                 }
 
                                 return (
-                                <div key={colIndex} className="flex flex-col items-center gap-4 relative w-[80px]">
-                                    
-                                    <div className="text-neutral-500 text-sm font-bold tracking-widest uppercase mb-2">
+                                <div
+                                    key={colIndex}
+                                    className={`flex flex-col items-center gap-4 relative w-[80px] rounded-xl p-2 transition-all duration-300 ${
+                                        flashCol === colIndex
+                                            ? 'bg-red-500/20 ring-2 ring-red-500 animate-pulse'
+                                            : ''
+                                    }`}
+                                >
+
+                                    <div className={`text-sm font-bold tracking-widest uppercase mb-2 transition-colors ${
+                                        flashCol === colIndex ? 'text-red-400' : 'text-neutral-500'
+                                    }`}>
                                         {getColumnLabel(userAnswers.length, colIndex)}
                                     </div>
 
