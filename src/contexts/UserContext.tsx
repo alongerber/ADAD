@@ -24,6 +24,8 @@ interface UserContextType {
   theme: typeof THEME_CONFIG['scifi']; // Helper to get current theme config
   newlyUnlockedAchievements: Achievement[];
   clearNewAchievements: () => void;
+  isMuted: boolean;
+  toggleMute: () => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -31,6 +33,18 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [newlyUnlockedAchievements, setNewlyUnlockedAchievements] = useState<Achievement[]>([]);
+  const [isMuted, setIsMuted] = useState<boolean>(() => {
+    const saved = localStorage.getItem('biss_muted');
+    return saved === 'true';
+  });
+
+  const toggleMute = useCallback(() => {
+    setIsMuted(prev => {
+      const newValue = !prev;
+      localStorage.setItem('biss_muted', String(newValue));
+      return newValue;
+    });
+  }, []);
 
   useEffect(() => {
     // Load from local storage on mount
@@ -146,7 +160,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const currentThemeConfig = user && THEME_CONFIG[user.theme] ? THEME_CONFIG[user.theme] : THEME_CONFIG['scifi'];
 
   return (
-    <UserContext.Provider value={{ user, updateUser, updateProgress, completeLevel, clearUser, theme: currentThemeConfig, newlyUnlockedAchievements, clearNewAchievements }}>
+    <UserContext.Provider value={{ user, updateUser, updateProgress, completeLevel, clearUser, theme: currentThemeConfig, newlyUnlockedAchievements, clearNewAchievements, isMuted, toggleMute }}>
       {children}
     </UserContext.Provider>
   );

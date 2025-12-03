@@ -44,8 +44,8 @@ export const LAB_CURRICULUM: FractionLevel[] = [
     targetNumerator: 1,
     targetDenominator: 2,
     title: 'עוד חצי!',
-    narrative: '🥧 נחלק את העוגה לשניים!',
-    explanation: 'כשחותכים עוגה לשני חלקים שווים, כל חלק הוא חצי.',
+    narrative: '⚗️ עוד ניסוי! המדען צריך שוב חצי בקבוק!',
+    explanation: 'חצי זה כשמחלקים לשני חלקים שווים ולוקחים חלק אחד.',
     tip: 'חצי = 1 מתוך 2',
     notebookHint: 'חצי מהבקבוק - בדיוק באמצע!'
   },

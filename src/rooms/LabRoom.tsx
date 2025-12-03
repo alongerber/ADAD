@@ -6,7 +6,7 @@ import { useIdleScaffold } from '../hooks/useIdleScaffold';
 import { GhostHand } from '../components/ui/GhostHand';
 import { ParticleSystem } from '../components/systems/ParticleSystem';
 import { LabState, RoomType } from '../types';
-import { X, Home, Beaker as BeakerIcon, Lock, CheckCircle, Play } from 'lucide-react';
+import { X, Home, Beaker as BeakerIcon, Lock, CheckCircle, Play, Volume2, VolumeX } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
 import { PedagogicalLabel } from '../components/ui/PedagogicalLabel';
 import { useSound } from '../hooks/useSound';
@@ -20,7 +20,7 @@ interface LabRoomProps {
 const SNAP_TOLERANCE = 0.05; // 5% tolerance for "Radio Tuning"
 
 export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
-  const { user, theme, completeLevel } = useUser();
+  const { user, theme, completeLevel, isMuted, toggleMute } = useUser();
   const { playSuccess, playError, playTick, playClick } = useSound();
 
   // --- Level Selection State ---
@@ -53,7 +53,15 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
   const [showErrorTooltip, setShowErrorTooltip] = useState(false);
 
   // --- Tuning State ---
-  const [isSnapped, setIsSnapped] = useState(false); 
+  const [isSnapped, setIsSnapped] = useState(false);
+
+  // --- Feedback Modal State ---
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackData, setFeedbackData] = useState<{
+    userAnswer: { n: number; d: number };
+    correctAnswer: { n: number; d: number };
+    hint: string;
+  } | null>(null); 
 
   // --- Discrete Fraction State ---
   const [labState, setLabState] = useState<LabState>({
@@ -176,10 +184,22 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
       playError();
       setShake(prev => prev + 1);
       setMissionStatus('error');
-      setShowErrorTooltip(true);
-      setTimeout(() => setMissionStatus('idle'), 1000);
-      setShowErrorTooltip(false);
+
+      // Show educational feedback modal
+      const hint = getErrorHint(labState.numerator, labState.denominator, target.n, target.d);
+      setFeedbackData({
+        userAnswer: { n: labState.numerator, d: labState.denominator },
+        correctAnswer: { n: target.n, d: target.d },
+        hint
+      });
+      setShowFeedback(true);
     }
+  };
+
+  const closeFeedback = () => {
+    setShowFeedback(false);
+    setFeedbackData(null);
+    setMissionStatus('idle');
   };
 
   // Styles for Mission Display based on status
@@ -201,6 +221,38 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
     return "כל הכבוד, אתה אלוף!";
   };
 
+  // Generate helpful hint based on error type
+  const getErrorHint = (userN: number, userD: number, targetN: number, targetD: number): string => {
+    const userVal = userD === 0 ? 0 : userN / userD;
+    const targetVal = targetD === 0 ? 0 : targetN / targetD;
+
+    // User chose less than target
+    if (userVal < targetVal) {
+      const diff = targetVal - userVal;
+      if (diff >= 0.5) return '↑ צריך הרבה יותר! הזז את הסליידר למעלה.';
+      if (diff >= 0.25) return '↑ קרוב! אבל צריך קצת יותר.';
+      return '↑ כמעט! רק קצת יותר למעלה.';
+    }
+
+    // User chose more than target
+    if (userVal > targetVal) {
+      const diff = userVal - targetVal;
+      if (diff >= 0.5) return '↓ יותר מדי! הזז את הסליידר למטה.';
+      if (diff >= 0.25) return '↓ קרוב! אבל שמת יותר מדי.';
+      return '↓ כמעט! רק קצת פחות.';
+    }
+
+    return 'נסה שוב!';
+  };
+
+  // Format fraction for display
+  const formatFraction = (n: number, d: number): string => {
+    if (n === 0 && d === 0) return '0';
+    if (n === 1 && d === 1) return '1';
+    if (d === 1) return String(n);
+    return `${n}/${d}`;
+  };
+
   // Level Selection Screen
   if (showLevelSelect) {
     return (
@@ -208,8 +260,18 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
         {/* Background */}
         <div className={`absolute inset-0 bg-gradient-to-br ${theme.bgGradient} opacity-60 pointer-events-none`} />
 
-        {/* Home Button */}
-        <div className="absolute top-6 left-6 z-50">
+        {/* Top Controls */}
+        <div className="absolute top-6 left-6 z-50 flex gap-2">
+          <button
+            onClick={toggleMute}
+            className={`p-3 rounded-full transition-all shadow-lg backdrop-blur-md border ${
+              isMuted
+                ? 'bg-red-500/20 border-red-500/30 text-red-400'
+                : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10 hover:text-white'
+            }`}
+          >
+            {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
+          </button>
           <button
             onClick={() => onNavigate(RoomType.LOBBY)}
             className="p-3 rounded-full bg-white/5 border border-white/10 text-white/50 hover:bg-white/10 hover:text-white transition-all shadow-lg backdrop-blur-md"
@@ -300,7 +362,7 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
   if (showLessonIntro) {
     return (
       <LessonIntro
-        levelType="vertical_math"
+        levelType="fraction"
         levelTitle={currentLevel.title}
         narrative={currentLevel.narrative}
         explanation={currentLevel.explanation}
@@ -323,8 +385,90 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
 
       <GhostHand show={isIdle} />
 
-      {/* Home Button */}
-      <div className="absolute top-6 left-6 z-50">
+      {/* Educational Feedback Modal */}
+      <AnimatePresence>
+        {showFeedback && feedbackData && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+            onClick={closeFeedback}
+          >
+            <motion.div
+              initial={{ scale: 0.8, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.8, y: 20 }}
+              className="bg-gradient-to-br from-orange-900/95 to-red-900/95 border-2 border-orange-500/50 rounded-2xl p-6 max-w-sm w-full shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+              dir="rtl"
+            >
+              {/* Header */}
+              <div className="text-center mb-4">
+                <span className="text-4xl">🤔</span>
+                <h3 className="text-xl font-bold text-white mt-2">לא בדיוק...</h3>
+              </div>
+
+              {/* Comparison */}
+              <div className="flex items-center justify-center gap-4 mb-4">
+                {/* User's answer */}
+                <div className="flex flex-col items-center p-3 bg-red-950/50 rounded-xl border border-red-500/30">
+                  <span className="text-xs text-red-300 mb-1">בחרת</span>
+                  <span className="text-2xl font-mono font-bold text-red-400">
+                    {formatFraction(feedbackData.userAnswer.n, feedbackData.userAnswer.d)}
+                  </span>
+                </div>
+
+                <span className="text-2xl text-white/50">→</span>
+
+                {/* Correct answer */}
+                <div className="flex flex-col items-center p-3 bg-green-950/50 rounded-xl border border-green-500/30">
+                  <span className="text-xs text-green-300 mb-1">צריך</span>
+                  <span className="text-2xl font-mono font-bold text-green-400">
+                    {formatFraction(feedbackData.correctAnswer.n, feedbackData.correctAnswer.d)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Hint */}
+              <div className="bg-amber-950/50 border border-amber-500/30 rounded-xl p-3 mb-4">
+                <div className="flex items-center gap-2 text-amber-300 text-sm font-bold mb-1">
+                  <span>💡</span>
+                  <span>טיפ:</span>
+                </div>
+                <p className="text-amber-100 text-sm">{feedbackData.hint}</p>
+              </div>
+
+              {/* Level tip reminder */}
+              <div className="bg-white/5 rounded-lg p-2 mb-4 text-center">
+                <span className="text-white/60 text-xs">{currentLevel.tip}</span>
+              </div>
+
+              {/* Try Again Button */}
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={closeFeedback}
+                className="w-full py-3 bg-gradient-to-r from-amber-600 to-orange-600 rounded-xl font-bold text-lg text-white shadow-lg hover:shadow-amber-500/30 transition-all"
+              >
+                הבנתי, ננסה שוב! 💪
+              </motion.button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Top Controls */}
+      <div className="absolute top-6 left-6 z-50 flex gap-2">
+          <button
+            onClick={toggleMute}
+            className={`p-3 rounded-full transition-all shadow-lg backdrop-blur-md border ${
+              isMuted
+                ? 'bg-red-500/20 border-red-500/30 text-red-400'
+                : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10 hover:text-white'
+            }`}
+          >
+            {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
+          </button>
           <button
             onClick={() => setShowLevelSelect(true)}
             className="p-3 rounded-full bg-white/5 border border-white/10 text-white/50 hover:bg-white/10 hover:text-white transition-all shadow-lg backdrop-blur-md"

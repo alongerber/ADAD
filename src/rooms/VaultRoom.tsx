@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RoomType } from '../types';
 import { useUser } from '../contexts/UserContext';
-import { Home, Lock, RefreshCw, Unlock, Star, ArrowLeft } from 'lucide-react';
+import { Home, Lock, RefreshCw, Unlock, Star, ArrowLeft, Volume2, VolumeX } from 'lucide-react';
 import { VaultWheel } from '../components/vault/VaultWheel';
 import { GhostHand } from '../components/ui/GhostHand';
 import { useIdleScaffold } from '../hooks/useIdleScaffold';
@@ -128,7 +128,7 @@ const LEVEL_INTROS: Record<string, { title: string; narrative: string; explanati
 };
 
 export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
-    const { user, completeLevel, updateProgress } = useUser();
+    const { user, completeLevel, updateProgress, isMuted, toggleMute } = useUser();
     const { isIdle, resetTimer } = useIdleScaffold();
     const { addMessage, setMessages, setIsOpen } = useNotebook();
     const { playSuccess, playError, playTick, playBorrow, playCelebrate, playClick } = useSound();
@@ -402,7 +402,17 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
 
                 <GhostHand show={isIdle && !isVaultOpen && !showIntro} />
 
-                <div className="absolute top-6 left-6 z-50 flex gap-4">
+                <div className="absolute top-6 left-6 z-50 flex gap-2">
+                    <button
+                        onClick={toggleMute}
+                        className={`p-3 rounded-full transition-all shadow-lg border ${
+                            isMuted
+                                ? 'bg-red-500/20 border-red-500/30 text-red-400'
+                                : 'bg-neutral-800 border-amber-500/20 text-amber-500/50 hover:text-amber-400'
+                        }`}
+                    >
+                        {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
+                    </button>
                     <button onClick={handleReset} className="p-3 rounded-full bg-neutral-800 border border-amber-500/20 text-amber-500/50 hover:bg-neutral-800 hover:text-amber-400 hover:rotate-180 transition-all shadow-lg">
                         <RefreshCw size={24} />
                     </button>

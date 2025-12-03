@@ -12,12 +12,42 @@ type SoundType = 'success' | 'error' | 'click' | 'tick' | 'whoosh' | 'celebrate'
 
 // Audio context singleton (created on first user interaction)
 let audioContext: AudioContext | null = null;
+let isInitialized = false;
 
-const getAudioContext = (): AudioContext => {
+const getAudioContext = (): AudioContext | null => {
   if (!audioContext) {
-    audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    try {
+      audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    } catch (e) {
+      console.warn('Web Audio API not supported');
+      return null;
+    }
   }
   return audioContext;
+};
+
+// Initialize audio on first user interaction (required for mobile)
+export const initAudio = (): void => {
+  if (isInitialized) return;
+
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  // Create and immediately stop a silent oscillator to unlock audio
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  gain.gain.value = 0; // Silent
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start();
+  osc.stop(ctx.currentTime + 0.001);
+
+  // Resume if suspended
+  if (ctx.state === 'suspended') {
+    ctx.resume();
+  }
+
+  isInitialized = true;
 };
 
 // Sound definitions using Web Audio API synthesis
@@ -179,9 +209,27 @@ const sounds: Record<SoundType, (ctx: AudioContext) => void> = {
 let lastTickTime = 0;
 const TICK_THROTTLE = 50; // ms
 
+// Check if sound is muted (reads from localStorage)
+const isMuted = (): boolean => {
+  try {
+    return localStorage.getItem('biss_muted') === 'true';
+  } catch {
+    return false;
+  }
+};
+
 export const playSound = (type: SoundType): void => {
   try {
+    // Check mute state first
+    if (isMuted()) return;
+
     const ctx = getAudioContext();
+    if (!ctx) return;
+
+    // Initialize on first sound (unlocks audio on mobile)
+    if (!isInitialized) {
+      initAudio();
+    }
 
     // Resume context if suspended (browser autoplay policy)
     if (ctx.state === 'suspended') {

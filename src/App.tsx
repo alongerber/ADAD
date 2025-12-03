@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { RoomType } from './types';
 import { LabRoom } from './rooms/LabRoom';
 import { VaultRoom } from './rooms/VaultRoom';
@@ -11,12 +11,31 @@ import { NotebookPanel } from './components/ui/NotebookPanel';
 import { SplashScreen } from './components/ui/SplashScreen';
 import { AchievementToast } from './components/ui/AchievementToast';
 import { Analytics } from '@vercel/analytics/react';
+import { initAudio } from './hooks/useSound';
 
 const GameContainer: React.FC = () => {
   const { user, theme } = useUser();
   const { isOpen, messages } = useNotebook();
   const [currentRoom, setCurrentRoom] = useState<RoomType>(RoomType.LOBBY);
   const [showSplash, setShowSplash] = useState(true);
+
+  // Initialize audio on first user interaction (required for mobile browsers)
+  useEffect(() => {
+    const handleFirstInteraction = () => {
+      initAudio();
+      // Remove listeners after first interaction
+      document.removeEventListener('touchstart', handleFirstInteraction);
+      document.removeEventListener('click', handleFirstInteraction);
+    };
+
+    document.addEventListener('touchstart', handleFirstInteraction, { passive: true });
+    document.addEventListener('click', handleFirstInteraction);
+
+    return () => {
+      document.removeEventListener('touchstart', handleFirstInteraction);
+      document.removeEventListener('click', handleFirstInteraction);
+    };
+  }, []);
 
   // Show splash screen first (only for new users)
   if (showSplash && !user) {
