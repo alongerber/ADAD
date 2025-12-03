@@ -5,6 +5,7 @@ import { ArrowLeft, Lightbulb, Hash, Calculator, Play, Eye } from 'lucide-react'
 interface LessonIntroProps {
   levelType: 'number_input' | 'vertical_math';
   levelTitle: string;
+  narrative?: string;  // Short story hook
   explanation: string;
   exampleBefore: string;
   exampleAfter: string;
@@ -16,6 +17,7 @@ interface LessonIntroProps {
 export const LessonIntro: React.FC<LessonIntroProps> = ({
   levelType,
   levelTitle,
+  narrative,
   explanation,
   exampleBefore,
   exampleAfter,
@@ -63,6 +65,15 @@ export const LessonIntro: React.FC<LessonIntroProps> = ({
           </div>
         </motion.div>
 
+        {narrative && (
+          <motion.p
+            variants={itemVariants}
+            className="text-2xl md:text-3xl text-amber-300 font-bold italic max-w-xl leading-relaxed"
+          >
+            {narrative}
+          </motion.p>
+        )}
+
         <motion.h1
           variants={itemVariants}
           className="text-5xl md:text-6xl font-black text-white drop-shadow-[0_4px_0_rgba(0,0,0,0.5)] leading-tight"
@@ -72,7 +83,7 @@ export const LessonIntro: React.FC<LessonIntroProps> = ({
 
         <motion.p
           variants={itemVariants}
-          className="text-xl md:text-2xl text-neutral-300 leading-relaxed max-w-lg font-medium"
+          className="text-lg md:text-xl text-neutral-300 leading-relaxed max-w-lg font-medium"
         >
           {explanation}
         </motion.p>

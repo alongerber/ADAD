@@ -17,13 +17,14 @@ interface VaultRoomProps {
     onNavigate: (room: RoomType) => void;
 }
 
-const LEVEL_INTROS: Record<string, { title: string; explanation: string; exampleBefore: string; exampleAfter: string; tip: string }> = {
+const LEVEL_INTROS: Record<string, { title: string; narrative: string; explanation: string; exampleBefore: string; exampleAfter: string; tip: string }> = {
     // ========================================
     // חלק א: כתיבת מספרים
     // ========================================
 
     'lvl_num_simple_3': {
         title: 'בונים מספרים!',
+        narrative: '🔐 הכספת הסודית ננעלה! רק מי שיודע לכתוב את הקוד יפתח אותה...',
         explanation: 'כל מספר בנוי מחלקים: מאות, עשרות ויחידות. בוא נתרגל!',
         exampleBefore: 'ארבע מאות עשרים וחמש',
         exampleAfter: '425',
@@ -31,6 +32,7 @@ const LEVEL_INTROS: Record<string, { title: string; explanation: string; example
     },
     'lvl_num_simple_4': {
         title: 'מספרים גדולים יותר!',
+        narrative: '📡 המודיעין שלח קוד חדש! הפעם המספרים גדולים יותר...',
         explanation: 'עכשיו יש לנו גם אלפים! ארבעה חלקים: אלפים, מאות, עשרות, יחידות.',
         exampleBefore: 'אלף שמונה מאות שלושים ושש',
         exampleAfter: '1836',
@@ -38,6 +40,7 @@ const LEVEL_INTROS: Record<string, { title: string; explanation: string; example
     },
     'lvl_num_zero_end': {
         title: 'מספרים עגולים',
+        narrative: '🎯 הקוד הזה מסתיים באפס. אל תפספס אותו!',
         explanation: 'כשאומרים "חמישים" זה אומר חמש עשרות ואפס יחידות!',
         exampleBefore: 'שלוש מאות וחמישים',
         exampleAfter: '350',
@@ -45,6 +48,7 @@ const LEVEL_INTROS: Record<string, { title: string; explanation: string; example
     },
     'lvl_num_zeros_end': {
         title: 'עוד יותר עגול!',
+        narrative: '💫 הכספת הזו אוהבת מספרים עגולים. כמה אפסים מתחבאים פה?',
         explanation: 'מספרים כמו "מאתיים" מסתיימים בכמה אפסים.',
         exampleBefore: 'שבעת אלפים ומאתיים',
         exampleAfter: '7200',
@@ -52,6 +56,7 @@ const LEVEL_INTROS: Record<string, { title: string; explanation: string; example
     },
     'lvl_zero_trap_1': {
         title: 'מלכודת האפס!',
+        narrative: '⚠️ זהירות! המספרים הערמומיים מנסים לבלבל את הסוכן הכי טוב שלנו!',
         explanation: 'יש מספרים שמנסים לבלבל אותנו! הם מחביאים אפסים באמצע.',
         exampleBefore: 'שלושת אלפים וחמישים',
         exampleAfter: '3050',
@@ -59,6 +64,7 @@ const LEVEL_INTROS: Record<string, { title: string; explanation: string; example
     },
     'lvl_zero_trap_2': {
         title: 'מלכודת כפולה!',
+        narrative: '🕵️ המספר הזה הכי ערמומי שיש! יש בו הפתעות מוסתרות...',
         explanation: 'המספרים הערמומיים חוזרים! הפעם הם מחביאים עוד יותר אפסים.',
         exampleBefore: 'ארבעים אלף וארבע',
         exampleAfter: '40004',
@@ -71,6 +77,7 @@ const LEVEL_INTROS: Record<string, { title: string; explanation: string; example
 
     'lvl_sub_simple_2': {
         title: 'חיסור קל!',
+        narrative: '🔢 משימה חדשה: לפצח את הקוד על ידי חיסור!',
         explanation: 'בחיסור במאונך, מחסרים כל ספרה בנפרד. מתחילים מימין!',
         exampleBefore: '89 - 34',
         exampleAfter: '55',
@@ -78,6 +85,7 @@ const LEVEL_INTROS: Record<string, { title: string; explanation: string; example
     },
     'lvl_sub_simple_3': {
         title: 'חיסור עם 3 ספרות',
+        narrative: '📊 הקוד הזה יותר ארוך. שלוש ספרות, שלוש משימות!',
         explanation: 'אותו דבר בדיוק, רק עם עוד ספרה אחת!',
         exampleBefore: '567 - 234',
         exampleAfter: '333',
@@ -85,6 +93,7 @@ const LEVEL_INTROS: Record<string, { title: string; explanation: string; example
     },
     'lvl_sub_borrow_1': {
         title: 'פריטה - השכן עוזר!',
+        narrative: '🤝 לפעמים צריך עזרה מחבר. גם ספרות יודעות לעזור אחת לשנייה!',
         explanation: 'לפעמים הספרה למעלה קטנה מדי. אז היא צריכה ללוות מהשכן!',
         exampleBefore: '452 - 138',
         exampleAfter: '314',
@@ -92,6 +101,7 @@ const LEVEL_INTROS: Record<string, { title: string; explanation: string; example
     },
     'lvl_sub_borrow_tens': {
         title: 'פריטה בעשרות',
+        narrative: '🔄 העשרות צריכות עזרה! מי יבוא להציל?',
         explanation: 'הפעם העשרות צריכות עזרה מהמאות!',
         exampleBefore: '534 - 271',
         exampleAfter: '263',
@@ -99,6 +109,7 @@ const LEVEL_INTROS: Record<string, { title: string; explanation: string; example
     },
     'lvl_sub_borrow_double': {
         title: 'פריטה כפולה!',
+        narrative: '⚡ משימת בונוס: שתי פריטות בתרגיל אחד! מוכנים לאתגר?',
         explanation: 'לפעמים צריך לפרוט פעמיים באותו תרגיל!',
         exampleBefore: '523 - 168',
         exampleAfter: '355',
@@ -106,6 +117,7 @@ const LEVEL_INTROS: Record<string, { title: string; explanation: string; example
     },
     'lvl_sub_borrow_zero': {
         title: 'האפס המציק',
+        narrative: '🚫 האפס חוסם את הדרך! איך עוקפים אותו?',
         explanation: 'מה עושים כשיש 0 באמצע ואי אפשר לפרוט ממנו?',
         exampleBefore: '503 - 127',
         exampleAfter: '376',
@@ -302,6 +314,7 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
 
     const introData = LEVEL_INTROS[currentLevel.id] || {
         title: 'שלב חדש',
+        narrative: '🎯 משימה חדשה מחכה לך!',
         explanation: 'בוא נלמד משהו חדש!',
         exampleBefore: '',
         exampleAfter: '',
@@ -315,6 +328,7 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                 <LessonIntro
                     levelType={currentLevel.mode}
                     levelTitle={introData.title}
+                    narrative={introData.narrative}
                     explanation={introData.explanation}
                     exampleBefore={introData.exampleBefore}
                     exampleAfter={introData.exampleAfter}
