@@ -24,7 +24,11 @@ export interface UserProgress {
   currentVaultLevel: number;     // Current level index in vault
   totalScore: number;            // Accumulated score
   streak: number;                // Current streak (consecutive correct answers)
+  maxStreak: number;             // Highest streak achieved
   lastPlayedAt: string | null;   // ISO date string
+  unlockedAchievements: string[]; // Array of unlocked achievement IDs
+  daysPlayed: number;            // Number of unique days played
+  lastPlayDate: string | null;   // Last play date (YYYY-MM-DD)
 }
 
 export interface UserProfile {
