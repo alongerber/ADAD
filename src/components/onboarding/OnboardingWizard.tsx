@@ -34,7 +34,7 @@ export const OnboardingWizard: React.FC = () => {
   const activeTheme = THEME_CONFIG[tempProfile.theme];
 
   return (
-    <div className={`fixed inset-0 w-full h-full ${activeTheme.bg} transition-colors duration-700 overflow-hidden flex flex-col items-center justify-center p-6`} dir="rtl">
+    <div className={`fixed inset-0 w-full h-full ${activeTheme.bg} transition-colors duration-700 overflow-y-auto flex flex-col items-center justify-start md:justify-center p-4 pt-16 pb-8`} dir="rtl">
       
       {/* Background Ambience */}
       <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${activeTheme.bgGradient} opacity-50 pointer-events-none`} />
@@ -52,33 +52,33 @@ export const OnboardingWizard: React.FC = () => {
         
         {/* STEP 1: GENDER */}
         {step === 0 && (
-          <motion.div 
+          <motion.div
             key="step1"
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 50 }}
-            className="z-10 flex flex-col items-center gap-10 w-full max-w-3xl"
+            className="z-10 flex flex-col items-center gap-6 md:gap-10 w-full max-w-3xl"
           >
-            <h1 className="text-5xl font-black text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] tracking-tight">מי משחק?</h1>
-            
-            <div className="flex flex-col md:flex-row gap-8 w-full justify-center">
-              <GenderCard 
-                label="אני תלמיד" 
-                icon={<User strokeWidth={1.5} />} 
-                selected={tempProfile.gender === 'boy'} 
-                onClick={() => setTempProfile(p => ({ ...p, gender: 'boy' }))} 
+            <h1 className="text-3xl md:text-5xl font-black text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] tracking-tight">מי משחק?</h1>
+
+            <div className="flex flex-col gap-4 md:flex-row md:gap-8 w-full justify-center px-2">
+              <GenderCard
+                label="אני תלמיד"
+                icon={<User strokeWidth={1.5} />}
+                selected={tempProfile.gender === 'boy'}
+                onClick={() => setTempProfile(p => ({ ...p, gender: 'boy' }))}
                 variant="cyan"
               />
-              <GenderCard 
-                label="אני תלמידה" 
-                icon={<User strokeWidth={1.5} />} 
-                selected={tempProfile.gender === 'girl'} 
-                onClick={() => setTempProfile(p => ({ ...p, gender: 'girl' }))} 
+              <GenderCard
+                label="אני תלמידה"
+                icon={<User strokeWidth={1.5} />}
+                selected={tempProfile.gender === 'girl'}
+                onClick={() => setTempProfile(p => ({ ...p, gender: 'girl' }))}
                 variant="fuchsia"
               />
             </div>
 
-            <div className="w-full max-w-md mt-4">
+            <div className="w-full max-w-md mt-2 md:mt-4 px-2">
                <NavButton onClick={handleNext} active={true} theme={tempProfile.theme} label="המשך" />
             </div>
           </motion.div>
@@ -213,26 +213,26 @@ const GenderCard: React.FC<GenderCardProps> = ({ label, icon, selected, onClick,
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
       className={`
-        relative flex-1 flex flex-col items-center justify-center gap-6 p-10 rounded-3xl border-2 transition-all duration-300 backdrop-blur-md overflow-hidden group min-w-[200px]
+        relative flex-1 flex flex-col items-center justify-center gap-3 md:gap-6 p-5 md:p-10 rounded-2xl md:rounded-3xl border-2 transition-all duration-300 backdrop-blur-md overflow-hidden group min-w-[140px] md:min-w-[200px]
         bg-slate-900/40
         ${selected ? `${selectedBorder} ${selectedGlow} bg-slate-900/60` : `border-white/5 hover:${borderColor} hover:${glowColor} hover:bg-slate-900/50`}
       `}
     >
       {/* Background Grid Texture */}
       <div className="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+CiAgPHBhdGggZD0iTTEgMWgydjJIMUMxeiIgZmlsbD0iI2ZmZiIgLz4KPC9zdmc+')] z-0 pointer-events-none" />
-      
+
       {/* Icon Container */}
       <div className={`
-        relative z-10 p-6 rounded-full bg-black/40 border border-white/10 transition-all duration-500
+        relative z-10 p-3 md:p-6 rounded-full bg-black/40 border border-white/10 transition-all duration-500
         ${selected ? 'scale-110 border-white/30' : 'group-hover:scale-110 group-hover:border-white/20'}
       `}>
-         <div className={`w-24 h-24 ${textColor} ${iconDropShadow} transition-all duration-300`}>
-             {React.cloneElement(icon as React.ReactElement<any>, { size: 96 })}
+         <div className={`w-12 h-12 md:w-24 md:h-24 ${textColor} ${iconDropShadow} transition-all duration-300`}>
+             {React.cloneElement(icon as React.ReactElement<any>, { className: 'w-full h-full' })}
          </div>
-         
+
          {/* Animated Scan Line */}
          {selected && (
-            <motion.div 
+            <motion.div
                 className={`absolute inset-0 w-full h-[20%] bg-white/20 blur-md`}
                 animate={{ top: ['0%', '100%'] }}
                 transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
@@ -241,21 +241,21 @@ const GenderCard: React.FC<GenderCardProps> = ({ label, icon, selected, onClick,
       </div>
 
       {/* Label */}
-      <div className="z-10 flex flex-col items-center gap-2">
-          <span className={`text-2xl font-black tracking-wider uppercase transition-colors duration-300 ${selected ? 'text-white' : 'text-slate-400 group-hover:text-white'}`}>
+      <div className="z-10 flex flex-col items-center gap-1 md:gap-2">
+          <span className={`text-lg md:text-2xl font-black tracking-wider uppercase transition-colors duration-300 ${selected ? 'text-white' : 'text-slate-400 group-hover:text-white'}`}>
             {label}
           </span>
-          <div className={`h-1 w-12 rounded-full transition-all duration-300 ${selected ? (isCyan ? 'bg-cyan-500 shadow-[0_0_10px_rgba(34,211,238,1)]' : 'bg-fuchsia-500 shadow-[0_0_10px_rgba(232,121,249,1)]') : 'bg-slate-700 w-2'}`} />
+          <div className={`h-1 w-8 md:w-12 rounded-full transition-all duration-300 ${selected ? (isCyan ? 'bg-cyan-500 shadow-[0_0_10px_rgba(34,211,238,1)]' : 'bg-fuchsia-500 shadow-[0_0_10px_rgba(232,121,249,1)]') : 'bg-slate-700 w-2'}`} />
       </div>
 
       {/* Selection Checkmark */}
       {selected && (
-        <motion.div 
-            initial={{ scale: 0 }} 
+        <motion.div
+            initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className={`absolute top-4 right-4 p-1 rounded-full ${isCyan ? 'bg-cyan-500 text-slate-900' : 'bg-fuchsia-500 text-slate-900'}`}
+            className={`absolute top-2 right-2 md:top-4 md:right-4 p-1 rounded-full ${isCyan ? 'bg-cyan-500 text-slate-900' : 'bg-fuchsia-500 text-slate-900'}`}
         >
-            <Check size={20} strokeWidth={4} />
+            <Check size={16} className="md:w-5 md:h-5" strokeWidth={4} />
         </motion.div>
       )}
     </motion.button>
