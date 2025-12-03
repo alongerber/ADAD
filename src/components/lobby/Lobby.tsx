@@ -4,7 +4,7 @@ import { useUser } from '../../contexts/UserContext';
 import { RoomType } from '../../types';
 import { Beaker, Lock, Calculator, Component, LogOut, Star, Flame, Trophy } from 'lucide-react';
 import { getTimeGreeting } from '../../utils/messages';
-import { VAULT_CURRICULUM } from '../../data/curriculum';
+import { VAULT_CURRICULUM, VAULT_TOPICS, LAB_TOPICS, LAB_CURRICULUM } from '../../data/curriculum';
 
 interface LobbyProps {
   onNavigate: (room: RoomType) => void;
@@ -105,7 +105,7 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
           onClick={() => onNavigate(RoomType.LAB)}
           className={getCardStyle(true)}
         >
-           <div className={`p-4 md:p-6 rounded-full bg-white/10 backdrop-blur-md border border-white/20 ${
+           <div className={`p-3 md:p-6 rounded-full bg-white/10 backdrop-blur-md border border-white/20 ${
              user?.theme === 'pop' ? 'text-yellow-300' :
              user?.theme === 'sports' ? 'text-white' :
              user?.theme === 'nature' ? 'text-lime-300' :
@@ -113,10 +113,18 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
              user?.theme === 'candy' ? 'text-rose-300' :
              'text-cyan-400'
            }`}>
-              <Beaker size={32} className="md:w-12 md:h-12" strokeWidth={1.5} />
+              <Beaker size={28} className="md:w-12 md:h-12" strokeWidth={1.5} />
            </div>
            <h3 className={`text-lg md:text-2xl font-bold text-white`}>מעבדת השברים</h3>
-           <div className={`px-3 py-1 rounded-full text-xs font-bold bg-white/10 text-white/70`}>שלב 1</div>
+           {/* Topic list */}
+           <div className="flex flex-wrap justify-center gap-1 md:gap-2 max-w-full px-2">
+             {LAB_TOPICS.map((topic, idx) => (
+               <span key={idx} className="text-[10px] md:text-xs px-2 py-0.5 rounded-full bg-white/10 text-white/70">
+                 {topic.icon} {topic.title}
+               </span>
+             ))}
+           </div>
+           <div className={`px-3 py-1 rounded-full text-xs font-bold bg-white/10 text-white/70`}>{LAB_CURRICULUM.length} שלבים</div>
         </motion.button>
 
         {/* CARD 2: VAULT (Now Unlocked) */}
@@ -127,12 +135,20 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
           onClick={() => onNavigate(RoomType.VAULT)}
           className={getVaultCardStyle()}
         >
-           <div className="p-4 md:p-6 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400">
-              <Lock size={32} className="md:w-12 md:h-12" strokeWidth={1.5} />
+           <div className="p-3 md:p-6 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400">
+              <Lock size={28} className="md:w-12 md:h-12" strokeWidth={1.5} />
            </div>
            <h3 className="text-lg md:text-2xl font-bold text-amber-100">הכספת</h3>
+           {/* Topic list */}
+           <div className="flex flex-wrap justify-center gap-1 md:gap-2 max-w-full px-2">
+             {VAULT_TOPICS.map((topic, idx) => (
+               <span key={idx} className="text-[10px] md:text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400/70">
+                 {topic.icon} {topic.title}
+               </span>
+             ))}
+           </div>
            {/* Progress indicator */}
-           <div className="w-full max-w-[180px] flex flex-col items-center gap-2">
+           <div className="w-full max-w-[180px] flex flex-col items-center gap-1">
              <div className="w-full h-2 bg-black/40 rounded-full overflow-hidden">
                <motion.div
                  initial={{ width: 0 }}
