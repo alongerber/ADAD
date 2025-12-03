@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Lightbulb, Hash, Calculator, Play, Eye } from 'lucide-react';
 
 interface LessonIntroProps {
-  levelType: 'number_input' | 'vertical_math';
+  levelType: 'number_input' | 'vertical_math' | 'fraction';
   levelTitle: string;
   narrative?: string;  // Short story hook
   explanation: string;
@@ -60,8 +60,8 @@ export const LessonIntro: React.FC<LessonIntroProps> = ({
 
         <motion.div variants={itemVariants}>
           <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold text-xs md:text-sm tracking-wider uppercase">
-             {levelType === 'number_input' ? <Hash size={14} className="md:w-4 md:h-4" /> : <Calculator size={14} className="md:w-4 md:h-4" />}
-             <span>{levelType === 'number_input' ? 'כתיבת מספרים' : 'חיסור במאונך'}</span>
+             {levelType === 'fraction' ? <span className="text-sm md:text-base">🧪</span> : levelType === 'number_input' ? <Hash size={14} className="md:w-4 md:h-4" /> : <Calculator size={14} className="md:w-4 md:h-4" />}
+             <span>{levelType === 'fraction' ? 'שברים' : levelType === 'number_input' ? 'כתיבת מספרים' : 'חיסור במאונך'}</span>
           </div>
         </motion.div>
 
