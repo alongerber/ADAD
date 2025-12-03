@@ -176,6 +176,9 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
         tip: 'בהצלחה!'
     };
 
+    // DEBUG: Log state
+    console.log('🔍 VaultRoom Debug:', { showIntro, isVaultOpen, levelId: currentLevel.id, introData });
+
     return (
         <div className="relative w-full h-full flex flex-col items-center bg-neutral-900 overflow-hidden select-none font-mono text-amber-500" dir="rtl">
             
