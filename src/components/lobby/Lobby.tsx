@@ -1,10 +1,11 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '../../contexts/UserContext';
 import { RoomType } from '../../types';
-import { Beaker, Lock, Calculator, Component, LogOut, Star, Flame, Trophy, Volume2, VolumeX } from 'lucide-react';
+import { Beaker, Lock, Calculator, Component, LogOut, Star, Flame, Trophy, Volume2, VolumeX, BarChart3 } from 'lucide-react';
 import { getTimeGreeting } from '../../utils/messages';
 import { VAULT_CURRICULUM, VAULT_TOPICS, LAB_TOPICS, LAB_CURRICULUM } from '../../data/curriculum';
+import { ParentDashboard } from '../dashboard/ParentDashboard';
 
 interface LobbyProps {
   onNavigate: (room: RoomType) => void;
@@ -12,6 +13,7 @@ interface LobbyProps {
 
 export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
   const { user, theme, clearUser, isMuted, toggleMute } = useUser();
+  const [showDashboard, setShowDashboard] = useState(false);
 
   // Dynamic Styles based on theme
   const getHeaderStyle = () => {
@@ -74,6 +76,15 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
       
       {/* Top Controls */}
       <div className="absolute top-6 left-6 z-50 flex gap-2">
+        {/* Parent Dashboard Button */}
+        <button
+          onClick={() => setShowDashboard(true)}
+          className="p-3 bg-white/5 rounded-full hover:bg-white/10 text-white/40 hover:text-white transition-all border border-white/5 hover:border-white/20"
+          title="לוח הורים"
+        >
+          <BarChart3 size={20} />
+        </button>
+
         {/* Mute Button */}
         <button
           onClick={toggleMute}
@@ -243,6 +254,13 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
           )}
         </motion.div>
       ) : null}
+
+      {/* Parent Dashboard Modal */}
+      <AnimatePresence>
+        {showDashboard && (
+          <ParentDashboard onClose={() => setShowDashboard(false)} />
+        )}
+      </AnimatePresence>
 
     </div>
   );
