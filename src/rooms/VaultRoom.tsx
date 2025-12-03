@@ -11,6 +11,7 @@ import { PedagogicalLabel } from '../components/ui/PedagogicalLabel';
 import { useNotebook } from '../contexts/NotebookContext';
 import { NotebookBridge } from '../components/vault/NotebookBridge';
 import { LessonIntro } from '../components/ui/LessonIntro';
+import { getSuccessMessage, getCodeCrackedMessage, getHintPrefix, getReadAgainMessage } from '../utils/messages';
 
 interface VaultRoomProps {
     onNavigate: (room: RoomType) => void;
@@ -162,9 +163,10 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                 }, delay * (index + 1));
             });
 
-            // After all digits, show success
+            // After all digits, show success (personalized)
             setTimeout(() => {
-                addMessage('🎉 ככה עושים את זה!');
+                const tryNowMsg = user?.gender === 'girl' ? 'עכשיו תורך!' : 'עכשיו תורך!';
+                addMessage(`🎉 ככה עושים את זה! ${user?.name ? user.name + ', ' : ''}${tryNowMsg}`);
                 setTimeout(() => {
                     setIsDemoMode(false);
                     initializeLevel(currentLevel); // Reset for user to try
@@ -252,23 +254,28 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                 setFlashCol(firstWrongIndex);
                 setTimeout(() => setFlashCol(null), 1000);
 
-                // Give specific feedback based on error type
+                // Give specific feedback based on error type (gendered)
+                const gender = user?.gender || 'boy';
+                const hintPrefix = getHintPrefix(gender);
+                const readAgain = getReadAgainMessage(gender);
+
                 if (expectedDigit === 0 && userDigit !== 0) {
                     // User put a digit where there should be 0
-                    addMessage(`🤔 ב${columnLabel}: שים לב - האם יש ${columnLabel} במספר? אם לא, שים 0!`);
+                    addMessage(`🤔 ב${columnLabel}: ${hintPrefix} - האם יש ${columnLabel} במספר? אם לא, שמים 0!`);
                 } else if (expectedDigit !== 0 && userDigit === 0) {
                     // User put 0 where there should be a digit
-                    addMessage(`🤔 ב${columnLabel}: יש פה ספרה, לא 0! קרא שוב את המספר.`);
+                    addMessage(`🤔 ב${columnLabel}: יש פה ספרה, לא 0! ${readAgain}.`);
                 } else {
                     // Wrong digit
-                    addMessage(`🤔 ב${columnLabel}: בדוק שוב - מה הספרה הנכונה?`);
+                    addMessage(`🤔 ב${columnLabel}: ${hintPrefix} - מה הספרה הנכונה?`);
                 }
             }
         }
 
         if (isCorrect) {
             setIsVaultOpen(true);
-            addMessage("מצוין! הקוד פוצח.");
+            const gender = user?.gender || 'boy';
+            addMessage(getCodeCrackedMessage(gender, user?.name));
         }
     };
 

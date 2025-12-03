@@ -16,7 +16,7 @@ export interface LabState {
   isCorrect: boolean;
 }
 
-export type ThemeType = 'scifi' | 'pop' | 'sports';
+export type ThemeType = 'scifi' | 'pop' | 'sports' | 'nature' | 'ocean' | 'candy';
 export type GenderType = 'boy' | 'girl';
 
 export interface UserProfile {

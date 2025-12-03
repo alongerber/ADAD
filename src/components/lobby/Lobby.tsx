@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useUser } from '../../contexts/UserContext';
 import { RoomType } from '../../types';
 import { Beaker, Lock, Calculator, Component, LogOut } from 'lucide-react';
+import { getTimeGreeting } from '../../utils/messages';
 
 interface LobbyProps {
   onNavigate: (room: RoomType) => void;
@@ -18,6 +19,12 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
         return 'font-sans text-yellow-300 drop-shadow-[0_4px_0_rgba(236,72,153,0.8)]';
       case 'sports':
         return 'font-sans font-black italic text-white drop-shadow-md';
+      case 'nature':
+        return 'font-sans text-lime-300 drop-shadow-[0_0_15px_rgba(163,230,53,0.6)]';
+      case 'ocean':
+        return 'font-sans text-sky-300 drop-shadow-[0_0_15px_rgba(56,189,248,0.6)]';
+      case 'candy':
+        return 'font-sans text-rose-300 drop-shadow-[0_0_15px_rgba(251,113,133,0.6)]';
       case 'scifi':
       default:
         return 'font-mono text-cyan-400 drop-shadow-[0_0_15px_rgba(34,211,238,0.6)]';
@@ -26,7 +33,7 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
 
   const getCardStyle = (isActive: boolean) => {
     const base = "relative overflow-hidden rounded-3xl border-2 transition-all duration-300 flex flex-col items-center justify-center gap-4 p-6 h-64 w-full";
-    
+
     if (!isActive) {
       return `${base} bg-black/40 border-white/5 opacity-50 grayscale cursor-not-allowed`;
     }
@@ -37,6 +44,12 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
         return `${base} bg-fuchsia-900/40 border-pink-400 shadow-[0_0_30px_rgba(236,72,153,0.3)] hover:scale-105 hover:bg-fuchsia-800/60 cursor-pointer`;
       case 'sports':
         return `${base} bg-emerald-900/40 border-emerald-400 shadow-[0_0_30px_rgba(52,211,153,0.3)] hover:scale-105 hover:bg-emerald-800/60 cursor-pointer`;
+      case 'nature':
+        return `${base} bg-amber-900/40 border-lime-400 shadow-[0_0_30px_rgba(163,230,53,0.3)] hover:scale-105 hover:bg-amber-800/60 cursor-pointer`;
+      case 'ocean':
+        return `${base} bg-sky-900/40 border-sky-400 shadow-[0_0_30px_rgba(56,189,248,0.3)] hover:scale-105 hover:bg-sky-800/60 cursor-pointer`;
+      case 'candy':
+        return `${base} bg-rose-900/40 border-rose-400 shadow-[0_0_30px_rgba(251,113,133,0.3)] hover:scale-105 hover:bg-rose-800/60 cursor-pointer`;
       case 'scifi':
       default:
         return `${base} bg-slate-800/40 border-cyan-400 shadow-[0_0_30px_rgba(34,211,238,0.2)] hover:scale-105 hover:bg-slate-700/60 cursor-pointer`;
@@ -67,12 +80,14 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
       </button>
 
       {/* Header */}
-      <motion.div 
+      <motion.div
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         className="relative z-10 w-full max-w-5xl flex flex-col items-start mt-8 mb-12"
       >
-        <h2 className={`text-2xl text-white/60 mb-2 font-bold`}>היי {user?.name},</h2>
+        <h2 className={`text-2xl text-white/60 mb-2 font-bold`}>
+          {user ? getTimeGreeting(user.gender, user.name) : 'שלום!'}
+        </h2>
         <h1 className={`text-6xl font-bold ${getHeaderStyle()}`}>
           לאן ממשיכים?
         </h1>
@@ -89,7 +104,14 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
           onClick={() => onNavigate(RoomType.LAB)}
           className={getCardStyle(true)}
         >
-           <div className={`p-6 rounded-full bg-white/10 backdrop-blur-md border border-white/20 ${user?.theme === 'pop' ? 'text-yellow-300' : user?.theme === 'sports' ? 'text-white' : 'text-cyan-400'}`}>
+           <div className={`p-6 rounded-full bg-white/10 backdrop-blur-md border border-white/20 ${
+             user?.theme === 'pop' ? 'text-yellow-300' :
+             user?.theme === 'sports' ? 'text-white' :
+             user?.theme === 'nature' ? 'text-lime-300' :
+             user?.theme === 'ocean' ? 'text-sky-300' :
+             user?.theme === 'candy' ? 'text-rose-300' :
+             'text-cyan-400'
+           }`}>
               <Beaker size={48} strokeWidth={1.5} />
            </div>
            <h3 className={`text-2xl font-bold text-white`}>מעבדת השברים</h3>
