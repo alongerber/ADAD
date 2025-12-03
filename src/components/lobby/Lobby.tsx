@@ -2,8 +2,9 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useUser } from '../../contexts/UserContext';
 import { RoomType } from '../../types';
-import { Beaker, Lock, Calculator, Component, LogOut } from 'lucide-react';
+import { Beaker, Lock, Calculator, Component, LogOut, Star, Flame, Trophy } from 'lucide-react';
 import { getTimeGreeting } from '../../utils/messages';
+import { VAULT_CURRICULUM } from '../../data/curriculum';
 
 interface LobbyProps {
   onNavigate: (room: RoomType) => void;
@@ -130,7 +131,20 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
               <Lock size={48} strokeWidth={1.5} />
            </div>
            <h3 className="text-2xl font-bold text-amber-100">הכספת</h3>
-           <div className="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">פתוח</div>
+           {/* Progress indicator */}
+           <div className="w-full max-w-[180px] flex flex-col items-center gap-2">
+             <div className="w-full h-2 bg-black/40 rounded-full overflow-hidden">
+               <motion.div
+                 initial={{ width: 0 }}
+                 animate={{ width: `${((user?.progress?.completedLevels.length || 0) / VAULT_CURRICULUM.length) * 100}%` }}
+                 transition={{ delay: 0.5, duration: 0.8 }}
+                 className="h-full bg-gradient-to-r from-amber-500 to-amber-300 rounded-full"
+               />
+             </div>
+             <div className="text-xs text-amber-400/70">
+               {user?.progress?.completedLevels.length || 0} / {VAULT_CURRICULUM.length} שלבים
+             </div>
+           </div>
         </motion.button>
 
         {/* CARD 3: COCKPIT (Locked) */}
@@ -148,6 +162,55 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
         </motion.div>
 
       </div>
+
+      {/* Stats Bar */}
+      {(user?.progress?.totalScore || user?.progress?.streak) ? (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="relative z-10 mt-12 flex gap-6 items-center justify-center"
+        >
+          {/* Total Score */}
+          {user?.progress?.totalScore > 0 && (
+            <div className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+              <div className="p-2 rounded-full bg-amber-500/20">
+                <Star size={24} className="text-amber-400 fill-amber-400" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-white/50 text-xs">ניקוד כולל</span>
+                <span className="text-white font-bold text-xl">{user.progress.totalScore}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Streak */}
+          {user?.progress?.streak > 0 && (
+            <div className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-gradient-to-r from-orange-500/20 to-amber-500/20 border border-orange-500/30 backdrop-blur-sm">
+              <div className="p-2 rounded-full bg-orange-500/20">
+                <Flame size={24} className="text-orange-400" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-orange-300/70 text-xs">רצף הצלחות</span>
+                <span className="text-orange-300 font-bold text-xl">{user.progress.streak} 🔥</span>
+              </div>
+            </div>
+          )}
+
+          {/* Completed Levels Badge */}
+          {user?.progress?.completedLevels.length >= VAULT_CURRICULUM.length && (
+            <div className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500/20 to-green-500/20 border border-emerald-500/30 backdrop-blur-sm">
+              <div className="p-2 rounded-full bg-emerald-500/20">
+                <Trophy size={24} className="text-emerald-400" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-emerald-300/70 text-xs">סיימת הכל!</span>
+                <span className="text-emerald-300 font-bold text-xl">אלוף! 🏆</span>
+              </div>
+            </div>
+          )}
+        </motion.div>
+      ) : null}
 
     </div>
   );
