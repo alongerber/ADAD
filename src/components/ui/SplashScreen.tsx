@@ -56,9 +56,9 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}
-        className="mt-8 text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500"
+        className="mt-8 text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500"
       >
-        ADAD
+        מתמטי-ביס
       </motion.h1>
 
       {/* Subtitle */}
@@ -68,7 +68,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
         transition={{ delay: 0.8 }}
         className="mt-3 text-lg md:text-xl text-amber-200/60 font-medium"
       >
-        לומדים מתמטיקה בכיף
+        לומדים בביסים קטנים
       </motion.p>
 
       {/* Loading dots */}
