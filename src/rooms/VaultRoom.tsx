@@ -182,19 +182,17 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
     return (
         <div className="relative w-full h-full flex flex-col items-center bg-neutral-900 overflow-hidden select-none font-mono text-amber-500" dir="rtl">
             
-            <AnimatePresence>
-                {showIntro && (
-                    <LessonIntro
-                        levelType={currentLevel.mode}
-                        levelTitle={introData.title}
-                        explanation={introData.explanation}
-                        exampleBefore={introData.exampleBefore}
-                        exampleAfter={introData.exampleAfter}
-                        tip={introData.tip}
-                        onStart={() => setShowIntro(false)}
-                    />
-                )}
-            </AnimatePresence>
+            {showIntro && (
+                <LessonIntro
+                    levelType={currentLevel.mode}
+                    levelTitle={introData.title}
+                    explanation={introData.explanation}
+                    exampleBefore={introData.exampleBefore}
+                    exampleAfter={introData.exampleAfter}
+                    tip={introData.tip}
+                    onStart={() => setShowIntro(false)}
+                />
+            )}
 
             <div className="absolute inset-0 flex items-center justify-center z-0">
                 <div className="flex flex-col items-center gap-6 animate-pulse">
