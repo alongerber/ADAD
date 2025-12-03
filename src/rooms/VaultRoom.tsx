@@ -13,6 +13,7 @@ import { NotebookBridge } from '../components/vault/NotebookBridge';
 import { LessonIntro } from '../components/ui/LessonIntro';
 import { getSuccessMessage, getCodeCrackedMessage, getHintPrefix, getReadAgainMessage } from '../utils/messages';
 import { useSound } from '../hooks/useSound';
+import { ParticleSystem } from '../components/systems/ParticleSystem';
 
 interface VaultRoomProps {
     onNavigate: (room: RoomType) => void;
@@ -147,6 +148,7 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
     const [borrowingState, setBorrowingState] = useState<{from: number, to: number} | null>(null);
     const [flashCol, setFlashCol] = useState<number | null>(null);
     const [isDemoMode, setIsDemoMode] = useState(false);
+    const [showCelebration, setShowCelebration] = useState(false);
 
     useEffect(() => {
         initializeLevel(currentLevel);
@@ -194,6 +196,7 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
 
     const initializeLevel = (level: Level) => {
         setIsVaultOpen(false);
+        setShowCelebration(false);
         setMessages([level.notebookHint]);
         setIsOpen(true);
         setShowIntro(true);
@@ -305,10 +308,13 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
         if (isCorrect) {
             playCelebrate();
             setIsVaultOpen(true);
+            setShowCelebration(true);
             const gender = user?.gender || 'boy';
             addMessage(getCodeCrackedMessage(gender, user?.name));
             // Save level completion
             completeLevel(currentLevel.id, 10);
+            // Auto-hide celebration after animation
+            setTimeout(() => setShowCelebration(false), 2000);
         }
     };
 
@@ -344,7 +350,10 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
 
     return (
         <div className="relative w-full h-full flex flex-col items-center bg-neutral-900 overflow-hidden select-none font-mono text-amber-500" dir="rtl">
-            
+
+            {/* Celebration Particles */}
+            <ParticleSystem active={showCelebration} count={150} />
+
             {showIntro && (
                 <LessonIntro
                     levelType={currentLevel.mode}
