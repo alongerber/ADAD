@@ -270,6 +270,8 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
 
             if (!isCorrect) {
                 playError();
+                // Reset streak on error
+                updateProgress({ streak: 0 });
             }
         }
         else if (currentLevel.mode === 'number_input') {
@@ -277,6 +279,8 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
 
             if (!isCorrect) {
                 playError();
+                // Reset streak on error
+                updateProgress({ streak: 0 });
                 // Find the first wrong digit and give specific feedback
                 const firstWrongIndex = userAnswers.findIndex((val, i) => val !== currentLevel.target[i]);
                 const columnLabel = getColumnLabel(currentLevel.target.length, firstWrongIndex);
@@ -405,6 +409,27 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                     <button onClick={() => onNavigate(RoomType.LOBBY)} className="p-3 rounded-full bg-neutral-800 border border-amber-500/20 text-amber-500/50 hover:bg-neutral-800 hover:text-amber-400 transition-all shadow-lg">
                         <Home size={24} />
                     </button>
+                </div>
+
+                {/* Streak & Score Display */}
+                <div className="absolute top-6 right-6 z-50 flex gap-4 items-center">
+                    {/* Streak Counter */}
+                    {user?.progress?.streak && user.progress.streak > 0 ? (
+                        <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-orange-600 to-amber-500 border border-orange-400 shadow-[0_0_20px_rgba(251,146,60,0.4)]"
+                        >
+                            <span className="text-2xl">🔥</span>
+                            <span className="text-white font-black text-xl">{user.progress.streak}</span>
+                        </motion.div>
+                    ) : null}
+
+                    {/* Total Score */}
+                    <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-neutral-800 border border-amber-500/30">
+                        <Star size={18} className="text-amber-400 fill-amber-400" />
+                        <span className="text-amber-400 font-bold">{user?.progress?.totalScore || 0}</span>
+                    </div>
                 </div>
 
                 <div className="z-10 w-full max-w-4xl h-full flex flex-col items-center justify-center p-6 gap-8">
