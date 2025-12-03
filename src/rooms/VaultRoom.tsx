@@ -128,10 +128,50 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
     const [hoveredCol, setHoveredCol] = useState<number | null>(null);
     const [borrowingState, setBorrowingState] = useState<{from: number, to: number} | null>(null);
     const [flashCol, setFlashCol] = useState<number | null>(null);
+    const [isDemoMode, setIsDemoMode] = useState(false);
 
     useEffect(() => {
         initializeLevel(currentLevel);
     }, [currentLevel]);
+
+    // Demo mode: fill in answers automatically with animation
+    const runDemo = () => {
+        setShowIntro(false);
+        setIsDemoMode(true);
+
+        if (currentLevel.mode === 'number_input') {
+            const target = currentLevel.target;
+            let delay = 500;
+
+            // Fill each digit one by one
+            target.forEach((digit, index) => {
+                setTimeout(() => {
+                    setUserAnswers(prev => {
+                        const newAnswers = [...prev];
+                        newAnswers[index] = digit;
+                        return newAnswers;
+                    });
+
+                    // Add explanation message for each digit
+                    const columnLabel = getColumnLabel(target.length, index);
+                    if (digit === 0) {
+                        addMessage(`${columnLabel}: אין ${columnLabel} - שמים 0!`);
+                    } else {
+                        addMessage(`${columnLabel}: ${digit}`);
+                    }
+                }, delay * (index + 1));
+            });
+
+            // After all digits, show success
+            setTimeout(() => {
+                addMessage('🎉 ככה עושים את זה!');
+                setTimeout(() => {
+                    setIsDemoMode(false);
+                    initializeLevel(currentLevel); // Reset for user to try
+                }, 2000);
+            }, delay * (target.length + 1));
+        }
+    };
 
     const initializeLevel = (level: Level) => {
         setIsVaultOpen(false);
@@ -260,6 +300,7 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                     exampleAfter={introData.exampleAfter}
                     tip={introData.tip}
                     onStart={() => setShowIntro(false)}
+                    onDemo={currentLevel.mode === 'number_input' ? runDemo : undefined}
                 />
             )}
 
