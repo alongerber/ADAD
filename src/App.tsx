@@ -9,6 +9,7 @@ import { NotebookProvider, useNotebook } from './contexts/NotebookContext';
 import { OnboardingWizard } from './components/onboarding/OnboardingWizard';
 import { NotebookPanel } from './components/ui/NotebookPanel';
 import { SplashScreen } from './components/ui/SplashScreen';
+import { AchievementToast } from './components/ui/AchievementToast';
 import { Analytics } from '@vercel/analytics/react';
 
 const GameContainer: React.FC = () => {
@@ -34,6 +35,9 @@ const GameContainer: React.FC = () => {
   // Lobby / Main Game
   return (
     <div className={`w-screen h-screen ${theme.bg} text-white relative overflow-hidden transition-colors duration-1000`}>
+
+        {/* Achievement Toast - Shows when achievements are unlocked */}
+        <AchievementToast />
 
         {/* GLOBAL NOTEBOOK OVERLAY */}
         <NotebookPanel show={isOpen} messages={messages} />

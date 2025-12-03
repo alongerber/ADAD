@@ -1,19 +1,37 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#1e293b"/>
-      <stop offset="100%" style="stop-color:#0f172a"/>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b"/>
+      <stop offset="100%" style="stop-color:#ea580c"/>
     </linearGradient>
-    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#fbbf24"/>
-      <stop offset="100%" style="stop-color:#f59e0b"/>
+    <linearGradient id="shineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:0.6"/>
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:0"/>
     </linearGradient>
+    <mask id="biteMask">
+      <rect width="192" height="192" fill="white"/>
+      <circle cx="163" cy="29" r="35" fill="black"/>
+    </mask>
   </defs>
-  <rect width="192" height="192" rx="38" fill="url(#bg)"/>
-  <circle cx="96" cy="96" r="67" fill="none" stroke="url(#gold)" stroke-width="5"/>
-  <rect x="69" y="82" width="54" height="46" rx="6" fill="url(#gold)"/>
-  <path d="M 79 82 L 79 67 A 17 17 0 0 1 113 67 L 113 82"
-        fill="none" stroke="url(#gold)" stroke-width="8" stroke-linecap="round"/>
-  <circle cx="96" cy="101" r="7" fill="#1e293b"/>
-  <rect x="93" y="103" width="6" height="13" rx="2" fill="#1e293b"/>
+
+  <!-- Main circle with bite -->
+  <g mask="url(#biteMask)">
+    <circle cx="96" cy="96" r="86" fill="url(#bgGrad)"/>
+    <ellipse cx="67" cy="67" rx="38" ry="29" fill="url(#shineGrad)" opacity="0.5"/>
+  </g>
+
+  <!-- Bite edge highlight -->
+  <path d="M 134 10 Q 128 29, 138 54" stroke="#fcd34d" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+  <!-- Math symbol: ½ -->
+  <g fill="#1e1b4b" font-family="Arial, sans-serif" font-weight="bold">
+    <text x="96" y="80" font-size="46" text-anchor="middle">1</text>
+    <line x1="67" y1="96" x2="125" y2="96" stroke="#1e1b4b" stroke-width="6" stroke-linecap="round"/>
+    <text x="96" y="138" font-size="46" text-anchor="middle">2</text>
+  </g>
+
+  <!-- Sparkles -->
+  <circle cx="150" cy="15" r="4" fill="#fef3c7"/>
+  <circle cx="177" cy="42" r="3" fill="#fef3c7"/>
+  <circle cx="169" cy="61" r="2" fill="#fef3c7"/>
 </svg>

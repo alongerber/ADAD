@@ -1,13 +1,18 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { UserProfile, ThemeType, UserProgress } from '../types';
 import { THEME_CONFIG } from '../constants';
+import { checkNewAchievements, Achievement, AchievementStats } from '../data/achievements';
 
 const DEFAULT_PROGRESS: UserProgress = {
   completedLevels: [],
   currentVaultLevel: 0,
   totalScore: 0,
   streak: 0,
+  maxStreak: 0,
   lastPlayedAt: null,
+  unlockedAchievements: [],
+  daysPlayed: 0,
+  lastPlayDate: null,
 };
 
 interface UserContextType {
@@ -17,12 +22,15 @@ interface UserContextType {
   completeLevel: (levelId: string, score?: number) => void;
   clearUser: () => void;
   theme: typeof THEME_CONFIG['scifi']; // Helper to get current theme config
+  newlyUnlockedAchievements: Achievement[];
+  clearNewAchievements: () => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
+  const [newlyUnlockedAchievements, setNewlyUnlockedAchievements] = useState<Achievement[]>([]);
 
   useEffect(() => {
     // Load from local storage on mount
@@ -34,11 +42,20 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (!parsed.progress) {
           parsed.progress = DEFAULT_PROGRESS;
         }
+        // Migration: add new fields if missing
+        if (!parsed.progress.maxStreak) parsed.progress.maxStreak = parsed.progress.streak || 0;
+        if (!parsed.progress.unlockedAchievements) parsed.progress.unlockedAchievements = [];
+        if (!parsed.progress.daysPlayed) parsed.progress.daysPlayed = 0;
+        if (!parsed.progress.lastPlayDate) parsed.progress.lastPlayDate = null;
         setUser(parsed);
       } catch (e) {
         console.error("Failed to parse user profile", e);
       }
     }
+  }, []);
+
+  const clearNewAchievements = useCallback(() => {
+    setNewlyUnlockedAchievements([]);
   }, []);
 
   const updateUser = (profile: UserProfile) => {
@@ -73,10 +90,50 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ? user.progress.completedLevels
       : [...user.progress.completedLevels, levelId];
 
+    const newStreak = user.progress.streak + 1;
+    const newMaxStreak = Math.max(user.progress.maxStreak || 0, newStreak);
+    const newTotalScore = user.progress.totalScore + (alreadyCompleted ? 0 : score);
+
+    // Check for new day
+    const today = new Date().toISOString().split('T')[0];
+    const isNewDay = user.progress.lastPlayDate !== today;
+    const newDaysPlayed = isNewDay ? (user.progress.daysPlayed || 0) + 1 : (user.progress.daysPlayed || 0);
+
+    // Calculate stats for achievement checking
+    const labLevels = newCompletedLevels.filter(id => id.startsWith('frac_'));
+    const vaultLevels = newCompletedLevels.filter(id => id.startsWith('lvl_'));
+
+    const stats: AchievementStats = {
+      totalLevelsCompleted: newCompletedLevels.length,
+      labLevelsCompleted: labLevels.length,
+      vaultLevelsCompleted: vaultLevels.length,
+      totalScore: newTotalScore,
+      currentStreak: newStreak,
+      maxStreak: newMaxStreak,
+      daysPlayed: newDaysPlayed,
+    };
+
+    // Check for new achievements
+    const existingAchievements = user.progress.unlockedAchievements || [];
+    const newAchievements = checkNewAchievements(stats, existingAchievements);
+
+    if (newAchievements.length > 0) {
+      setNewlyUnlockedAchievements(prev => [...prev, ...newAchievements]);
+    }
+
+    const newUnlockedAchievements = [
+      ...existingAchievements,
+      ...newAchievements.map(a => a.id)
+    ];
+
     updateProgress({
       completedLevels: newCompletedLevels,
-      totalScore: user.progress.totalScore + (alreadyCompleted ? 0 : score),
-      streak: user.progress.streak + 1,
+      totalScore: newTotalScore,
+      streak: newStreak,
+      maxStreak: newMaxStreak,
+      unlockedAchievements: newUnlockedAchievements,
+      daysPlayed: newDaysPlayed,
+      lastPlayDate: today,
     });
   };
 
@@ -89,7 +146,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const currentThemeConfig = user && THEME_CONFIG[user.theme] ? THEME_CONFIG[user.theme] : THEME_CONFIG['scifi'];
 
   return (
-    <UserContext.Provider value={{ user, updateUser, updateProgress, completeLevel, clearUser, theme: currentThemeConfig }}>
+    <UserContext.Provider value={{ user, updateUser, updateProgress, completeLevel, clearUser, theme: currentThemeConfig, newlyUnlockedAchievements, clearNewAchievements }}>
       {children}
     </UserContext.Provider>
   );

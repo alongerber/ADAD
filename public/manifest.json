@@ -1,7 +1,7 @@
 {
-  "name": "ADAD - לומדים מתמטיקה",
-  "short_name": "ADAD",
-  "description": "אפליקציה ללימוד מתמטיקה לתלמידי כיתה ד׳",
+  "name": "מתמטי-ביס | לומדים בביסים קטנים",
+  "short_name": "מתמטי-ביס",
+  "description": "מתמטי-ביס - לומדים מתמטיקה בביסים קטנים לתלמידי כיתה ד׳",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f172a",
