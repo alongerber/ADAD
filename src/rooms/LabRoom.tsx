@@ -9,6 +9,7 @@ import { LabState, RoomType } from '../types';
 import { X, Home } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
 import { PedagogicalLabel } from '../components/ui/PedagogicalLabel';
+import { useSound } from '../hooks/useSound';
 
 interface LabRoomProps {
     onNavigate: (room: RoomType) => void;
@@ -26,7 +27,8 @@ const SNAP_TOLERANCE = 0.05; // 5% tolerance for "Radio Tuning"
 
 export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
   const { user, theme } = useUser();
-  
+  const { playSuccess, playError, playTick, playClick } = useSound();
+
   // --- Game State ---
   const [target, setTarget] = useState(() => TARGETS[Math.floor(Math.random() * TARGETS.length)]);
   const [score, setScore] = useState(0);
@@ -97,6 +99,7 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
 
     if (foundSnap) {
         if (!isSnapped || nextNum !== labState.numerator || nextDenom !== labState.denominator) {
+            playTick();
             setLabState(prev => ({ ...prev, numerator: nextNum, denominator: nextDenom }));
             setFeedbackScale(1.3);
             setTimeout(() => setFeedbackScale(1), 150);
@@ -109,8 +112,10 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
 
   const checkAnswer = () => {
     if (missionStatus === 'success') return;
+    playClick();
 
     if (!isSnapped) {
+        playError();
         setShake(prev => prev + 1);
         setMissionStatus('error');
         setShowErrorTooltip(true);
@@ -120,8 +125,9 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
 
     const currentVal = labState.denominator === 0 ? 0 : labState.numerator / labState.denominator;
     const isCorrect = Math.abs(currentVal - target.val) < 0.01;
-    
+
     if (isCorrect) {
+      playSuccess();
       setMissionStatus('success');
       setShowParticles(true);
       setScore(s => s + 10);
@@ -130,7 +136,8 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
       }, 2000);
 
     } else {
-      setShake(prev => prev + 1); 
+      playError();
+      setShake(prev => prev + 1);
       setMissionStatus('error');
       setShowErrorTooltip(true);
       setTimeout(() => setMissionStatus('idle'), 1000);

@@ -12,6 +12,7 @@ import { useNotebook } from '../contexts/NotebookContext';
 import { NotebookBridge } from '../components/vault/NotebookBridge';
 import { LessonIntro } from '../components/ui/LessonIntro';
 import { getSuccessMessage, getCodeCrackedMessage, getHintPrefix, getReadAgainMessage } from '../utils/messages';
+import { useSound } from '../hooks/useSound';
 
 interface VaultRoomProps {
     onNavigate: (room: RoomType) => void;
@@ -129,6 +130,7 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
     const { user } = useUser();
     const { isIdle, resetTimer } = useIdleScaffold();
     const { addMessage, setMessages, setIsOpen } = useNotebook();
+    const { playSuccess, playError, playTick, playBorrow, playCelebrate, playClick } = useSound();
 
     const [levelIndex, setLevelIndex] = useState(0);
     const currentLevel: Level = VAULT_CURRICULUM[levelIndex];
@@ -204,6 +206,7 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
 
     const handleWheelChange = (colIndex: number, val: number) => {
         resetTimer();
+        playTick();
         const newAnswers = [...userAnswers];
         newAnswers[colIndex] = val;
         setUserAnswers(newAnswers);
@@ -213,22 +216,24 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
         resetTimer();
         if (currentLevel.mode !== 'vertical_math') return;
         if (isVaultOpen) return;
-        if (colIndex >= minuend.length - 1) return; 
-        if (minuend[colIndex] <= 0) return; 
-        
+        if (colIndex >= minuend.length - 1) return;
+        if (minuend[colIndex] <= 0) return;
+
+        playClick();
         setBorrowingState({ from: colIndex, to: colIndex + 1 });
 
         setTimeout(() => {
+            playBorrow();
             const newMinuend = [...minuend];
-            newMinuend[colIndex] -= 1;      
-            newMinuend[colIndex + 1] += 10; 
+            newMinuend[colIndex] -= 1;
+            newMinuend[colIndex + 1] += 10;
             setMinuend(newMinuend);
-            
+
             setBorrowingState(null);
             setFlashCol(colIndex + 1);
             setTimeout(() => setFlashCol(null), 500);
             addMessage(`פרטנו ${1} מאות ל-${10} עשרות`);
-        }, 600); 
+        }, 600);
     };
 
     const handleReset = () => {
@@ -244,6 +249,7 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
     };
 
     const checkUnlock = () => {
+        playClick();
         let isCorrect = false;
 
         if (currentLevel.mode === 'vertical_math') {
@@ -251,11 +257,16 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
             const botVal = parseInt(currentLevel.bottom.join(''));
             const userStr = userAnswers.join('');
             isCorrect = parseInt(userStr) === (topVal - botVal);
-        } 
+
+            if (!isCorrect) {
+                playError();
+            }
+        }
         else if (currentLevel.mode === 'number_input') {
             isCorrect = userAnswers.every((val, i) => val === currentLevel.target[i]);
 
             if (!isCorrect) {
+                playError();
                 // Find the first wrong digit and give specific feedback
                 const firstWrongIndex = userAnswers.findIndex((val, i) => val !== currentLevel.target[i]);
                 const columnLabel = getColumnLabel(currentLevel.target.length, firstWrongIndex);
@@ -285,6 +296,7 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
         }
 
         if (isCorrect) {
+            playCelebrate();
             setIsVaultOpen(true);
             const gender = user?.gender || 'boy';
             addMessage(getCodeCrackedMessage(gender, user?.name));
