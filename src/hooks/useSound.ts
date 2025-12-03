@@ -209,8 +209,20 @@ const sounds: Record<SoundType, (ctx: AudioContext) => void> = {
 let lastTickTime = 0;
 const TICK_THROTTLE = 50; // ms
 
+// Check if sound is muted (reads from localStorage)
+const isMuted = (): boolean => {
+  try {
+    return localStorage.getItem('biss_muted') === 'true';
+  } catch {
+    return false;
+  }
+};
+
 export const playSound = (type: SoundType): void => {
   try {
+    // Check mute state first
+    if (isMuted()) return;
+
     const ctx = getAudioContext();
     if (!ctx) return;
 

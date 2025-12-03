@@ -6,7 +6,7 @@ import { useIdleScaffold } from '../hooks/useIdleScaffold';
 import { GhostHand } from '../components/ui/GhostHand';
 import { ParticleSystem } from '../components/systems/ParticleSystem';
 import { LabState, RoomType } from '../types';
-import { X, Home, Beaker as BeakerIcon, Lock, CheckCircle, Play } from 'lucide-react';
+import { X, Home, Beaker as BeakerIcon, Lock, CheckCircle, Play, Volume2, VolumeX } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
 import { PedagogicalLabel } from '../components/ui/PedagogicalLabel';
 import { useSound } from '../hooks/useSound';
@@ -20,7 +20,7 @@ interface LabRoomProps {
 const SNAP_TOLERANCE = 0.05; // 5% tolerance for "Radio Tuning"
 
 export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
-  const { user, theme, completeLevel } = useUser();
+  const { user, theme, completeLevel, isMuted, toggleMute } = useUser();
   const { playSuccess, playError, playTick, playClick } = useSound();
 
   // --- Level Selection State ---
@@ -260,8 +260,18 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
         {/* Background */}
         <div className={`absolute inset-0 bg-gradient-to-br ${theme.bgGradient} opacity-60 pointer-events-none`} />
 
-        {/* Home Button */}
-        <div className="absolute top-6 left-6 z-50">
+        {/* Top Controls */}
+        <div className="absolute top-6 left-6 z-50 flex gap-2">
+          <button
+            onClick={toggleMute}
+            className={`p-3 rounded-full transition-all shadow-lg backdrop-blur-md border ${
+              isMuted
+                ? 'bg-red-500/20 border-red-500/30 text-red-400'
+                : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10 hover:text-white'
+            }`}
+          >
+            {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
+          </button>
           <button
             onClick={() => onNavigate(RoomType.LOBBY)}
             className="p-3 rounded-full bg-white/5 border border-white/10 text-white/50 hover:bg-white/10 hover:text-white transition-all shadow-lg backdrop-blur-md"
@@ -447,8 +457,18 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
         )}
       </AnimatePresence>
 
-      {/* Home Button */}
-      <div className="absolute top-6 left-6 z-50">
+      {/* Top Controls */}
+      <div className="absolute top-6 left-6 z-50 flex gap-2">
+          <button
+            onClick={toggleMute}
+            className={`p-3 rounded-full transition-all shadow-lg backdrop-blur-md border ${
+              isMuted
+                ? 'bg-red-500/20 border-red-500/30 text-red-400'
+                : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10 hover:text-white'
+            }`}
+          >
+            {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
+          </button>
           <button
             onClick={() => setShowLevelSelect(true)}
             className="p-3 rounded-full bg-white/5 border border-white/10 text-white/50 hover:bg-white/10 hover:text-white transition-all shadow-lg backdrop-blur-md"

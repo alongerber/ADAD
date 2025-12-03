@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useUser } from '../../contexts/UserContext';
 import { RoomType } from '../../types';
-import { Beaker, Lock, Calculator, Component, LogOut, Star, Flame, Trophy } from 'lucide-react';
+import { Beaker, Lock, Calculator, Component, LogOut, Star, Flame, Trophy, Volume2, VolumeX } from 'lucide-react';
 import { getTimeGreeting } from '../../utils/messages';
 import { VAULT_CURRICULUM, VAULT_TOPICS, LAB_TOPICS, LAB_CURRICULUM } from '../../data/curriculum';
 
@@ -11,7 +11,7 @@ interface LobbyProps {
 }
 
 export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
-  const { user, theme, clearUser } = useUser();
+  const { user, theme, clearUser, isMuted, toggleMute } = useUser();
 
   // Dynamic Styles based on theme
   const getHeaderStyle = () => {
@@ -72,13 +72,29 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
       {/* Background Ambience */}
       <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${theme.bgGradient} opacity-60 pointer-events-none`} />
       
-      {/* Logout / Reset Profile */}
-      <button 
-        onClick={clearUser} 
-        className="absolute top-6 left-6 z-50 p-3 bg-white/5 rounded-full hover:bg-white/10 text-white/40 hover:text-white transition-all border border-white/5 hover:border-white/20"
-      >
-        <LogOut size={20} />
-      </button>
+      {/* Top Controls */}
+      <div className="absolute top-6 left-6 z-50 flex gap-2">
+        {/* Mute Button */}
+        <button
+          onClick={toggleMute}
+          className={`p-3 rounded-full transition-all border ${
+            isMuted
+              ? 'bg-red-500/20 border-red-500/30 text-red-400 hover:bg-red-500/30'
+              : 'bg-white/5 border-white/5 text-white/40 hover:bg-white/10 hover:text-white hover:border-white/20'
+          }`}
+          title={isMuted ? 'הפעל צלילים' : 'השתק צלילים'}
+        >
+          {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+        </button>
+
+        {/* Logout / Reset Profile */}
+        <button
+          onClick={clearUser}
+          className="p-3 bg-white/5 rounded-full hover:bg-white/10 text-white/40 hover:text-white transition-all border border-white/5 hover:border-white/20"
+        >
+          <LogOut size={20} />
+        </button>
+      </div>
 
       {/* Header */}
       <motion.div
