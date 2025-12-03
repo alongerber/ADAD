@@ -6,7 +6,7 @@ import { Home, Lock, RefreshCw, Unlock, Star, ArrowLeft, Volume2, VolumeX } from
 import { VaultWheel } from '../components/vault/VaultWheel';
 import { GhostHand } from '../components/ui/GhostHand';
 import { useIdleScaffold } from '../hooks/useIdleScaffold';
-import { VAULT_CURRICULUM, Level } from '../data/curriculum';
+import { VAULT_CURRICULUM, VAULT_TOPICS, Level } from '../data/curriculum';
 import { PedagogicalLabel } from '../components/ui/PedagogicalLabel';
 import { useNotebook } from '../contexts/NotebookContext';
 import { NotebookBridge } from '../components/vault/NotebookBridge';
@@ -14,6 +14,22 @@ import { LessonIntro } from '../components/ui/LessonIntro';
 import { getSuccessMessage, getCodeCrackedMessage, getHintPrefix, getReadAgainMessage } from '../utils/messages';
 import { useSound } from '../hooks/useSound';
 import { ParticleSystem } from '../components/systems/ParticleSystem';
+import { LearningMode, createVaultLearningSlides } from '../components/learning/LearningMode';
+
+// Helper to get topic number from level index
+const getTopicFromLevelIndex = (levelIndex: number): number => {
+  if (levelIndex < 12) return 1;  // Writing numbers: levels 0-11
+  return 2;                        // Subtraction: levels 12-23
+};
+
+// Helper to get first level index for a topic
+const getFirstLevelOfTopic = (topicNumber: number): number => {
+  switch (topicNumber) {
+    case 1: return 0;   // Writing numbers
+    case 2: return 12;  // Subtraction
+    default: return 0;
+  }
+};
 
 interface VaultRoomProps {
     onNavigate: (room: RoomType) => void;
@@ -128,7 +144,7 @@ const LEVEL_INTROS: Record<string, { title: string; narrative: string; explanati
 };
 
 export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
-    const { user, completeLevel, updateProgress, isMuted, toggleMute } = useUser();
+    const { user, completeLevel, updateProgress, completeTopic, hasLearnedTopic, isMuted, toggleMute } = useUser();
     const { isIdle, resetTimer } = useIdleScaffold();
     const { addMessage, setMessages, setIsOpen } = useNotebook();
     const { playSuccess, playError, playTick, playBorrow, playCelebrate, playClick } = useSound();
@@ -142,13 +158,45 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
     const [minuend, setMinuend] = useState<number[]>([]);
     const [userAnswers, setUserAnswers] = useState<number[]>([]);
     const [isVaultOpen, setIsVaultOpen] = useState(false);
-    const [showIntro, setShowIntro] = useState(true);
+    const [showIntro, setShowIntro] = useState(false); // Changed to false by default
+    const [showLearningMode, setShowLearningMode] = useState(false);
+    const [currentLearningTopic, setCurrentLearningTopic] = useState(1);
 
     const [hoveredCol, setHoveredCol] = useState<number | null>(null);
     const [borrowingState, setBorrowingState] = useState<{from: number, to: number} | null>(null);
     const [flashCol, setFlashCol] = useState<number | null>(null);
     const [isDemoMode, setIsDemoMode] = useState(false);
     const [showCelebration, setShowCelebration] = useState(false);
+
+    // Check if learning mode should be shown on mount or when level changes
+    useEffect(() => {
+        const topicNumber = getTopicFromLevelIndex(levelIndex);
+        const topicId = `vault_topic_${topicNumber}`;
+
+        // Show learning mode if this is the first level of a topic and hasn't been learned
+        const isFirstLevelOfTopic = levelIndex === getFirstLevelOfTopic(topicNumber);
+        if (isFirstLevelOfTopic && !hasLearnedTopic(topicId)) {
+            setCurrentLearningTopic(topicNumber);
+            setShowLearningMode(true);
+        } else {
+            setShowIntro(true);
+        }
+    }, []); // Only on mount
+
+    const handleLearningComplete = () => {
+        const topicId = `vault_topic_${currentLearningTopic}`;
+        completeTopic(topicId);
+        setShowLearningMode(false);
+        setShowIntro(true);
+        playClick();
+    };
+
+    const handleLearningSkip = () => {
+        const topicId = `vault_topic_${currentLearningTopic}`;
+        completeTopic(topicId);
+        setShowLearningMode(false);
+        setShowIntro(true);
+    };
 
     useEffect(() => {
         initializeLevel(currentLevel);
@@ -252,6 +300,21 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
             setLevelIndex(nextIndex);
             // Save progress
             updateProgress({ currentVaultLevel: nextIndex });
+
+            // Check if entering a new topic
+            const currentTopicNumber = getTopicFromLevelIndex(levelIndex);
+            const nextTopicNumber = getTopicFromLevelIndex(nextIndex);
+            const nextTopicId = `vault_topic_${nextTopicNumber}`;
+
+            if (nextTopicNumber !== currentTopicNumber && !hasLearnedTopic(nextTopicId)) {
+                // New topic! Show learning mode
+                setCurrentLearningTopic(nextTopicNumber);
+                setShowLearningMode(true);
+                setShowIntro(false);
+            } else {
+                // Same topic, just show intro
+                setShowIntro(true);
+            }
         } else {
             // Completed all levels - return to lobby
             onNavigate(RoomType.LOBBY);
@@ -358,7 +421,19 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
             {/* Celebration Particles */}
             <ParticleSystem active={showCelebration} count={150} />
 
-            {showIntro && (
+            {/* Learning Mode - shows before intro for new topics */}
+            {showLearningMode && (
+                <LearningMode
+                    topicId={`vault_topic_${currentLearningTopic}`}
+                    topicTitle={VAULT_TOPICS[currentLearningTopic - 1]?.title || `נושא ${currentLearningTopic}`}
+                    topicIcon={VAULT_TOPICS[currentLearningTopic - 1]?.icon || '📚'}
+                    slides={createVaultLearningSlides(currentLearningTopic)}
+                    onComplete={handleLearningComplete}
+                    onSkip={handleLearningSkip}
+                />
+            )}
+
+            {showIntro && !showLearningMode && (
                 <LessonIntro
                     levelType={currentLevel.mode}
                     levelTitle={introData.title}
