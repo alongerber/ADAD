@@ -327,7 +327,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onClose }) => 
 
             {/* Feedback Button */}
             <a
-              href="mailto:feedback@matmati-bis.app?subject=משוב על מתמטי-ביס"
+              href="mailto:comeddadyisrael@gmail.com?subject=משוב על מתמטי-ביס"
               className="flex items-center justify-center gap-3 p-4 bg-green-500/20 border border-green-500/30 rounded-xl hover:bg-green-500/30 transition-all"
             >
               <MessageCircle size={20} className="text-green-400" />
