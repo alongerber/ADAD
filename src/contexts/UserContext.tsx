@@ -13,6 +13,7 @@ const DEFAULT_PROGRESS: UserProgress = {
   unlockedAchievements: [],
   daysPlayed: 0,
   lastPlayDate: null,
+  learnedTopics: [],
 };
 
 interface UserContextType {
@@ -20,6 +21,8 @@ interface UserContextType {
   updateUser: (profile: UserProfile) => void;
   updateProgress: (updates: Partial<UserProgress>) => void;
   completeLevel: (levelId: string, score?: number) => void;
+  completeTopic: (topicId: string) => void;
+  hasLearnedTopic: (topicId: string) => boolean;
   clearUser: () => void;
   theme: typeof THEME_CONFIG['scifi']; // Helper to get current theme config
   newlyUnlockedAchievements: Achievement[];
@@ -61,6 +64,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (!parsed.progress.unlockedAchievements) parsed.progress.unlockedAchievements = [];
         if (!parsed.progress.daysPlayed) parsed.progress.daysPlayed = 0;
         if (!parsed.progress.lastPlayDate) parsed.progress.lastPlayDate = null;
+        if (!parsed.progress.learnedTopics) parsed.progress.learnedTopics = [];
         setUser(parsed);
       } catch (e) {
         console.error("Failed to parse user profile", e);
@@ -151,6 +155,21 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
+  const completeTopic = useCallback((topicId: string) => {
+    if (!user) return;
+
+    const alreadyLearned = user.progress.learnedTopics?.includes(topicId);
+    if (alreadyLearned) return;
+
+    const newLearnedTopics = [...(user.progress.learnedTopics || []), topicId];
+    updateProgress({ learnedTopics: newLearnedTopics });
+  }, [user, updateProgress]);
+
+  const hasLearnedTopic = useCallback((topicId: string): boolean => {
+    if (!user) return false;
+    return user.progress.learnedTopics?.includes(topicId) || false;
+  }, [user]);
+
   const clearUser = () => {
     setUser(null);
     localStorage.removeItem('biss_user_profile');
@@ -160,7 +179,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const currentThemeConfig = user && THEME_CONFIG[user.theme] ? THEME_CONFIG[user.theme] : THEME_CONFIG['scifi'];
 
   return (
-    <UserContext.Provider value={{ user, updateUser, updateProgress, completeLevel, clearUser, theme: currentThemeConfig, newlyUnlockedAchievements, clearNewAchievements, isMuted, toggleMute }}>
+    <UserContext.Provider value={{ user, updateUser, updateProgress, completeLevel, completeTopic, hasLearnedTopic, clearUser, theme: currentThemeConfig, newlyUnlockedAchievements, clearNewAchievements, isMuted, toggleMute }}>
       {children}
     </UserContext.Provider>
   );
