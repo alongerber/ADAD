@@ -165,7 +165,7 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
   };
 
   return (
-    <div className={`relative w-full h-full flex flex-col items-center p-6 overflow-hidden select-none ${theme.bg} transition-colors duration-500`}>
+    <div className={`relative w-full h-full flex flex-col items-center p-3 md:p-6 overflow-y-auto md:overflow-hidden select-none ${theme.bg} transition-colors duration-500`}>
       
       {/* --- GLOBAL OVERLAYS --- */}
       <div className={`absolute top-[-20%] left-[-10%] w-[50%] h-[50%] opacity-20 rounded-full blur-[100px] pointer-events-none ${theme.bg === 'bg-fuchsia-950' ? 'bg-pink-500' : 'bg-blue-500'}`} />
@@ -186,7 +186,7 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
       </div>
 
       {/* --- Header --- */}
-      <header className="w-full max-w-5xl flex justify-between items-start z-10 mb-2 shrink-0 h-[80px] pt-8">
+      <header className="w-full max-w-5xl flex justify-between items-start z-10 mb-2 shrink-0 min-h-[60px] md:h-[80px] pt-4 md:pt-8">
         
         {/* Score */}
         <div className="flex flex-col items-start gap-1">
@@ -226,7 +226,7 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
       </header>
 
       {/* --- Main Game Area --- */}
-      <div className="w-full max-w-5xl flex-1 flex flex-row items-center justify-center gap-16 relative z-0 h-full overflow-hidden">
+      <div className="w-full max-w-5xl flex-1 flex flex-col-reverse md:flex-row items-center justify-center gap-6 md:gap-16 relative z-0 min-h-0 overflow-visible md:overflow-hidden">
         
         {/* --- RIGHT COL: Beaker --- */}
         <motion.div 
@@ -234,14 +234,16 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
             animate={{ x: shake % 2 === 0 ? 0 : [-8, 8, -8, 8, 0] }}
             transition={{ duration: 0.4 }}
         >
-            <div className="relative">
-                <PedagogicalLabel 
-                    text="שלם (1)" 
-                    position="top-[-10px] right-[-80px]" 
-                    arrowDirection="left"
-                    color="text-white"
-                    delay={1.5}
-                />
+            <div className="relative scale-75 md:scale-100">
+                <div className="hidden md:block">
+                    <PedagogicalLabel
+                        text="שיקוי מלא"
+                        position="top-[-10px] right-[-90px]"
+                        arrowDirection="left"
+                        color="text-white"
+                        delay={1.5}
+                    />
+                </div>
                 <Beaker fillPercentage={fillLevel} />
             </div>
             
@@ -262,30 +264,30 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
         </motion.div>
 
         {/* --- LEFT COL: Controls --- */}
-        <div className={`flex-1 flex flex-col items-center justify-center py-4 gap-6 pl-8 border-l border-white/10 h-full relative z-30`}>
+        <div className={`flex-1 flex flex-col items-center justify-center py-2 md:py-4 gap-4 md:gap-6 md:pl-8 md:border-l border-white/10 w-full md:w-auto md:h-full relative z-30`}>
             
             {/* Display Screen */}
             <div className="w-full max-w-[180px] bg-black/40 rounded-xl border-2 border-white/10 shadow-[0_0_20px_rgba(0,0,0,0.5)] relative overflow-visible group min-h-[140px] flex flex-col items-center justify-center py-4 shrink-0">
-                 <div className="absolute top-3 left-0 w-full text-xs font-bold tracking-widest text-center uppercase opacity-50 text-white">מד גובה</div>
+                 <div className="absolute top-3 left-0 w-full text-xs font-bold tracking-widest text-center uppercase opacity-50 text-white">מידת השיקוי</div>
                  
-                 {/* Pedagogical Labels for Fractions */}
+                 {/* Pedagogical Labels for Fractions - Hidden on mobile */}
                  {isSnapped && labState.denominator !== 0 && (
-                     <>
-                        <PedagogicalLabel 
-                            text="החלקים שלקחתי" 
-                            position="top-[35%] right-[-140px]" 
+                     <div className="hidden md:block">
+                        <PedagogicalLabel
+                            text="כמות השיקוי"
+                            position="top-[35%] right-[-120px]"
                             arrowDirection="left"
                             color="text-cyan-400"
                             delay={0.2}
                         />
-                        <PedagogicalLabel 
-                            text="לכמה חילקתי?" 
-                            position="bottom-[20%] right-[-130px]" 
+                        <PedagogicalLabel
+                            text="מתוך כמה?"
+                            position="bottom-[20%] right-[-100px]"
                             arrowDirection="left"
                             color="text-white"
                             delay={0.4}
                         />
-                     </>
+                     </div>
                  )}
 
                  <motion.div 
@@ -336,7 +338,7 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
           whileTap={{ scale: 0.95 }}
           onClick={checkAnswer}
           disabled={missionStatus === 'success'}
-          className={`absolute bottom-8 left-12 w-[160px] py-4 rounded-xl bg-slate-800 border-4 ${theme.border} ${theme.textMain} font-black text-xl shadow-[0_4px_0_rgba(0,0,0,0.5)] hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-all z-50`}
+          className={`relative md:absolute md:bottom-8 md:left-12 w-full max-w-[200px] md:w-[160px] py-3 md:py-4 mt-4 md:mt-0 rounded-xl bg-slate-800 border-4 ${theme.border} ${theme.textMain} font-black text-lg md:text-xl shadow-[0_4px_0_rgba(0,0,0,0.5)] hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-all z-50`}
       >
           בדוק
       </motion.button>
