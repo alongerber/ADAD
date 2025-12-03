@@ -17,26 +17,98 @@ interface VaultRoomProps {
 }
 
 const LEVEL_INTROS: Record<string, { title: string; explanation: string; exampleBefore: string; exampleAfter: string; tip: string }> = {
-    'lvl_zero_1': {
-        title: 'מלכודת האפס',
-        explanation: 'כשכותבים מספר, כל ספרה יושבת במקום שלה. אם אין מאות - שמים אפס!',
+    // ========================================
+    // חלק א: כתיבת מספרים
+    // ========================================
+
+    'lvl_num_simple_3': {
+        title: 'בונים מספרים!',
+        explanation: 'כל מספר בנוי מחלקים: מאות, עשרות ויחידות. בוא נתרגל!',
+        exampleBefore: 'ארבע מאות עשרים וחמש',
+        exampleAfter: '425',
+        tip: 'קרא לאט: ארבע מאות (4), עשרים (2), וחמש (5).'
+    },
+    'lvl_num_simple_4': {
+        title: 'מספרים גדולים יותר!',
+        explanation: 'עכשיו יש לנו גם אלפים! ארבעה חלקים: אלפים, מאות, עשרות, יחידות.',
+        exampleBefore: 'אלף שמונה מאות שלושים ושש',
+        exampleAfter: '1836',
+        tip: 'התחל מהאלפים ולך ימינה: 1, 8, 3, 6.'
+    },
+    'lvl_num_zero_end': {
+        title: 'מספרים עגולים',
+        explanation: 'כשאומרים "חמישים" זה אומר חמש עשרות ואפס יחידות!',
+        exampleBefore: 'שלוש מאות וחמישים',
+        exampleAfter: '350',
+        tip: 'חמישים = 50. האפס בסוף אומר "אין יחידות".'
+    },
+    'lvl_num_zeros_end': {
+        title: 'עוד יותר עגול!',
+        explanation: 'מספרים כמו "מאתיים" מסתיימים בכמה אפסים.',
+        exampleBefore: 'שבעת אלפים ומאתיים',
+        exampleAfter: '7200',
+        tip: 'מאתיים = 200. אז יש 7 אלפים, 2 מאות, ואפס עשרות ויחידות.'
+    },
+    'lvl_zero_trap_1': {
+        title: 'מלכודת האפס!',
+        explanation: 'יש מספרים שמנסים לבלבל אותנו! הם מחביאים אפסים באמצע.',
         exampleBefore: 'שלושת אלפים וחמישים',
         exampleAfter: '3050',
-        tip: 'שים לב: "חמישים" זה 50. האפס במאות שומר על המקום!'
+        tip: 'חמישים = 50 (חמש עשרות). אז איפה המאות? אין! לכן שמים 0.'
     },
-    'lvl_zero_2': {
-        title: 'מלכודת האפס - שלב 2',
-        explanation: 'עכשיו עם מספרים יותר גדולים! כל מקום ריק צריך אפס.',
+    'lvl_zero_trap_2': {
+        title: 'מלכודת כפולה!',
+        explanation: 'המספרים הערמומיים חוזרים! הפעם הם מחביאים עוד יותר אפסים.',
         exampleBefore: 'ארבעים אלף וארבע',
         exampleAfter: '40004',
-        tip: 'ספור את האפסים באמצע - יש שלושה!'
+        tip: 'ארבעים אלף = 40,000. וארבע = 4. מה באמצע? שלושה אפסים!'
     },
-    'lvl_sub_1': {
-        title: 'חיסור עם פריטה',
-        explanation: 'כשהספרה למעלה קטנה מלמטה - לוחצים עליה כדי לפרוט מהשכן.',
+
+    // ========================================
+    // חלק ב: חיסור במאונך
+    // ========================================
+
+    'lvl_sub_simple_2': {
+        title: 'חיסור קל!',
+        explanation: 'בחיסור במאונך, מחסרים כל ספרה בנפרד. מתחילים מימין!',
+        exampleBefore: '89 - 34',
+        exampleAfter: '55',
+        tip: '9 פחות 4 = 5. אחר כך 8 פחות 3 = 5. קל!'
+    },
+    'lvl_sub_simple_3': {
+        title: 'חיסור עם 3 ספרות',
+        explanation: 'אותו דבר בדיוק, רק עם עוד ספרה אחת!',
+        exampleBefore: '567 - 234',
+        exampleAfter: '333',
+        tip: 'ספרה ספרה מימין לשמאל: 7-4, 6-3, 5-2.'
+    },
+    'lvl_sub_borrow_1': {
+        title: 'פריטה - השכן עוזר!',
+        explanation: 'לפעמים הספרה למעלה קטנה מדי. אז היא צריכה ללוות מהשכן!',
         exampleBefore: '452 - 138',
         exampleAfter: '314',
-        tip: 'לחץ על הספרה כדי לפרוט - היא תיתן 10 לשכן!'
+        tip: '2 פחות 8? לא מספיק! לחץ על ה-5 והוא ייתן 10 לשכן שלו.'
+    },
+    'lvl_sub_borrow_tens': {
+        title: 'פריטה בעשרות',
+        explanation: 'הפעם העשרות צריכות עזרה מהמאות!',
+        exampleBefore: '534 - 271',
+        exampleAfter: '263',
+        tip: '3 פחות 7? המאות יעזרו! לחץ על ה-5.'
+    },
+    'lvl_sub_borrow_double': {
+        title: 'פריטה כפולה!',
+        explanation: 'לפעמים צריך לפרוט פעמיים באותו תרגיל!',
+        exampleBefore: '523 - 168',
+        exampleAfter: '355',
+        tip: 'קודם תטפל באחדות (3-8), אחר כך בעשרות (2-6). שתי פריטות!'
+    },
+    'lvl_sub_borrow_zero': {
+        title: 'האפס המציק',
+        explanation: 'מה עושים כשיש 0 באמצע ואי אפשר לפרוט ממנו?',
+        exampleBefore: '503 - 127',
+        exampleAfter: '376',
+        tip: 'אי אפשר לקחת מ-0! צריך קודם לפרוט מהמאות לעשרות.'
     }
 };
 
@@ -175,9 +247,6 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
         exampleAfter: '',
         tip: 'בהצלחה!'
     };
-
-    // DEBUG: Log state
-    console.log('🔍 VaultRoom Debug:', { showIntro, isVaultOpen, levelId: currentLevel.id, introData });
 
     return (
         <div className="relative w-full h-full flex flex-col items-center bg-neutral-900 overflow-hidden select-none font-mono text-amber-500" dir="rtl">
