@@ -23,16 +23,19 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onClose }) => 
     return null;
   }
 
-  // Calculate stats
-  const labLevels = progress.completedLevels.filter(id => id.startsWith('frac_'));
-  const vaultLevels = progress.completedLevels.filter(id => id.startsWith('lvl_'));
+  // Calculate stats with defensive checks
+  const completedLevels = progress.completedLevels || [];
+  const achievementsList = progress.unlockedAchievements || [];
+
+  const labLevels = completedLevels.filter(id => id.startsWith('frac_'));
+  const vaultLevels = completedLevels.filter(id => id.startsWith('lvl_'));
 
   const labProgress = (labLevels.length / LAB_CURRICULUM.length) * 100;
   const vaultProgress = (vaultLevels.length / VAULT_CURRICULUM.length) * 100;
-  const totalProgress = (progress.completedLevels.length / (LAB_CURRICULUM.length + VAULT_CURRICULUM.length)) * 100;
+  const totalProgress = (completedLevels.length / (LAB_CURRICULUM.length + VAULT_CURRICULUM.length)) * 100;
 
   const unlockedAchievements = ACHIEVEMENTS.filter(a =>
-    progress.unlockedAchievements.includes(a.id)
+    achievementsList.includes(a.id)
   );
 
   // Format last played date
@@ -93,7 +96,7 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onClose }) => 
               </div>
               <div className="text-3xl font-black text-white">{Math.round(totalProgress)}%</div>
               <div className="text-xs text-white/50 mt-1">
-                {progress.completedLevels.length} / {LAB_CURRICULUM.length + VAULT_CURRICULUM.length} שלבים
+                {completedLevels.length} / {LAB_CURRICULUM.length + VAULT_CURRICULUM.length} שלבים
               </div>
             </div>
 

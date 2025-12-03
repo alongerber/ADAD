@@ -109,10 +109,10 @@ export class ErrorBoundary extends Component<Props, State> {
               אם הבעיה חוזרת, נשמח לשמוע ממך:
               <br />
               <a
-                href="mailto:feedback@matmati-bis.app?subject=דיווח על תקלה"
+                href="mailto:comeddadyisrael@gmail.com?subject=דיווח על תקלה"
                 className="text-amber-400 hover:underline"
               >
-                feedback@matmati-bis.app
+                comeddadyisrael@gmail.com
               </a>
             </p>
           </div>
