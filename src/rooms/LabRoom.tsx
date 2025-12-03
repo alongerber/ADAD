@@ -6,12 +6,13 @@ import { useIdleScaffold } from '../hooks/useIdleScaffold';
 import { GhostHand } from '../components/ui/GhostHand';
 import { ParticleSystem } from '../components/systems/ParticleSystem';
 import { LabState, RoomType } from '../types';
-import { X, Home, Beaker as BeakerIcon, Lock, CheckCircle, Play, Volume2, VolumeX } from 'lucide-react';
+import { X, Home, Beaker as BeakerIcon, Lock, CheckCircle, Play, Volume2, VolumeX, GraduationCap } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
 import { PedagogicalLabel } from '../components/ui/PedagogicalLabel';
 import { useSound } from '../hooks/useSound';
 import { LAB_CURRICULUM, FractionLevel, LAB_TOPICS } from '../data/curriculum';
 import { LessonIntro } from '../components/ui/LessonIntro';
+import { LearningMode, createFractionLearningSlides } from '../components/learning/LearningMode';
 
 interface LabRoomProps {
     onNavigate: (room: RoomType) => void;
@@ -19,14 +20,24 @@ interface LabRoomProps {
 
 const SNAP_TOLERANCE = 0.05; // 5% tolerance for "Radio Tuning"
 
+// Helper to get topic number from level index (1-6 = topic 1, 7-12 = topic 2, etc.)
+const getTopicFromLevelIndex = (levelIndex: number): number => {
+  if (levelIndex < 6) return 1;
+  if (levelIndex < 12) return 2;
+  if (levelIndex < 18) return 3;
+  return 4;
+};
+
 export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
-  const { user, theme, completeLevel, isMuted, toggleMute } = useUser();
+  const { user, theme, completeLevel, completeTopic, hasLearnedTopic, isMuted, toggleMute } = useUser();
   const { playSuccess, playError, playTick, playClick } = useSound();
 
   // --- Level Selection State ---
   const [showLevelSelect, setShowLevelSelect] = useState(true);
   const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
   const [showLessonIntro, setShowLessonIntro] = useState(false);
+  const [showLearningMode, setShowLearningMode] = useState(false);
+  const [currentLearningTopic, setCurrentLearningTopic] = useState(1);
 
   // Get completed levels from user progress (persisted in localStorage)
   // Filter to only include lab levels (those starting with 'frac_')
@@ -103,11 +114,60 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
   const selectLevel = (index: number) => {
     setCurrentLevelIndex(index);
     setShowLevelSelect(false);
-    setShowLessonIntro(true);
     setFillLevel(0.5);
     setIsSnapped(false);
     setLabState({ numerator: 0, denominator: 0, isCorrect: false });
     setMissionStatus('idle');
+
+    // Check if this topic needs learning mode first
+    const topicNumber = getTopicFromLevelIndex(index);
+    const topicId = `lab_topic_${topicNumber}`;
+
+    if (!hasLearnedTopic(topicId)) {
+      // Show learning mode first
+      setCurrentLearningTopic(topicNumber);
+      setShowLearningMode(true);
+    } else {
+      // Already learned, go straight to lesson intro
+      setShowLessonIntro(true);
+    }
+  };
+
+  const handleLearningComplete = () => {
+    const topicId = `lab_topic_${currentLearningTopic}`;
+    const wasAlreadyLearned = hasLearnedTopic(topicId);
+
+    completeTopic(topicId);
+    setShowLearningMode(false);
+    playClick();
+
+    // If they were re-watching, go back to level select
+    // Otherwise, proceed to lesson intro for their first time
+    if (wasAlreadyLearned) {
+      setShowLevelSelect(true);
+    } else {
+      setShowLessonIntro(true);
+    }
+  };
+
+  const handleLearningSkip = () => {
+    const topicId = `lab_topic_${currentLearningTopic}`;
+    const wasAlreadyLearned = hasLearnedTopic(topicId);
+
+    // Mark as learned even if skipped (they at least started it)
+    if (!wasAlreadyLearned) {
+      completeTopic(topicId);
+    }
+
+    setShowLearningMode(false);
+
+    // If they were re-watching (already learned), go back to level select
+    // Otherwise, proceed to lesson intro for their first time
+    if (wasAlreadyLearned) {
+      setShowLevelSelect(true);
+    } else {
+      setShowLessonIntro(true);
+    }
   };
 
   const startLevel = () => {
@@ -293,15 +353,39 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
           <p className="text-white/60 text-sm md:text-base">בחר שלב להתחיל</p>
         </motion.div>
 
-        {/* Topics Overview */}
+        {/* Topics Overview with Learning Mode Access */}
         <div className="relative z-10 flex flex-wrap justify-center gap-2 md:gap-4 mb-6 w-full max-w-3xl px-2">
-          {LAB_TOPICS.map((topic, idx) => (
-            <div key={idx} className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-center">
-              <span className="text-xl md:text-2xl">{topic.icon}</span>
-              <div className="text-xs text-white/70 mt-1">{topic.title}</div>
-              <div className="text-[10px] text-white/40">שלבים {topic.levels}</div>
-            </div>
-          ))}
+          {LAB_TOPICS.map((topic, idx) => {
+            const topicNumber = idx + 1;
+            const topicId = `lab_topic_${topicNumber}`;
+            const isLearned = hasLearnedTopic(topicId);
+
+            return (
+              <motion.button
+                key={idx}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  setCurrentLearningTopic(topicNumber);
+                  setShowLevelSelect(false);
+                  setShowLearningMode(true);
+                }}
+                className={`px-3 py-2 rounded-xl border text-center transition-all cursor-pointer ${
+                  isLearned
+                    ? 'bg-purple-900/30 border-purple-500/30 hover:bg-purple-900/50'
+                    : 'bg-amber-900/30 border-amber-500/50 hover:bg-amber-900/50 shadow-[0_0_10px_rgba(251,191,36,0.2)]'
+                }`}
+              >
+                <span className="text-xl md:text-2xl">{topic.icon}</span>
+                <div className="text-xs text-white/70 mt-1">{topic.title}</div>
+                <div className="text-[10px] text-white/40">שלבים {topic.levels}</div>
+                <div className={`flex items-center justify-center gap-1 mt-1 text-[10px] ${isLearned ? 'text-purple-400' : 'text-amber-400'}`}>
+                  <GraduationCap size={10} />
+                  <span>{isLearned ? 'צפה שוב' : 'למד!'}</span>
+                </div>
+              </motion.button>
+            );
+          })}
         </div>
 
         {/* Level Grid */}
@@ -355,6 +439,21 @@ export const LabRoom: React.FC<LabRoomProps> = ({ onNavigate }) => {
           {completedLabLevels.length} / {LAB_CURRICULUM.length} שלבים הושלמו
         </motion.div>
       </div>
+    );
+  }
+
+  // Learning Mode Screen - shows when entering a new topic for the first time
+  if (showLearningMode) {
+    const topicInfo = LAB_TOPICS[currentLearningTopic - 1];
+    return (
+      <LearningMode
+        topicId={`lab_topic_${currentLearningTopic}`}
+        topicTitle={topicInfo?.title || `נושא ${currentLearningTopic}`}
+        topicIcon={topicInfo?.icon || '📚'}
+        slides={createFractionLearningSlides(currentLearningTopic)}
+        onComplete={handleLearningComplete}
+        onSkip={handleLearningSkip}
+      />
     );
   }
 

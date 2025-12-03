@@ -29,6 +29,7 @@ export interface UserProgress {
   unlockedAchievements: string[]; // Array of unlocked achievement IDs
   daysPlayed: number;            // Number of unique days played
   lastPlayDate: string | null;   // Last play date (YYYY-MM-DD)
+  learnedTopics: string[];       // Array of topics that have been learned (e.g., 'lab_topic_1')
 }
 
 export interface UserProfile {
