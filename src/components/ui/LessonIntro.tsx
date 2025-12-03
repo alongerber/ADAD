@@ -1,32 +1,36 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Lightbulb, Hash, Calculator, Play } from 'lucide-react';
+import { ArrowLeft, Lightbulb, Hash, Calculator, Play, Eye } from 'lucide-react';
 
 interface LessonIntroProps {
   levelType: 'number_input' | 'vertical_math';
   levelTitle: string;
+  narrative?: string;  // Short story hook
   explanation: string;
   exampleBefore: string;
   exampleAfter: string;
   tip: string;
   onStart: () => void;
+  onDemo?: () => void;  // Optional: Show demo mode
 }
 
 export const LessonIntro: React.FC<LessonIntroProps> = ({
   levelType,
   levelTitle,
+  narrative,
   explanation,
   exampleBefore,
   exampleAfter,
   tip,
-  onStart
+  onStart,
+  onDemo
 }) => {
-  
+
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { 
+    visible: {
       opacity: 1,
-      transition: { 
+      transition: {
         when: "beforeChildren",
         staggerChildren: 0.15
       }
@@ -36,15 +40,15 @@ export const LessonIntro: React.FC<LessonIntroProps> = ({
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
-    visible: { 
-      y: 0, 
+    visible: {
+      y: 0,
       opacity: 1,
       transition: { type: "spring", stiffness: 300, damping: 20 }
     }
   };
 
   return (
-    <motion.div 
+    <motion.div
       className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-neutral-900/95 backdrop-blur-md"
       initial="hidden"
       animate="visible"
@@ -53,7 +57,7 @@ export const LessonIntro: React.FC<LessonIntroProps> = ({
       dir="rtl"
     >
       <div className="w-full max-w-2xl flex flex-col items-center gap-8 text-center select-none">
-        
+
         <motion.div variants={itemVariants}>
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold text-sm tracking-wider uppercase">
              {levelType === 'number_input' ? <Hash size={16} /> : <Calculator size={16} />}
@@ -61,21 +65,30 @@ export const LessonIntro: React.FC<LessonIntroProps> = ({
           </div>
         </motion.div>
 
-        <motion.h1 
+        {narrative && (
+          <motion.p
+            variants={itemVariants}
+            className="text-2xl md:text-3xl text-amber-300 font-bold italic max-w-xl leading-relaxed"
+          >
+            {narrative}
+          </motion.p>
+        )}
+
+        <motion.h1
           variants={itemVariants}
           className="text-5xl md:text-6xl font-black text-white drop-shadow-[0_4px_0_rgba(0,0,0,0.5)] leading-tight"
         >
           {levelTitle}
         </motion.h1>
 
-        <motion.p 
+        <motion.p
           variants={itemVariants}
-          className="text-xl md:text-2xl text-neutral-300 leading-relaxed max-w-lg font-medium"
+          className="text-lg md:text-xl text-neutral-300 leading-relaxed max-w-lg font-medium"
         >
           {explanation}
         </motion.p>
 
-        <motion.div 
+        <motion.div
           variants={itemVariants}
           className="w-full bg-black/40 border-2 border-neutral-800 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-center gap-6 relative overflow-hidden"
         >
@@ -95,7 +108,7 @@ export const LessonIntro: React.FC<LessonIntroProps> = ({
           </div>
         </motion.div>
 
-        <motion.div 
+        <motion.div
           variants={itemVariants}
           className="flex items-start gap-4 bg-amber-900/20 border border-amber-500/20 p-4 rounded-xl text-amber-200 text-lg text-right w-full"
         >
@@ -108,12 +121,24 @@ export const LessonIntro: React.FC<LessonIntroProps> = ({
           </div>
         </motion.div>
 
-        <motion.div variants={itemVariants} className="pt-4 w-full">
+        <motion.div variants={itemVariants} className="pt-4 w-full flex flex-col md:flex-row gap-4 justify-center">
+          {onDemo && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={onDemo}
+              className="px-8 py-4 bg-neutral-800 hover:bg-neutral-700 rounded-full font-bold text-xl text-amber-400 shadow-[0_4px_0_#404040,0_10px_15px_rgba(0,0,0,0.3)] hover:shadow-[0_6px_0_#404040,0_15px_20px_rgba(0,0,0,0.3)] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-3 border border-amber-500/30 cursor-pointer"
+            >
+              <Eye />
+              תראה לי קודם
+            </motion.button>
+          )}
+
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={onStart}
-            className="w-full md:w-auto px-12 py-5 bg-gradient-to-r from-amber-600 to-orange-600 rounded-full font-black text-2xl text-white shadow-[0_6px_0_#9a3412,0_15px_20px_rgba(0,0,0,0.4)] hover:shadow-[0_8px_0_#9a3412,0_20px_25px_rgba(251,191,36,0.2)] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-3 border-t border-white/20 cursor-pointer"
+            className="px-12 py-5 bg-gradient-to-r from-amber-600 to-orange-600 rounded-full font-black text-2xl text-white shadow-[0_6px_0_#9a3412,0_15px_20px_rgba(0,0,0,0.4)] hover:shadow-[0_8px_0_#9a3412,0_20px_25px_rgba(251,191,36,0.2)] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-3 border-t border-white/20 cursor-pointer"
           >
             <Play fill="currentColor" />
             בוא נתחיל!

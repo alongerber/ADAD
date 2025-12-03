@@ -3,17 +3,24 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { UserProfile, GenderType, ThemeType } from '../../types';
 import { useUser } from '../../contexts/UserContext';
 import { THEME_CONFIG } from '../../constants';
-import { User, Sparkles, Rocket, Trophy, Check, GraduationCap } from 'lucide-react';
+import { User, Sparkles, Rocket, Trophy, Check, GraduationCap, TreePine, Fish, Candy } from 'lucide-react';
 
 export const OnboardingWizard: React.FC = () => {
   const { updateUser } = useUser();
   const [step, setStep] = useState(0);
-  
+
   // Temporary state before saving
   const [tempProfile, setTempProfile] = useState<UserProfile>({
     name: '',
     gender: 'boy', // Default
-    theme: 'scifi' // Default
+    theme: 'scifi', // Default
+    progress: {
+      completedLevels: [],
+      currentVaultLevel: 0,
+      totalScore: 0,
+      streak: 0,
+      lastPlayedAt: null,
+    }
   });
 
   const handleNext = () => setStep(prev => prev + 1);
@@ -108,39 +115,63 @@ export const OnboardingWizard: React.FC = () => {
 
         {/* STEP 3: THEME */}
         {step === 2 && (
-          <motion.div 
+          <motion.div
             key="step3"
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 50 }}
-            className="z-10 flex flex-col items-center gap-6 w-full max-w-2xl"
+            className="z-10 flex flex-col items-center gap-6 w-full max-w-4xl"
           >
             <h1 className="text-4xl font-black text-white drop-shadow-lg">מה הסטייל שלך?</h1>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
-              <ThemeCard 
-                id="scifi" 
+
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full">
+              <ThemeCard
+                id="scifi"
                 label={THEME_CONFIG.scifi.label}
                 icon={<Rocket size={32} />}
                 colors="from-slate-800 to-cyan-900 border-cyan-500"
                 selected={tempProfile.theme === 'scifi'}
                 onClick={() => setTempProfile(p => ({ ...p, theme: 'scifi' }))}
               />
-              <ThemeCard 
-                id="pop" 
+              <ThemeCard
+                id="pop"
                 label={THEME_CONFIG.pop.label}
                 icon={<Sparkles size={32} />}
                 colors="from-purple-800 to-pink-600 border-pink-400"
                 selected={tempProfile.theme === 'pop'}
                 onClick={() => setTempProfile(p => ({ ...p, theme: 'pop' }))}
               />
-              <ThemeCard 
-                id="sports" 
+              <ThemeCard
+                id="sports"
                 label={THEME_CONFIG.sports.label}
                 icon={<Trophy size={32} />}
                 colors="from-emerald-800 to-green-600 border-green-400"
                 selected={tempProfile.theme === 'sports'}
                 onClick={() => setTempProfile(p => ({ ...p, theme: 'sports' }))}
+              />
+              <ThemeCard
+                id="nature"
+                label={THEME_CONFIG.nature.label}
+                icon={<TreePine size={32} />}
+                colors="from-amber-800 to-lime-700 border-lime-400"
+                selected={tempProfile.theme === 'nature'}
+                onClick={() => setTempProfile(p => ({ ...p, theme: 'nature' }))}
+              />
+              <ThemeCard
+                id="ocean"
+                label={THEME_CONFIG.ocean.label}
+                icon={<Fish size={32} />}
+                colors="from-sky-800 to-blue-600 border-sky-400"
+                selected={tempProfile.theme === 'ocean'}
+                onClick={() => setTempProfile(p => ({ ...p, theme: 'ocean' }))}
+              />
+              <ThemeCard
+                id="candy"
+                label={THEME_CONFIG.candy.label}
+                icon={<Candy size={32} />}
+                colors="from-rose-800 to-pink-600 border-rose-400"
+                selected={tempProfile.theme === 'candy'}
+                onClick={() => setTempProfile(p => ({ ...p, theme: 'candy' }))}
               />
             </div>
 

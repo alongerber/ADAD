@@ -11,18 +11,22 @@ import { PedagogicalLabel } from '../components/ui/PedagogicalLabel';
 import { useNotebook } from '../contexts/NotebookContext';
 import { NotebookBridge } from '../components/vault/NotebookBridge';
 import { LessonIntro } from '../components/ui/LessonIntro';
+import { getSuccessMessage, getCodeCrackedMessage, getHintPrefix, getReadAgainMessage } from '../utils/messages';
+import { useSound } from '../hooks/useSound';
+import { ParticleSystem } from '../components/systems/ParticleSystem';
 
 interface VaultRoomProps {
     onNavigate: (room: RoomType) => void;
 }
 
-const LEVEL_INTROS: Record<string, { title: string; explanation: string; exampleBefore: string; exampleAfter: string; tip: string }> = {
+const LEVEL_INTROS: Record<string, { title: string; narrative: string; explanation: string; exampleBefore: string; exampleAfter: string; tip: string }> = {
     // ========================================
     // חלק א: כתיבת מספרים
     // ========================================
 
     'lvl_num_simple_3': {
         title: 'בונים מספרים!',
+        narrative: '🔐 הכספת הסודית ננעלה! רק מי שיודע לכתוב את הקוד יפתח אותה...',
         explanation: 'כל מספר בנוי מחלקים: מאות, עשרות ויחידות. בוא נתרגל!',
         exampleBefore: 'ארבע מאות עשרים וחמש',
         exampleAfter: '425',
@@ -30,6 +34,7 @@ const LEVEL_INTROS: Record<string, { title: string; explanation: string; example
     },
     'lvl_num_simple_4': {
         title: 'מספרים גדולים יותר!',
+        narrative: '📡 המודיעין שלח קוד חדש! הפעם המספרים גדולים יותר...',
         explanation: 'עכשיו יש לנו גם אלפים! ארבעה חלקים: אלפים, מאות, עשרות, יחידות.',
         exampleBefore: 'אלף שמונה מאות שלושים ושש',
         exampleAfter: '1836',
@@ -37,6 +42,7 @@ const LEVEL_INTROS: Record<string, { title: string; explanation: string; example
     },
     'lvl_num_zero_end': {
         title: 'מספרים עגולים',
+        narrative: '🎯 הקוד הזה מסתיים באפס. אל תפספס אותו!',
         explanation: 'כשאומרים "חמישים" זה אומר חמש עשרות ואפס יחידות!',
         exampleBefore: 'שלוש מאות וחמישים',
         exampleAfter: '350',
@@ -44,6 +50,7 @@ const LEVEL_INTROS: Record<string, { title: string; explanation: string; example
     },
     'lvl_num_zeros_end': {
         title: 'עוד יותר עגול!',
+        narrative: '💫 הכספת הזו אוהבת מספרים עגולים. כמה אפסים מתחבאים פה?',
         explanation: 'מספרים כמו "מאתיים" מסתיימים בכמה אפסים.',
         exampleBefore: 'שבעת אלפים ומאתיים',
         exampleAfter: '7200',
@@ -51,6 +58,7 @@ const LEVEL_INTROS: Record<string, { title: string; explanation: string; example
     },
     'lvl_zero_trap_1': {
         title: 'מלכודת האפס!',
+        narrative: '⚠️ זהירות! המספרים הערמומיים מנסים לבלבל את הסוכן הכי טוב שלנו!',
         explanation: 'יש מספרים שמנסים לבלבל אותנו! הם מחביאים אפסים באמצע.',
         exampleBefore: 'שלושת אלפים וחמישים',
         exampleAfter: '3050',
@@ -58,6 +66,7 @@ const LEVEL_INTROS: Record<string, { title: string; explanation: string; example
     },
     'lvl_zero_trap_2': {
         title: 'מלכודת כפולה!',
+        narrative: '🕵️ המספר הזה הכי ערמומי שיש! יש בו הפתעות מוסתרות...',
         explanation: 'המספרים הערמומיים חוזרים! הפעם הם מחביאים עוד יותר אפסים.',
         exampleBefore: 'ארבעים אלף וארבע',
         exampleAfter: '40004',
@@ -70,6 +79,7 @@ const LEVEL_INTROS: Record<string, { title: string; explanation: string; example
 
     'lvl_sub_simple_2': {
         title: 'חיסור קל!',
+        narrative: '🔢 משימה חדשה: לפצח את הקוד על ידי חיסור!',
         explanation: 'בחיסור במאונך, מחסרים כל ספרה בנפרד. מתחילים מימין!',
         exampleBefore: '89 - 34',
         exampleAfter: '55',
@@ -77,6 +87,7 @@ const LEVEL_INTROS: Record<string, { title: string; explanation: string; example
     },
     'lvl_sub_simple_3': {
         title: 'חיסור עם 3 ספרות',
+        narrative: '📊 הקוד הזה יותר ארוך. שלוש ספרות, שלוש משימות!',
         explanation: 'אותו דבר בדיוק, רק עם עוד ספרה אחת!',
         exampleBefore: '567 - 234',
         exampleAfter: '333',
@@ -84,6 +95,7 @@ const LEVEL_INTROS: Record<string, { title: string; explanation: string; example
     },
     'lvl_sub_borrow_1': {
         title: 'פריטה - השכן עוזר!',
+        narrative: '🤝 לפעמים צריך עזרה מחבר. גם ספרות יודעות לעזור אחת לשנייה!',
         explanation: 'לפעמים הספרה למעלה קטנה מדי. אז היא צריכה ללוות מהשכן!',
         exampleBefore: '452 - 138',
         exampleAfter: '314',
@@ -91,6 +103,7 @@ const LEVEL_INTROS: Record<string, { title: string; explanation: string; example
     },
     'lvl_sub_borrow_tens': {
         title: 'פריטה בעשרות',
+        narrative: '🔄 העשרות צריכות עזרה! מי יבוא להציל?',
         explanation: 'הפעם העשרות צריכות עזרה מהמאות!',
         exampleBefore: '534 - 271',
         exampleAfter: '263',
@@ -98,6 +111,7 @@ const LEVEL_INTROS: Record<string, { title: string; explanation: string; example
     },
     'lvl_sub_borrow_double': {
         title: 'פריטה כפולה!',
+        narrative: '⚡ משימת בונוס: שתי פריטות בתרגיל אחד! מוכנים לאתגר?',
         explanation: 'לפעמים צריך לפרוט פעמיים באותו תרגיל!',
         exampleBefore: '523 - 168',
         exampleAfter: '355',
@@ -105,6 +119,7 @@ const LEVEL_INTROS: Record<string, { title: string; explanation: string; example
     },
     'lvl_sub_borrow_zero': {
         title: 'האפס המציק',
+        narrative: '🚫 האפס חוסם את הדרך! איך עוקפים אותו?',
         explanation: 'מה עושים כשיש 0 באמצע ואי אפשר לפרוט ממנו?',
         exampleBefore: '503 - 127',
         exampleAfter: '376',
@@ -113,11 +128,15 @@ const LEVEL_INTROS: Record<string, { title: string; explanation: string; example
 };
 
 export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
-    const { user } = useUser();
+    const { user, completeLevel, updateProgress } = useUser();
     const { isIdle, resetTimer } = useIdleScaffold();
     const { addMessage, setMessages, setIsOpen } = useNotebook();
+    const { playSuccess, playError, playTick, playBorrow, playCelebrate, playClick } = useSound();
 
-    const [levelIndex, setLevelIndex] = useState(0);
+    // Load saved progress or start from beginning
+    const [levelIndex, setLevelIndex] = useState(() => {
+        return user?.progress?.currentVaultLevel || 0;
+    });
     const currentLevel: Level = VAULT_CURRICULUM[levelIndex];
 
     const [minuend, setMinuend] = useState<number[]>([]);
@@ -128,13 +147,56 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
     const [hoveredCol, setHoveredCol] = useState<number | null>(null);
     const [borrowingState, setBorrowingState] = useState<{from: number, to: number} | null>(null);
     const [flashCol, setFlashCol] = useState<number | null>(null);
+    const [isDemoMode, setIsDemoMode] = useState(false);
+    const [showCelebration, setShowCelebration] = useState(false);
 
     useEffect(() => {
         initializeLevel(currentLevel);
     }, [currentLevel]);
 
+    // Demo mode: fill in answers automatically with animation
+    const runDemo = () => {
+        setShowIntro(false);
+        setIsDemoMode(true);
+
+        if (currentLevel.mode === 'number_input') {
+            const target = currentLevel.target;
+            let delay = 500;
+
+            // Fill each digit one by one
+            target.forEach((digit, index) => {
+                setTimeout(() => {
+                    setUserAnswers(prev => {
+                        const newAnswers = [...prev];
+                        newAnswers[index] = digit;
+                        return newAnswers;
+                    });
+
+                    // Add explanation message for each digit
+                    const columnLabel = getColumnLabel(target.length, index);
+                    if (digit === 0) {
+                        addMessage(`${columnLabel}: אין ${columnLabel} - שמים 0!`);
+                    } else {
+                        addMessage(`${columnLabel}: ${digit}`);
+                    }
+                }, delay * (index + 1));
+            });
+
+            // After all digits, show success (personalized)
+            setTimeout(() => {
+                const tryNowMsg = user?.gender === 'girl' ? 'עכשיו תורך!' : 'עכשיו תורך!';
+                addMessage(`🎉 ככה עושים את זה! ${user?.name ? user.name + ', ' : ''}${tryNowMsg}`);
+                setTimeout(() => {
+                    setIsDemoMode(false);
+                    initializeLevel(currentLevel); // Reset for user to try
+                }, 2000);
+            }, delay * (target.length + 1));
+        }
+    };
+
     const initializeLevel = (level: Level) => {
         setIsVaultOpen(false);
+        setShowCelebration(false);
         setMessages([level.notebookHint]);
         setIsOpen(true);
         setShowIntro(true);
@@ -150,6 +212,7 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
 
     const handleWheelChange = (colIndex: number, val: number) => {
         resetTimer();
+        playTick();
         const newAnswers = [...userAnswers];
         newAnswers[colIndex] = val;
         setUserAnswers(newAnswers);
@@ -159,22 +222,24 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
         resetTimer();
         if (currentLevel.mode !== 'vertical_math') return;
         if (isVaultOpen) return;
-        if (colIndex >= minuend.length - 1) return; 
-        if (minuend[colIndex] <= 0) return; 
-        
+        if (colIndex >= minuend.length - 1) return;
+        if (minuend[colIndex] <= 0) return;
+
+        playClick();
         setBorrowingState({ from: colIndex, to: colIndex + 1 });
 
         setTimeout(() => {
+            playBorrow();
             const newMinuend = [...minuend];
-            newMinuend[colIndex] -= 1;      
-            newMinuend[colIndex + 1] += 10; 
+            newMinuend[colIndex] -= 1;
+            newMinuend[colIndex + 1] += 10;
             setMinuend(newMinuend);
-            
+
             setBorrowingState(null);
             setFlashCol(colIndex + 1);
             setTimeout(() => setFlashCol(null), 500);
             addMessage(`פרטנו ${1} מאות ל-${10} עשרות`);
-        }, 600); 
+        }, 600);
     };
 
     const handleReset = () => {
@@ -183,13 +248,18 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
 
     const nextLevel = () => {
         if (levelIndex < VAULT_CURRICULUM.length - 1) {
-            setLevelIndex(prev => prev + 1);
+            const nextIndex = levelIndex + 1;
+            setLevelIndex(nextIndex);
+            // Save progress
+            updateProgress({ currentVaultLevel: nextIndex });
         } else {
+            // Completed all levels - return to lobby
             onNavigate(RoomType.LOBBY);
         }
     };
 
     const checkUnlock = () => {
+        playClick();
         let isCorrect = false;
 
         if (currentLevel.mode === 'vertical_math') {
@@ -197,25 +267,58 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
             const botVal = parseInt(currentLevel.bottom.join(''));
             const userStr = userAnswers.join('');
             isCorrect = parseInt(userStr) === (topVal - botVal);
-        } 
+
+            if (!isCorrect) {
+                playError();
+                // Reset streak on error
+                updateProgress({ streak: 0 });
+            }
+        }
         else if (currentLevel.mode === 'number_input') {
             isCorrect = userAnswers.every((val, i) => val === currentLevel.target[i]);
 
             if (!isCorrect) {
-                const targetDigits = currentLevel.target.filter(d => d !== 0);
-                const userDigits = userAnswers.filter(d => d !== 0);
-                
-                if (targetDigits.join('') === userDigits.join('')) {
-                     addMessage("אופס! נראה ששכחת אפס שומר מקום.");
+                playError();
+                // Reset streak on error
+                updateProgress({ streak: 0 });
+                // Find the first wrong digit and give specific feedback
+                const firstWrongIndex = userAnswers.findIndex((val, i) => val !== currentLevel.target[i]);
+                const columnLabel = getColumnLabel(currentLevel.target.length, firstWrongIndex);
+                const expectedDigit = currentLevel.target[firstWrongIndex];
+                const userDigit = userAnswers[firstWrongIndex];
+
+                // Flash the wrong column
+                setFlashCol(firstWrongIndex);
+                setTimeout(() => setFlashCol(null), 1000);
+
+                // Give specific feedback based on error type (gendered)
+                const gender = user?.gender || 'boy';
+                const hintPrefix = getHintPrefix(gender);
+                const readAgain = getReadAgainMessage(gender);
+
+                if (expectedDigit === 0 && userDigit !== 0) {
+                    // User put a digit where there should be 0
+                    addMessage(`🤔 ב${columnLabel}: ${hintPrefix} - האם יש ${columnLabel} במספר? אם לא, שמים 0!`);
+                } else if (expectedDigit !== 0 && userDigit === 0) {
+                    // User put 0 where there should be a digit
+                    addMessage(`🤔 ב${columnLabel}: יש פה ספרה, לא 0! ${readAgain}.`);
                 } else {
-                     addMessage("נסה לקרוא את המספר בקול רם.");
+                    // Wrong digit
+                    addMessage(`🤔 ב${columnLabel}: ${hintPrefix} - מה הספרה הנכונה?`);
                 }
             }
         }
 
         if (isCorrect) {
+            playCelebrate();
             setIsVaultOpen(true);
-            addMessage("מצוין! הקוד פוצח.");
+            setShowCelebration(true);
+            const gender = user?.gender || 'boy';
+            addMessage(getCodeCrackedMessage(gender, user?.name));
+            // Save level completion
+            completeLevel(currentLevel.id, 10);
+            // Auto-hide celebration after animation
+            setTimeout(() => setShowCelebration(false), 2000);
         }
     };
 
@@ -242,6 +345,7 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
 
     const introData = LEVEL_INTROS[currentLevel.id] || {
         title: 'שלב חדש',
+        narrative: '🎯 משימה חדשה מחכה לך!',
         explanation: 'בוא נלמד משהו חדש!',
         exampleBefore: '',
         exampleAfter: '',
@@ -250,16 +354,21 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
 
     return (
         <div className="relative w-full h-full flex flex-col items-center bg-neutral-900 overflow-hidden select-none font-mono text-amber-500" dir="rtl">
-            
+
+            {/* Celebration Particles */}
+            <ParticleSystem active={showCelebration} count={150} />
+
             {showIntro && (
                 <LessonIntro
                     levelType={currentLevel.mode}
                     levelTitle={introData.title}
+                    narrative={introData.narrative}
                     explanation={introData.explanation}
                     exampleBefore={introData.exampleBefore}
                     exampleAfter={introData.exampleAfter}
                     tip={introData.tip}
                     onStart={() => setShowIntro(false)}
+                    onDemo={currentLevel.mode === 'number_input' ? runDemo : undefined}
                 />
             )}
 
@@ -302,16 +411,42 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                     </button>
                 </div>
 
+                {/* Streak & Score Display */}
+                <div className="absolute top-6 right-6 z-50 flex gap-4 items-center">
+                    {/* Streak Counter */}
+                    {user?.progress?.streak && user.progress.streak > 0 ? (
+                        <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-orange-600 to-amber-500 border border-orange-400 shadow-[0_0_20px_rgba(251,146,60,0.4)]"
+                        >
+                            <span className="text-2xl">🔥</span>
+                            <span className="text-white font-black text-xl">{user.progress.streak}</span>
+                        </motion.div>
+                    ) : null}
+
+                    {/* Total Score */}
+                    <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-neutral-800 border border-amber-500/30">
+                        <Star size={18} className="text-amber-400 fill-amber-400" />
+                        <span className="text-amber-400 font-bold">{user?.progress?.totalScore || 0}</span>
+                    </div>
+                </div>
+
                 <div className="z-10 w-full max-w-4xl h-full flex flex-col items-center justify-center p-6 gap-8">
                     
                     <div className="flex flex-col items-center gap-2 mb-2 opacity-90 text-center w-full">
                         <div className="text-amber-500/60 text-xs tracking-[0.3em] uppercase border-b border-amber-500/30 pb-1">Secure Vault Access - Level {levelIndex + 1}</div>
                         
                         {currentLevel.mode === 'number_input' ? (
-                            <div className="bg-gradient-to-b from-amber-700 to-amber-900 border-4 border-amber-600 rounded-xl px-12 py-6 shadow-[0_10px_30px_rgba(0,0,0,0.5)] transform -rotate-1 max-w-2xl">
-                                <h1 className="text-white font-handwriting font-bold text-5xl md:text-6xl drop-shadow-[0_2px_0_rgba(0,0,0,0.8)] text-center leading-tight">
-                                    "{currentLevel.instruction}"
-                                </h1>
+                            <div className="flex flex-col items-center gap-4">
+                                <div className="bg-gradient-to-b from-amber-700 to-amber-900 border-4 border-amber-600 rounded-xl px-12 py-6 shadow-[0_10px_30px_rgba(0,0,0,0.5)] transform -rotate-1 max-w-2xl">
+                                    <h1 className="text-white font-handwriting font-bold text-5xl md:text-6xl drop-shadow-[0_2px_0_rgba(0,0,0,0.8)] text-center leading-tight">
+                                        "{currentLevel.instruction}"
+                                    </h1>
+                                </div>
+                                <p className="text-amber-300 text-xl font-bold animate-pulse">
+                                    👆 סובב את הגלגלים וכתוב את המספר!
+                                </p>
                             </div>
                         ) : (
                             <h1 className="text-amber-400 font-black text-3xl md:text-4xl drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]">
@@ -354,9 +489,18 @@ export const VaultRoom: React.FC<VaultRoomProps> = ({ onNavigate }) => {
                                 }
 
                                 return (
-                                <div key={colIndex} className="flex flex-col items-center gap-4 relative w-[80px]">
-                                    
-                                    <div className="text-neutral-500 text-sm font-bold tracking-widest uppercase mb-2">
+                                <div
+                                    key={colIndex}
+                                    className={`flex flex-col items-center gap-4 relative w-[80px] rounded-xl p-2 transition-all duration-300 ${
+                                        flashCol === colIndex
+                                            ? 'bg-red-500/20 ring-2 ring-red-500 animate-pulse'
+                                            : ''
+                                    }`}
+                                >
+
+                                    <div className={`text-sm font-bold tracking-widest uppercase mb-2 transition-colors ${
+                                        flashCol === colIndex ? 'text-red-400' : 'text-neutral-500'
+                                    }`}>
                                         {getColumnLabel(userAnswers.length, colIndex)}
                                     </div>
 

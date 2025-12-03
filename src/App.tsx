@@ -8,6 +8,7 @@ import { UserProvider, useUser } from './contexts/UserContext';
 import { NotebookProvider, useNotebook } from './contexts/NotebookContext';
 import { OnboardingWizard } from './components/onboarding/OnboardingWizard';
 import { NotebookPanel } from './components/ui/NotebookPanel';
+import { Analytics } from '@vercel/analytics/react';
 
 const GameContainer: React.FC = () => {
   const { user, theme } = useUser();
@@ -79,6 +80,7 @@ const App: React.FC = () => {
     <UserProvider>
       <NotebookProvider>
         <GameContainer />
+        <Analytics />
       </NotebookProvider>
     </UserProvider>
   );

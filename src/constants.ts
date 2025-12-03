@@ -71,5 +71,41 @@ export const THEME_CONFIG = {
     accent: 'emerald',
     liquid: '#4ade80', // Green 400
     particleColors: ['#4ade80', '#ffffff', '#fbbf24', '#f87171']
+  },
+  nature: {
+    id: 'nature',
+    label: 'טבע וחיות',
+    bg: 'bg-amber-950',
+    bgGradient: 'from-amber-900 via-orange-900 to-amber-950',
+    textMain: 'text-lime-300',
+    textSecondary: 'text-amber-200',
+    border: 'border-lime-400',
+    accent: 'lime',
+    liquid: '#a3e635', // Lime 400
+    particleColors: ['#a3e635', '#fbbf24', '#4ade80', '#fdba74']
+  },
+  ocean: {
+    id: 'ocean',
+    label: 'ים ואוקיינוס',
+    bg: 'bg-sky-950',
+    bgGradient: 'from-sky-900 via-blue-900 to-sky-950',
+    textMain: 'text-sky-300',
+    textSecondary: 'text-blue-200',
+    border: 'border-sky-400',
+    accent: 'sky',
+    liquid: '#38bdf8', // Sky 400
+    particleColors: ['#38bdf8', '#67e8f9', '#a5f3fc', '#ffffff']
+  },
+  candy: {
+    id: 'candy',
+    label: 'ממתקים וצבעים',
+    bg: 'bg-rose-950',
+    bgGradient: 'from-rose-900 via-pink-900 to-rose-950',
+    textMain: 'text-rose-300',
+    textSecondary: 'text-pink-200',
+    border: 'border-rose-400',
+    accent: 'rose',
+    liquid: '#fb7185', // Rose 400
+    particleColors: ['#fb7185', '#fdba74', '#fde047', '#a5f3fc']
   }
 };
