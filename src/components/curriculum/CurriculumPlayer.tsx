@@ -6,19 +6,54 @@ import { LearningSlidePlayer } from './LearningSlidePlayer';
 import { PracticeRouter } from '../practice/PracticeRouter';
 import { MasteryTest } from '../practice/MasteryTest';
 import { useUser } from '../../contexts/UserContext';
-import { fractionsModule, getUnitById, isUnitAvailable, getModuleStats } from '../../data/curriculum/fractions';
+import { fractionsModule, getModuleStats as getFractionsStats, getUnitById as getFractionUnitById, isUnitAvailable as isFractionUnitAvailable } from '../../data/curriculum/fractions';
+import { numbersModule, getModuleStats as getNumbersStats, getUnitById as getNumbersUnitById, isUnitAvailable as isNumbersUnitAvailable } from '../../data/curriculum/numbers';
 
 // =============================================
-// מסך בחירת יחידה
+// Helper functions for multi-module support
 // =============================================
-interface UnitSelectProps {
-  onSelectUnit: (unitId: string) => void;
+type ModuleType = 'fractions' | 'numbers';
+
+const modules = {
+  fractions: fractionsModule,
+  numbers: numbersModule
+};
+
+const getModuleStats = (moduleType: ModuleType, completedUnits: string[]) => {
+  return moduleType === 'fractions'
+    ? getFractionsStats(completedUnits)
+    : getNumbersStats(completedUnits);
+};
+
+const getUnitById = (moduleType: ModuleType, unitId: string) => {
+  return moduleType === 'fractions'
+    ? getFractionUnitById(unitId)
+    : getNumbersUnitById(unitId);
+};
+
+const isUnitAvailable = (moduleType: ModuleType, unitId: string, completedUnits: string[]) => {
+  return moduleType === 'fractions'
+    ? isFractionUnitAvailable(unitId, completedUnits)
+    : isNumbersUnitAvailable(unitId, completedUnits);
+};
+
+// =============================================
+// מסך בחירת מודול
+// =============================================
+interface ModuleSelectProps {
+  onSelectModule: (moduleType: ModuleType) => void;
   completedUnits: string[];
   onBack: () => void;
 }
 
-const UnitSelect: React.FC<UnitSelectProps> = ({ onSelectUnit, completedUnits, onBack }) => {
-  const stats = getModuleStats(completedUnits);
+const ModuleSelect: React.FC<ModuleSelectProps> = ({ onSelectModule, completedUnits, onBack }) => {
+  const fractionsStats = getFractionsStats(completedUnits);
+  const numbersStats = getNumbersStats(completedUnits);
+
+  const moduleOptions = [
+    { type: 'fractions' as ModuleType, module: fractionsModule, stats: fractionsStats },
+    { type: 'numbers' as ModuleType, module: numbersModule, stats: numbersStats }
+  ];
 
   return (
     <motion.div
@@ -44,15 +79,116 @@ const UnitSelect: React.FC<UnitSelectProps> = ({ onSelectUnit, completedUnits, o
       </div>
 
       {/* כותרת */}
+      <header className="relative z-10 w-full p-6 md:p-8 text-center pt-16">
+        <motion.div
+          initial={{ y: -30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="flex flex-col items-center gap-4"
+        >
+          <h1 className="text-3xl md:text-4xl font-black text-white">בחר נושא ללמוד</h1>
+          <p className="text-white/60 max-w-md">בחר את הנושא שתרצה ללמוד ולתרגל</p>
+        </motion.div>
+      </header>
+
+      {/* כרטיסי מודולים */}
+      <div className="relative z-10 flex-1 p-4 md:p-6">
+        <div className="max-w-3xl mx-auto grid gap-6 md:grid-cols-2">
+          {moduleOptions.map(({ type, module, stats }, idx) => (
+            <motion.button
+              key={type}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.15 }}
+              onClick={() => onSelectModule(type)}
+              className="relative flex flex-col items-center gap-4 p-6 md:p-8 rounded-3xl border-2 bg-white/5 border-white/20 hover:bg-white/10 hover:border-purple-500/50 hover:scale-[1.02] transition-all cursor-pointer text-center"
+            >
+              <div className="text-6xl md:text-7xl">{module.icon}</div>
+              <h3 className="text-2xl md:text-3xl font-black text-white">{module.title}</h3>
+              <p className="text-white/60 text-sm">{module.description}</p>
+
+              {/* התקדמות */}
+              <div className="w-full mt-4">
+                <div className="flex justify-between text-xs text-white/50 mb-2">
+                  <span>{stats.completedCount} / {stats.totalCount} יחידות</span>
+                  <span>{stats.progressPercent}%</span>
+                </div>
+                <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                  <motion.div
+                    className="h-full bg-gradient-to-r from-green-500 to-emerald-500"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${stats.progressPercent}%` }}
+                    transition={{ duration: 0.5, delay: 0.3 + idx * 0.1 }}
+                  />
+                </div>
+              </div>
+
+              {/* תג המשך/התחל */}
+              {stats.progressPercent > 0 && stats.progressPercent < 100 && (
+                <div className="absolute top-4 right-4 px-3 py-1 bg-amber-500/20 border border-amber-500/30 rounded-full text-amber-400 text-xs font-bold">
+                  המשך
+                </div>
+              )}
+              {stats.progressPercent === 100 && (
+                <div className="absolute top-4 right-4 px-3 py-1 bg-green-500/20 border border-green-500/30 rounded-full text-green-400 text-xs font-bold flex items-center gap-1">
+                  <CheckCircle size={12} />
+                  הושלם
+                </div>
+              )}
+            </motion.button>
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+// =============================================
+// מסך בחירת יחידה
+// =============================================
+interface UnitSelectProps {
+  moduleType: ModuleType;
+  onSelectUnit: (unitId: string) => void;
+  completedUnits: string[];
+  onBack: () => void;
+}
+
+const UnitSelect: React.FC<UnitSelectProps> = ({ moduleType, onSelectUnit, completedUnits, onBack }) => {
+  const currentModule = modules[moduleType];
+  const stats = getModuleStats(moduleType, completedUnits);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="fixed inset-0 z-[200] flex flex-col bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-900 overflow-y-auto"
+      dir="rtl"
+    >
+      {/* רקע */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-purple-500/10 rounded-full blur-[100px]" />
+        <div className="absolute bottom-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-500/10 rounded-full blur-[100px]" />
+      </div>
+
+      {/* כפתור חזרה */}
+      <div className="absolute top-6 left-6 z-50">
+        <button
+          onClick={onBack}
+          className="p-3 rounded-full bg-white/5 border border-white/10 text-white/50 hover:bg-white/10 hover:text-white transition-all"
+        >
+          <ChevronLeft size={24} />
+        </button>
+      </div>
+
+      {/* כותרת */}
       <header className="relative z-10 w-full p-6 md:p-8 text-center">
         <motion.div
           initial={{ y: -30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           className="flex flex-col items-center gap-4"
         >
-          <div className="text-6xl">{fractionsModule.icon}</div>
-          <h1 className="text-3xl md:text-4xl font-black text-white">{fractionsModule.title}</h1>
-          <p className="text-white/60 max-w-md">{fractionsModule.description}</p>
+          <div className="text-6xl">{currentModule.icon}</div>
+          <h1 className="text-3xl md:text-4xl font-black text-white">{currentModule.title}</h1>
+          <p className="text-white/60 max-w-md">{currentModule.description}</p>
 
           {/* התקדמות */}
           <div className="flex items-center gap-4 mt-4">
@@ -74,9 +210,9 @@ const UnitSelect: React.FC<UnitSelectProps> = ({ onSelectUnit, completedUnits, o
       {/* רשימת יחידות */}
       <div className="relative z-10 flex-1 p-4 md:p-6">
         <div className="max-w-2xl mx-auto grid gap-4">
-          {fractionsModule.units.map((unit, idx) => {
+          {currentModule.units.map((unit, idx) => {
             const isCompleted = completedUnits.includes(unit.id);
-            const isAvailable = isUnitAvailable(unit.id, completedUnits);
+            const isAvailable = isUnitAvailable(moduleType, unit.id, completedUnits);
             const isNext = !isCompleted && isAvailable;
 
             return (
@@ -382,17 +518,18 @@ interface CurriculumPlayerProps {
 }
 
 type ViewState =
-  | { type: 'unit-select' }
-  | { type: 'unit-intro'; unitId: string }
-  | { type: 'learning'; unitId: string; stepIndex: number }
-  | { type: 'practice'; unitId: string; stepIndex: number }
-  | { type: 'mastery'; unitId: string; stepIndex: number }
-  | { type: 'step-complete'; unitId: string; stepIndex: number }
-  | { type: 'unit-complete'; unitId: string };
+  | { type: 'module-select' }
+  | { type: 'unit-select'; moduleType: ModuleType }
+  | { type: 'unit-intro'; moduleType: ModuleType; unitId: string }
+  | { type: 'learning'; moduleType: ModuleType; unitId: string; stepIndex: number }
+  | { type: 'practice'; moduleType: ModuleType; unitId: string; stepIndex: number }
+  | { type: 'mastery'; moduleType: ModuleType; unitId: string; stepIndex: number }
+  | { type: 'step-complete'; moduleType: ModuleType; unitId: string; stepIndex: number }
+  | { type: 'unit-complete'; moduleType: ModuleType; unitId: string };
 
 export const CurriculumPlayer: React.FC<CurriculumPlayerProps> = ({ onBack }) => {
   const { user, completeLevel } = useUser();
-  const [viewState, setViewState] = useState<ViewState>({ type: 'unit-select' });
+  const [viewState, setViewState] = useState<ViewState>({ type: 'module-select' });
 
   // רשימת יחידות שהושלמו
   const completedUnits = useMemo(() => {
@@ -401,128 +538,142 @@ export const CurriculumPlayer: React.FC<CurriculumPlayerProps> = ({ onBack }) =>
 
   // --- Handlers ---
 
-  const handleSelectUnit = (unitId: string) => {
-    setViewState({ type: 'unit-intro', unitId });
+  const handleSelectModule = (moduleType: ModuleType) => {
+    setViewState({ type: 'unit-select', moduleType });
   };
 
-  const handleStartUnit = (unitId: string) => {
-    setViewState({ type: 'learning', unitId, stepIndex: 0 });
-    advanceStep(unitId, 0);
+  const handleSelectUnit = (moduleType: ModuleType, unitId: string) => {
+    setViewState({ type: 'unit-intro', moduleType, unitId });
   };
 
-  const advanceStep = (unitId: string, stepIndex: number) => {
-    const unit = getUnitById(unitId);
+  const handleStartUnit = (moduleType: ModuleType, unitId: string) => {
+    setViewState({ type: 'learning', moduleType, unitId, stepIndex: 0 });
+    advanceStep(moduleType, unitId, 0);
+  };
+
+  const advanceStep = (moduleType: ModuleType, unitId: string, stepIndex: number) => {
+    const unit = getUnitById(moduleType, unitId);
     if (!unit) return;
 
     const step = unit.steps[stepIndex];
     if (!step) {
       // יחידה הושלמה
-      setViewState({ type: 'unit-complete', unitId });
+      setViewState({ type: 'unit-complete', moduleType, unitId });
       return;
     }
 
     switch (step.type) {
       case 'learning':
-        setViewState({ type: 'learning', unitId, stepIndex });
+        setViewState({ type: 'learning', moduleType, unitId, stepIndex });
         break;
       case 'practice':
-        setViewState({ type: 'practice', unitId, stepIndex });
+        setViewState({ type: 'practice', moduleType, unitId, stepIndex });
         break;
       case 'mastery':
-        setViewState({ type: 'mastery', unitId, stepIndex });
+        setViewState({ type: 'mastery', moduleType, unitId, stepIndex });
         break;
     }
   };
 
-  const handleLearningComplete = (unitId: string, stepIndex: number) => {
-    advanceStep(unitId, stepIndex + 1);
+  const handleLearningComplete = (moduleType: ModuleType, unitId: string, stepIndex: number) => {
+    advanceStep(moduleType, unitId, stepIndex + 1);
   };
 
-  const handlePracticeComplete = (unitId: string, stepIndex: number, correct: number, total: number) => {
-    const unit = getUnitById(unitId);
+  const handlePracticeComplete = (moduleType: ModuleType, unitId: string, stepIndex: number, correct: number, total: number) => {
+    const unit = getUnitById(moduleType, unitId);
     if (!unit) return;
 
     const step = unit.steps[stepIndex] as PracticeStep;
     const passed = correct >= step.requiredCorrect;
 
     if (passed) {
-      advanceStep(unitId, stepIndex + 1);
+      advanceStep(moduleType, unitId, stepIndex + 1);
     } else {
       // נכשל - חוזר לתרגל (כרגע פשוט ממשיך)
-      advanceStep(unitId, stepIndex + 1);
+      advanceStep(moduleType, unitId, stepIndex + 1);
     }
   };
 
-  const handleMasteryComplete = (unitId: string, stepIndex: number, passed: boolean, score: number) => {
+  const handleMasteryComplete = (moduleType: ModuleType, unitId: string, stepIndex: number, passed: boolean, score: number) => {
     if (passed) {
       // עבר את המבחן - מסמן את היחידה כהושלמה
       completeLevel(unitId, score);
-      advanceStep(unitId, stepIndex + 1);
+      advanceStep(moduleType, unitId, stepIndex + 1);
     } else {
       // נכשל - חוזר להתחלת היחידה
-      setViewState({ type: 'unit-intro', unitId });
+      setViewState({ type: 'unit-intro', moduleType, unitId });
     }
   };
 
-  const handleUnitComplete = (unitId: string) => {
+  const handleUnitComplete = (moduleType: ModuleType, unitId: string) => {
     completeLevel(unitId, 100);
-    setViewState({ type: 'unit-select' });
+    setViewState({ type: 'unit-select', moduleType });
   };
 
   // --- Render ---
 
   const renderView = () => {
     switch (viewState.type) {
-      case 'unit-select':
+      case 'module-select':
         return (
-          <UnitSelect
+          <ModuleSelect
             completedUnits={completedUnits}
-            onSelectUnit={handleSelectUnit}
+            onSelectModule={handleSelectModule}
             onBack={onBack}
           />
         );
 
+      case 'unit-select':
+        return (
+          <UnitSelect
+            moduleType={viewState.moduleType}
+            completedUnits={completedUnits}
+            onSelectUnit={(unitId) => handleSelectUnit(viewState.moduleType, unitId)}
+            onBack={() => setViewState({ type: 'module-select' })}
+          />
+        );
+
       case 'unit-intro': {
-        const unit = getUnitById(viewState.unitId);
+        const unit = getUnitById(viewState.moduleType, viewState.unitId);
         if (!unit) return null;
         return (
           <UnitIntro
             unit={unit}
-            onStart={() => handleStartUnit(viewState.unitId)}
-            onBack={() => setViewState({ type: 'unit-select' })}
+            onStart={() => handleStartUnit(viewState.moduleType, viewState.unitId)}
+            onBack={() => setViewState({ type: 'unit-select', moduleType: viewState.moduleType })}
           />
         );
       }
 
       case 'learning': {
-        const unit = getUnitById(viewState.unitId);
+        const unit = getUnitById(viewState.moduleType, viewState.unitId);
         if (!unit) return null;
         const step = unit.steps[viewState.stepIndex] as LearningStep;
         return (
           <LearningSlidePlayer
             slides={step.slides}
             stepTitle={step.title}
-            onComplete={() => handleLearningComplete(viewState.unitId, viewState.stepIndex)}
+            onComplete={() => handleLearningComplete(viewState.moduleType, viewState.unitId, viewState.stepIndex)}
           />
         );
       }
 
       case 'practice': {
-        const unit = getUnitById(viewState.unitId);
+        const unit = getUnitById(viewState.moduleType, viewState.unitId);
         if (!unit) return null;
         const step = unit.steps[viewState.stepIndex] as PracticeStep;
         return (
           <PracticeSession
             step={step}
             onComplete={(correct, total) =>
-              handlePracticeComplete(viewState.unitId, viewState.stepIndex, correct, total)
+              handlePracticeComplete(viewState.moduleType, viewState.unitId, viewState.stepIndex, correct, total)
             }
           />
         );
       }
 
       case 'mastery': {
-        const unit = getUnitById(viewState.unitId);
+        const unit = getUnitById(viewState.moduleType, viewState.unitId);
         if (!unit) return null;
         const step = unit.steps[viewState.stepIndex] as MasteryStep;
         return (
@@ -531,15 +682,15 @@ export const CurriculumPlayer: React.FC<CurriculumPlayerProps> = ({ onBack }) =>
             questions={step.questions}
             passingScore={step.passingScore}
             onComplete={(passed, score, attempts) =>
-              handleMasteryComplete(viewState.unitId, viewState.stepIndex, passed, score)
+              handleMasteryComplete(viewState.moduleType, viewState.unitId, viewState.stepIndex, passed, score)
             }
-            onReview={() => setViewState({ type: 'unit-intro', unitId: viewState.unitId })}
+            onReview={() => setViewState({ type: 'unit-intro', moduleType: viewState.moduleType, unitId: viewState.unitId })}
           />
         );
       }
 
       case 'unit-complete': {
-        const unit = getUnitById(viewState.unitId);
+        const unit = getUnitById(viewState.moduleType, viewState.unitId);
         if (!unit) return null;
         return (
           <motion.div
@@ -563,7 +714,7 @@ export const CurriculumPlayer: React.FC<CurriculumPlayerProps> = ({ onBack }) =>
             <div className="w-full max-w-md bg-white/5 border border-white/10 rounded-xl p-4 my-6">
               <h3 className="text-sm font-bold text-green-400 mb-3">עכשיו אתה יודע:</h3>
               <ul className="space-y-2">
-                {unit.masterySkills.map((skill, idx) => (
+                {unit.masterySkills?.map((skill, idx) => (
                   <li key={idx} className="flex items-center gap-2 text-white/80 text-sm">
                     <CheckCircle size={14} className="text-green-400" />
                     <span>{skill}</span>
@@ -574,7 +725,7 @@ export const CurriculumPlayer: React.FC<CurriculumPlayerProps> = ({ onBack }) =>
 
             <motion.button
               whileTap={{ scale: 0.95 }}
-              onClick={() => handleUnitComplete(viewState.unitId)}
+              onClick={() => handleUnitComplete(viewState.moduleType, viewState.unitId)}
               className="px-8 py-4 rounded-xl font-bold text-lg bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg shadow-green-500/30 flex items-center gap-2"
             >
               <span>המשך ליחידה הבאה</span>
