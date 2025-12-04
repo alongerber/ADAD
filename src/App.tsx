@@ -117,6 +117,32 @@ const GameContainer: React.FC = () => {
                 </motion.div>
             )}
 
+            {currentRoom === RoomType.FRACTIONS && (
+                <motion.div
+                    key="fractions"
+                    className="w-full h-full"
+                    initial={{ opacity: 0, x: 100 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 100 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <CurriculumPlayer onBack={() => setCurrentRoom(RoomType.LOBBY)} initialModule="fractions" />
+                </motion.div>
+            )}
+
+            {currentRoom === RoomType.NUMBERS && (
+                <motion.div
+                    key="numbers"
+                    className="w-full h-full"
+                    initial={{ opacity: 0, x: 100 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 100 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <CurriculumPlayer onBack={() => setCurrentRoom(RoomType.LOBBY)} initialModule="numbers" />
+                </motion.div>
+            )}
+
             {/* Future rooms */}
             {currentRoom === RoomType.COCKPIT && <div className="p-10">Cockpit Locked</div>}
         </AnimatePresence>

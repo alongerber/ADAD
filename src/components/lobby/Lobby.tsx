@@ -5,7 +5,8 @@ import { RoomType } from '../../types';
 import { Beaker, Lock, Calculator, Component, LogOut, Star, Flame, Trophy, Volume2, VolumeX, BarChart3, GraduationCap, MessageCircle } from 'lucide-react';
 import { getTimeGreeting } from '../../utils/messages';
 import { VAULT_CURRICULUM, VAULT_TOPICS, LAB_TOPICS, LAB_CURRICULUM } from '../../data/curriculum';
-import { fractionsModule, getModuleStats } from '../../data/curriculum/fractions';
+import { fractionsModule, getModuleStats as getFractionsStats } from '../../data/curriculum/fractions';
+import { numbersModule, getModuleStats as getNumbersStats } from '../../data/curriculum/numbers';
 import { ParentDashboard } from '../dashboard/ParentDashboard';
 
 interface LobbyProps {
@@ -133,13 +134,13 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
 
       {/* Cards Grid */}
       <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 w-full max-w-5xl">
-        
-        {/* CARD 1: FRACTIONS CURRICULUM (Active) */}
+
+        {/* CARD 1: FRACTIONS (Active) */}
         <motion.button
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          onClick={() => onNavigate(RoomType.CURRICULUM)}
+          onClick={() => onNavigate(RoomType.FRACTIONS)}
           className={getCardStyle(true)}
         >
            <div className={`p-3 md:p-6 rounded-full bg-white/10 backdrop-blur-md border border-white/20 ${
@@ -150,14 +151,14 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
              user?.theme === 'candy' ? 'text-rose-300' :
              'text-cyan-400'
            }`}>
-              <GraduationCap size={28} className="md:w-12 md:h-12" strokeWidth={1.5} />
+              <span className="text-3xl md:text-5xl">{fractionsModule.icon}</span>
            </div>
            <h3 className={`text-lg md:text-2xl font-bold text-white`}>{fractionsModule.title}</h3>
            <p className="text-xs text-white/50 text-center px-2">{fractionsModule.description}</p>
            {/* Progress bar */}
            {(() => {
              const completedUnits = user?.progress?.completedLevels?.filter(id => id.startsWith('unit_')) || [];
-             const stats = getModuleStats(completedUnits);
+             const stats = getFractionsStats(completedUnits);
              return (
                <div className="w-full max-w-[180px] flex flex-col items-center gap-1">
                  <div className="w-full h-2 bg-black/40 rounded-full overflow-hidden">
@@ -176,43 +177,42 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
            })()}
         </motion.button>
 
-        {/* CARD 2: VAULT (Now Unlocked) */}
+        {/* CARD 2: NUMBERS (Active) */}
         <motion.button
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          onClick={() => onNavigate(RoomType.VAULT)}
+          onClick={() => onNavigate(RoomType.NUMBERS)}
           className={getVaultCardStyle()}
         >
-           <div className="p-3 md:p-6 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400">
-              <Lock size={28} className="md:w-12 md:h-12" strokeWidth={1.5} />
+           <div className="p-3 md:p-6 rounded-full bg-amber-500/10 border border-amber-500/20">
+              <span className="text-3xl md:text-5xl">{numbersModule.icon}</span>
            </div>
-           <h3 className="text-lg md:text-2xl font-bold text-amber-100">הכספת</h3>
-           {/* Topic list */}
-           <div className="flex flex-wrap justify-center gap-1 md:gap-2 max-w-full px-2">
-             {VAULT_TOPICS.map((topic, idx) => (
-               <span key={idx} className="text-[10px] md:text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400/70">
-                 {topic.icon} {topic.title}
-               </span>
-             ))}
-           </div>
-           {/* Progress indicator */}
-           <div className="w-full max-w-[180px] flex flex-col items-center gap-1">
-             <div className="w-full h-2 bg-black/40 rounded-full overflow-hidden">
-               <motion.div
-                 initial={{ width: 0 }}
-                 animate={{ width: `${((user?.progress?.completedLevels.length || 0) / VAULT_CURRICULUM.length) * 100}%` }}
-                 transition={{ delay: 0.5, duration: 0.8 }}
-                 className="h-full bg-gradient-to-r from-amber-500 to-amber-300 rounded-full"
-               />
-             </div>
-             <div className="text-xs text-amber-400/70">
-               {user?.progress?.completedLevels.length || 0} / {VAULT_CURRICULUM.length} שלבים
-             </div>
-           </div>
+           <h3 className="text-lg md:text-2xl font-bold text-amber-100">{numbersModule.title}</h3>
+           <p className="text-xs text-amber-400/70 text-center px-2">{numbersModule.description}</p>
+           {/* Progress bar */}
+           {(() => {
+             const completedUnits = user?.progress?.completedLevels?.filter(id => id.startsWith('unit_')) || [];
+             const stats = getNumbersStats(completedUnits);
+             return (
+               <div className="w-full max-w-[180px] flex flex-col items-center gap-1">
+                 <div className="w-full h-2 bg-black/40 rounded-full overflow-hidden">
+                   <motion.div
+                     initial={{ width: 0 }}
+                     animate={{ width: `${stats.progressPercent}%` }}
+                     transition={{ delay: 0.5, duration: 0.8 }}
+                     className="h-full bg-gradient-to-r from-amber-500 to-amber-300 rounded-full"
+                   />
+                 </div>
+                 <div className="text-xs text-amber-400/70">
+                   {stats.completedCount} / {stats.totalCount} יחידות
+                 </div>
+               </div>
+             );
+           })()}
         </motion.button>
 
-        {/* CARD 3: COCKPIT (Locked) */}
+        {/* CARD 3: GEOMETRY (Coming Soon) */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -220,10 +220,10 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
           className={getCardStyle(false)}
         >
            <div className="p-4 md:p-6 rounded-full bg-black/20 border border-white/5 text-white/20">
-              <Component size={32} className="md:w-12 md:h-12" strokeWidth={1.5} />
+              <span className="text-3xl md:text-5xl opacity-40">📐</span>
            </div>
-           <h3 className="text-lg md:text-2xl font-bold text-white/40">הקוקפיט</h3>
-           <div className="px-3 py-1 rounded-full text-xs font-bold bg-black/20 text-white/30">נעול</div>
+           <h3 className="text-lg md:text-2xl font-bold text-white/40">גיאומטריה</h3>
+           <div className="px-3 py-1 rounded-full text-xs font-bold bg-black/20 text-white/30">בקרוב</div>
         </motion.div>
 
       </div>

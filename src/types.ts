@@ -3,7 +3,9 @@ export enum RoomType {
   LAB = 'LAB',
   VAULT = 'VAULT',
   COCKPIT = 'COCKPIT',
-  CURRICULUM = 'CURRICULUM'  // מסלול לימוד מובנה עם יחידות
+  CURRICULUM = 'CURRICULUM',  // מסלול לימוד כללי
+  FRACTIONS = 'FRACTIONS',    // מסלול שברים
+  NUMBERS = 'NUMBERS'         // מסלול מספרים וחיסור
 }
 
 export interface GameState {

@@ -6,6 +6,7 @@ import { LearningUnit } from '../../../types/curriculum';
 import { unit1PlaceValue } from './unit1-place-value';
 import { unit2Thousands } from './unit2-thousands';
 import { unit3ZeroTraps } from './unit3-zero-traps';
+import { unitAddition } from './unit-addition';
 import { unit4Subtraction } from './unit4-subtraction';
 import { unit5Borrowing } from './unit5-borrowing';
 import { unit6Mastery } from './unit6-mastery';
@@ -25,13 +26,14 @@ export interface NumbersModule {
 
 export const numbersModule: NumbersModule = {
   id: 'numbers_grade_4',
-  title: 'מספרים וחיסור',
-  description: 'כתיבת מספרים גדולים וחיסור במאונך עם פריטה',
+  title: 'מספרים וחשבון',
+  description: 'כתיבת מספרים גדולים, חיבור וחיסור במאונך',
   icon: '🔢',
   units: [
     unit1PlaceValue,
     unit2Thousands,
     unit3ZeroTraps,
+    unitAddition,
     unit4Subtraction,
     unit5Borrowing,
     unit6Mastery
@@ -40,10 +42,11 @@ export const numbersModule: NumbersModule = {
     unit1PlaceValue.steps.length +
     unit2Thousands.steps.length +
     unit3ZeroTraps.steps.length +
+    unitAddition.steps.length +
     unit4Subtraction.steps.length +
     unit5Borrowing.steps.length +
     unit6Mastery.steps.length,
-  estimatedTime: '3-4 שעות'
+  estimatedTime: '4-5 שעות'
 };
 
 // =============================================
@@ -129,6 +132,7 @@ export {
   unit1PlaceValue,
   unit2Thousands,
   unit3ZeroTraps,
+  unitAddition,
   unit4Subtraction,
   unit5Borrowing,
   unit6Mastery

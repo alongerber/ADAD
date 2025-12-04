@@ -399,9 +399,10 @@ const UnitIntro: React.FC<UnitIntroProps> = ({ unit, onStart, onBack }) => {
 interface PracticeSessionProps {
   step: PracticeStep;
   onComplete: (correctCount: number, totalCount: number) => void;
+  onBack: () => void;
 }
 
-const PracticeSession: React.FC<PracticeSessionProps> = ({ step, onComplete }) => {
+const PracticeSession: React.FC<PracticeSessionProps> = ({ step, onComplete, onBack }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<boolean[]>([]);
   const [isAnswered, setIsAnswered] = useState(false);
@@ -438,6 +439,16 @@ const PracticeSession: React.FC<PracticeSessionProps> = ({ step, onComplete }) =
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-purple-500/10 rounded-full blur-[100px]" />
         <div className="absolute bottom-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-500/10 rounded-full blur-[100px]" />
+      </div>
+
+      {/* כפתור חזרה */}
+      <div className="absolute top-6 left-6 z-50">
+        <button
+          onClick={onBack}
+          className="p-3 rounded-full bg-white/5 border border-white/10 text-white/50 hover:bg-white/10 hover:text-white transition-all"
+        >
+          <Home size={24} />
+        </button>
       </div>
 
       {/* כותרת */}
@@ -515,6 +526,7 @@ const PracticeSession: React.FC<PracticeSessionProps> = ({ step, onComplete }) =
 // =============================================
 interface CurriculumPlayerProps {
   onBack: () => void;
+  initialModule?: ModuleType; // אם מועבר, דולג על מסך בחירת המודול
 }
 
 type ViewState =
@@ -527,9 +539,13 @@ type ViewState =
   | { type: 'step-complete'; moduleType: ModuleType; unitId: string; stepIndex: number }
   | { type: 'unit-complete'; moduleType: ModuleType; unitId: string };
 
-export const CurriculumPlayer: React.FC<CurriculumPlayerProps> = ({ onBack }) => {
+export const CurriculumPlayer: React.FC<CurriculumPlayerProps> = ({ onBack, initialModule }) => {
   const { user, completeLevel } = useUser();
-  const [viewState, setViewState] = useState<ViewState>({ type: 'module-select' });
+  const [viewState, setViewState] = useState<ViewState>(
+    initialModule
+      ? { type: 'unit-select', moduleType: initialModule }
+      : { type: 'module-select' }
+  );
 
   // רשימת יחידות שהושלמו
   const completedUnits = useMemo(() => {
@@ -654,6 +670,7 @@ export const CurriculumPlayer: React.FC<CurriculumPlayerProps> = ({ onBack }) =>
             slides={step.slides}
             stepTitle={step.title}
             onComplete={() => handleLearningComplete(viewState.moduleType, viewState.unitId, viewState.stepIndex)}
+            onBack={onBack}
           />
         );
       }
@@ -668,6 +685,7 @@ export const CurriculumPlayer: React.FC<CurriculumPlayerProps> = ({ onBack }) =>
             onComplete={(correct, total) =>
               handlePracticeComplete(viewState.moduleType, viewState.unitId, viewState.stepIndex, correct, total)
             }
+            onBack={onBack}
           />
         );
       }
@@ -685,6 +703,7 @@ export const CurriculumPlayer: React.FC<CurriculumPlayerProps> = ({ onBack }) =>
               handleMasteryComplete(viewState.moduleType, viewState.unitId, viewState.stepIndex, passed, score)
             }
             onReview={() => setViewState({ type: 'unit-intro', moduleType: viewState.moduleType, unitId: viewState.unitId })}
+            onBack={onBack}
           />
         );
       }

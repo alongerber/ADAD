@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Lightbulb, HelpCircle, Sparkles } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Lightbulb, HelpCircle, Sparkles, Home } from 'lucide-react';
 import { LearningSlide } from '../../types/curriculum';
 
 // =============================================
@@ -92,12 +92,14 @@ interface LearningSlidePlayerProps {
   slides: LearningSlide[];
   onComplete: () => void;
   stepTitle: string;
+  onBack?: () => void;
 }
 
 export const LearningSlidePlayer: React.FC<LearningSlidePlayerProps> = ({
   slides,
   onComplete,
-  stepTitle
+  stepTitle,
+  onBack
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const currentSlide = slides[currentIndex];
@@ -140,6 +142,18 @@ export const LearningSlidePlayer: React.FC<LearningSlidePlayerProps> = ({
         <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-purple-500/10 rounded-full blur-[100px]" />
         <div className="absolute bottom-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-500/10 rounded-full blur-[100px]" />
       </div>
+
+      {/* כפתור חזרה */}
+      {onBack && (
+        <div className="absolute top-6 left-6 z-50">
+          <button
+            onClick={onBack}
+            className="p-3 rounded-full bg-white/5 border border-white/10 text-white/50 hover:bg-white/10 hover:text-white transition-all"
+          >
+            <Home size={24} />
+          </button>
+        </div>
+      )}
 
       {/* כותרת */}
       <header className="relative z-10 w-full p-4 md:p-6">
