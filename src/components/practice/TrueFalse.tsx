@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, X, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useSound } from '../../hooks/useSound';
@@ -58,7 +58,43 @@ export const TrueFalse: React.FC<TrueFalseProps> = ({
 }) => {
   const [userAnswer, setUserAnswer] = useState<boolean | null>(null);
   const [showResult, setShowResult] = useState(false);
+  const [focusedButton, setFocusedButton] = useState<'true' | 'false'>('true');
   const { playSuccess, playError, playClick } = useSound();
+  const trueButtonRef = useRef<HTMLButtonElement>(null);
+  const falseButtonRef = useRef<HTMLButtonElement>(null);
+
+  // פוקוס ראשוני
+  useEffect(() => {
+    if (!disabled && userAnswer === null) {
+      trueButtonRef.current?.focus();
+    }
+  }, [disabled, userAnswer]);
+
+  // ניווט מקלדת
+  const handleKeyDown = useCallback((e: React.KeyboardEvent, isForTrue: boolean) => {
+    if (disabled || userAnswer !== null) return;
+
+    switch (e.key) {
+      case 'ArrowLeft':
+      case 'ArrowRight':
+      case 'ArrowUp':
+      case 'ArrowDown':
+        e.preventDefault();
+        if (isForTrue) {
+          setFocusedButton('false');
+          falseButtonRef.current?.focus();
+        } else {
+          setFocusedButton('true');
+          trueButtonRef.current?.focus();
+        }
+        break;
+      case 'Enter':
+      case ' ':
+        e.preventDefault();
+        handleAnswer(isForTrue);
+        break;
+    }
+  }, [disabled, userAnswer]);
 
   const handleAnswer = (answer: boolean) => {
     if (disabled || userAnswer !== null) return;
@@ -163,18 +199,29 @@ export const TrueFalse: React.FC<TrueFalseProps> = ({
       </motion.div>
 
       {/* כפתורי תשובה */}
-      <div className="flex gap-4 w-full max-w-sm">
+      <div
+        className="flex gap-4 w-full max-w-sm"
+        role="radiogroup"
+        aria-label="בחר אם הטענה נכונה או לא"
+      >
         {/* כפתור נכון */}
         <motion.button
+          ref={trueButtonRef}
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
           whileTap={!disabled && userAnswer === null ? { scale: 0.95 } : {}}
           onClick={() => handleAnswer(true)}
+          onKeyDown={(e) => handleKeyDown(e, true)}
           disabled={disabled || userAnswer !== null}
+          role="radio"
+          aria-checked={userAnswer === true}
+          aria-label="הטענה נכונה"
+          tabIndex={focusedButton === 'true' ? 0 : -1}
           className={`
             flex-1 py-4 rounded-xl font-bold text-lg transition-all duration-300
             flex items-center justify-center gap-2
+            focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-slate-900
             ${userAnswer === null
               ? 'bg-green-600/20 border-2 border-green-500/50 text-green-400 hover:bg-green-600/40 hover:scale-105'
               : userAnswer === true
@@ -186,21 +233,28 @@ export const TrueFalse: React.FC<TrueFalseProps> = ({
             ${disabled || userAnswer !== null ? 'cursor-default' : 'cursor-pointer'}
           `}
         >
-          <ThumbsUp size={24} />
+          <ThumbsUp size={24} aria-hidden="true" />
           <span>נכון!</span>
         </motion.button>
 
         {/* כפתור לא נכון */}
         <motion.button
+          ref={falseButtonRef}
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 }}
           whileTap={!disabled && userAnswer === null ? { scale: 0.95 } : {}}
           onClick={() => handleAnswer(false)}
+          onKeyDown={(e) => handleKeyDown(e, false)}
           disabled={disabled || userAnswer !== null}
+          role="radio"
+          aria-checked={userAnswer === false}
+          aria-label="הטענה לא נכונה"
+          tabIndex={focusedButton === 'false' ? 0 : -1}
           className={`
             flex-1 py-4 rounded-xl font-bold text-lg transition-all duration-300
             flex items-center justify-center gap-2
+            focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-slate-900
             ${userAnswer === null
               ? 'bg-red-600/20 border-2 border-red-500/50 text-red-400 hover:bg-red-600/40 hover:scale-105'
               : userAnswer === false
@@ -212,57 +266,60 @@ export const TrueFalse: React.FC<TrueFalseProps> = ({
             ${disabled || userAnswer !== null ? 'cursor-default' : 'cursor-pointer'}
           `}
         >
-          <ThumbsDown size={24} />
+          <ThumbsDown size={24} aria-hidden="true" />
           <span>לא נכון!</span>
         </motion.button>
       </div>
 
       {/* משוב */}
-      <AnimatePresence>
-        {showResult && (
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0 }}
-            className={`
-              flex items-center gap-3 px-6 py-4 rounded-xl font-bold text-lg
-              ${isCorrect
-                ? 'bg-green-500/20 border border-green-500/50 text-green-400'
-                : 'bg-red-500/20 border border-red-500/50 text-red-400'
-              }
-            `}
-          >
-            {isCorrect ? (
-              <>
-                <motion.div
-                  initial={{ rotate: -180, scale: 0 }}
-                  animate={{ rotate: 0, scale: 1 }}
-                  transition={{ type: 'spring' }}
-                >
-                  <Check size={28} />
-                </motion.div>
-                <span>נכון מאוד! 🎉</span>
-              </>
-            ) : (
-              <>
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: 'spring' }}
-                >
-                  <X size={28} />
-                </motion.div>
-                <span>
-                  {isTrue
-                    ? 'למעשה, הטענה הזו נכונה!'
-                    : 'למעשה, הטענה הזו לא נכונה!'
-                  }
-                </span>
-              </>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div aria-live="polite" aria-atomic="true">
+        <AnimatePresence>
+          {showResult && (
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0 }}
+              role="alert"
+              className={`
+                flex items-center gap-3 px-6 py-4 rounded-xl font-bold text-lg
+                ${isCorrect
+                  ? 'bg-green-500/20 border border-green-500/50 text-green-400'
+                  : 'bg-red-500/20 border border-red-500/50 text-red-400'
+                }
+              `}
+            >
+              {isCorrect ? (
+                <>
+                  <motion.div
+                    initial={{ rotate: -180, scale: 0 }}
+                    animate={{ rotate: 0, scale: 1 }}
+                    transition={{ type: 'spring' }}
+                  >
+                    <Check size={28} aria-hidden="true" />
+                  </motion.div>
+                  <span>נכון מאוד! 🎉</span>
+                </>
+              ) : (
+                <>
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: 'spring' }}
+                  >
+                    <X size={28} aria-hidden="true" />
+                  </motion.div>
+                  <span>
+                    {isTrue
+                      ? 'למעשה, הטענה הזו נכונה!'
+                      : 'למעשה, הטענה הזו לא נכונה!'
+                    }
+                  </span>
+                </>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       {/* הסבר אחרי תשובה */}
       <AnimatePresence>

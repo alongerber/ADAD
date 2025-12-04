@@ -1,6 +1,9 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, ChevronLeft, Lock, CheckCircle, BookOpen, Award, Play } from 'lucide-react';
+import { Home, ChevronLeft, Lock, CheckCircle, BookOpen, Award, Play, Pause } from 'lucide-react';
+import { PauseOverlay } from '../ui/PauseOverlay';
+import { SaveIndicator } from '../ui/SaveIndicator';
+import { useAutoSave, clearSessionState } from '../../hooks/useSessionSave';
 import { LearningUnit, LearningStep, PracticeStep, MasteryStep, PracticeQuestion } from '../../types/curriculum';
 import { LearningSlidePlayer } from './LearningSlidePlayer';
 import { PracticeRouter } from '../practice/PracticeRouter';
@@ -410,19 +413,56 @@ interface PracticeSessionProps {
   step: PracticeStep;
   onComplete: (correctCount: number, totalCount: number) => void;
   onBack: () => void;
+  moduleType?: string;
+  unitId?: string;
+  stepIndex?: number;
 }
 
-const PracticeSession: React.FC<PracticeSessionProps> = ({ step, onComplete, onBack }) => {
+const PracticeSession: React.FC<PracticeSessionProps> = ({ step, onComplete, onBack, moduleType, unitId, stepIndex }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<boolean[]>([]);
   const [isAnswered, setIsAnswered] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [sessionTime, setSessionTime] = useState(0);
+  const sessionStartRef = useRef<number>(Date.now());
 
   const questions = step.questions;
   const currentQuestion = questions[currentIndex];
   const totalQuestions = questions.length;
   const correctAnswers = answers.filter(a => a).length;
 
+  // שמירה אוטומטית
+  const { lastSaved, isSaving, clearSession } = useAutoSave({
+    moduleType,
+    unitId,
+    stepIndex,
+    questionIndex: currentIndex,
+    answers,
+  });
+
+  // מעקב זמן סשן (עוצר כשמושהה)
+  useEffect(() => {
+    if (isPaused) return;
+    const interval = setInterval(() => {
+      setSessionTime(Math.floor((Date.now() - sessionStartRef.current) / 1000));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [isPaused]);
+
+  // תמיכה בלחיצת Escape להשהייה
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !isAnswered) {
+        setIsPaused(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isAnswered]);
+
   const handleAnswer = useCallback((isCorrect: boolean) => {
+    if (isPaused) return; // לא לאפשר תשובה בזמן השהייה
+
     setAnswers(prev => [...prev, isCorrect]);
     setIsAnswered(true);
 
@@ -431,12 +471,13 @@ const PracticeSession: React.FC<PracticeSessionProps> = ({ step, onComplete, onB
         setCurrentIndex(prev => prev + 1);
         setIsAnswered(false);
       } else {
-        // סיום
+        // סיום - מחיקת סשן שמור
+        clearSession();
         const finalCorrect = [...answers, isCorrect].filter(a => a).length;
         onComplete(finalCorrect, totalQuestions);
       }
     }, 1500);
-  }, [currentIndex, totalQuestions, answers, onComplete]);
+  }, [currentIndex, totalQuestions, answers, onComplete, isPaused, clearSession]);
 
   return (
     <motion.div
@@ -451,11 +492,31 @@ const PracticeSession: React.FC<PracticeSessionProps> = ({ step, onComplete, onB
         <div className="absolute bottom-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-500/10 rounded-full blur-[100px]" />
       </div>
 
-      {/* כפתור חזרה */}
-      <div className="absolute top-6 left-6 z-50">
+      {/* PauseOverlay */}
+      <PauseOverlay
+        isOpen={isPaused}
+        onResume={() => setIsPaused(false)}
+        onQuit={onBack}
+        sessionTime={sessionTime}
+        showBreakSuggestion={sessionTime >= 900} // 15 דקות
+      />
+
+      {/* כפתורי ניווט */}
+      <div className="absolute top-6 left-6 z-50 flex gap-2">
+        {/* כפתור השהייה */}
+        <button
+          onClick={() => setIsPaused(true)}
+          className="p-3 rounded-full bg-white/5 border border-white/10 text-white/50 hover:bg-white/10 hover:text-white transition-all"
+          aria-label="השהה"
+          title="השהה (Escape)"
+        >
+          <Pause size={24} />
+        </button>
+        {/* כפתור בית */}
         <button
           onClick={onBack}
           className="p-3 rounded-full bg-white/5 border border-white/10 text-white/50 hover:bg-white/10 hover:text-white transition-all"
+          aria-label="חזרה הביתה"
         >
           <Home size={24} />
         </button>
@@ -474,9 +535,17 @@ const PracticeSession: React.FC<PracticeSessionProps> = ({ step, onComplete, onB
             </div>
           </div>
 
-          {/* מונה */}
-          <div className="text-white/60 text-sm">
-            {currentIndex + 1} / {totalQuestions}
+          {/* מונה + זמן + שמירה */}
+          <div className="text-left flex flex-col items-end gap-1">
+            <div className="text-white/60 text-sm">
+              {currentIndex + 1} / {totalQuestions}
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-white/40 text-xs">
+                {Math.floor(sessionTime / 60)}:{(sessionTime % 60).toString().padStart(2, '0')}
+              </span>
+              <SaveIndicator lastSaved={lastSaved} isSaving={isSaving} />
+            </div>
           </div>
         </div>
 
@@ -522,7 +591,7 @@ const PracticeSession: React.FC<PracticeSessionProps> = ({ step, onComplete, onB
             <PracticeRouter
               question={currentQuestion}
               onAnswer={handleAnswer}
-              disabled={isAnswered}
+              disabled={isAnswered || isPaused}
             />
           </motion.div>
         </AnimatePresence>
@@ -692,6 +761,9 @@ export const CurriculumPlayer: React.FC<CurriculumPlayerProps> = ({ onBack, init
         return (
           <PracticeSession
             step={step}
+            moduleType={viewState.moduleType}
+            unitId={viewState.unitId}
+            stepIndex={viewState.stepIndex}
             onComplete={(correct, total) =>
               handlePracticeComplete(viewState.moduleType, viewState.unitId, viewState.stepIndex, correct, total)
             }
@@ -709,6 +781,9 @@ export const CurriculumPlayer: React.FC<CurriculumPlayerProps> = ({ onBack, init
             title={step.title}
             questions={step.questions}
             passingScore={step.passingScore}
+            moduleType={viewState.moduleType}
+            unitId={viewState.unitId}
+            stepIndex={viewState.stepIndex}
             onComplete={(passed, score, attempts) =>
               handleMasteryComplete(viewState.moduleType, viewState.unitId, viewState.stepIndex, passed, score)
             }

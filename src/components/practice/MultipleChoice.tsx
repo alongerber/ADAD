@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, X } from 'lucide-react';
 import { ChoiceOption, VisualContent } from '../../types/curriculum';
@@ -173,8 +173,48 @@ export const MultipleChoice: React.FC<MultipleChoiceProps> = ({
   showFeedback = true
 }) => {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [focusedIndex, setFocusedIndex] = useState<number>(0);
   const [answered, setAnswered] = useState(false);
   const { playSuccess, playError, playClick } = useSound();
+  const optionRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  // פוקוס ראשוני על האפשרות הראשונה
+  useEffect(() => {
+    if (!disabled && !answered && optionRefs.current[0]) {
+      optionRefs.current[0]?.focus();
+    }
+  }, [disabled, answered]);
+
+  // ניווט מקלדת
+  const handleKeyDown = useCallback((e: React.KeyboardEvent, index: number) => {
+    if (disabled || answered) return;
+
+    let nextIndex = index;
+    const numOptions = options.length;
+
+    switch (e.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        e.preventDefault();
+        nextIndex = (index + 1) % numOptions;
+        break;
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        e.preventDefault();
+        nextIndex = (index - 1 + numOptions) % numOptions;
+        break;
+      case 'Enter':
+      case ' ':
+        e.preventDefault();
+        handleSelect(index);
+        return;
+      default:
+        return;
+    }
+
+    setFocusedIndex(nextIndex);
+    optionRefs.current[nextIndex]?.focus();
+  }, [disabled, answered, options.length]);
 
   const handleSelect = (index: number) => {
     if (disabled || answered) return;
@@ -198,6 +238,14 @@ export const MultipleChoice: React.FC<MultipleChoiceProps> = ({
     setTimeout(() => {
       onAnswer(isCorrect, index);
     }, showFeedback ? 1500 : 500);
+  };
+
+  // יצירת תיאור נגיש לאפשרות
+  const getOptionAriaLabel = (option: ChoiceOption, index: number): string => {
+    if (option.text) return `אפשרות ${index + 1}: ${option.text}`;
+    if (option.fraction) return `אפשרות ${index + 1}: ${option.fraction.n} חלקי ${option.fraction.d}`;
+    if (option.visual) return `אפשרות ${index + 1}: איור ויזואלי`;
+    return `אפשרות ${index + 1}`;
   };
 
   const getOptionStyle = (index: number) => {
@@ -275,19 +323,30 @@ export const MultipleChoice: React.FC<MultipleChoiceProps> = ({
       </div>
 
       {/* אפשרויות */}
-      <div className="grid grid-cols-2 gap-3 md:gap-4 w-full">
+      <div
+        className="grid grid-cols-2 gap-3 md:gap-4 w-full"
+        role="radiogroup"
+        aria-label="אפשרויות תשובה"
+      >
         {options.map((option, index) => (
           <motion.button
             key={index}
+            ref={(el) => { optionRefs.current[index] = el; }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
             whileTap={!disabled && !answered ? { scale: 0.95 } : {}}
             onClick={() => handleSelect(index)}
+            onKeyDown={(e) => handleKeyDown(e, index)}
             disabled={disabled || answered}
+            role="radio"
+            aria-checked={selectedIndex === index}
+            aria-label={getOptionAriaLabel(option, index)}
+            tabIndex={focusedIndex === index ? 0 : -1}
             className={`
               relative p-4 md:p-6 rounded-xl border-2 transition-all duration-300
               flex flex-col items-center justify-center gap-2 min-h-[100px] md:min-h-[140px]
+              focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-slate-900
               ${getOptionStyle(index)}
               ${!disabled && !answered ? 'cursor-pointer' : 'cursor-default'}
             `}
@@ -329,28 +388,31 @@ export const MultipleChoice: React.FC<MultipleChoiceProps> = ({
       </div>
 
       {/* משוב */}
-      <AnimatePresence>
-        {answered && showFeedback && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className={`
-              px-6 py-3 rounded-xl font-bold text-lg
-              ${selectedIndex === correctIndex
-                ? 'bg-green-500/20 border border-green-500/50 text-green-400'
-                : 'bg-red-500/20 border border-red-500/50 text-red-400'
-              }
-            `}
-          >
-            {selectedIndex === correctIndex ? (
-              <span>מעולה! תשובה נכונה! 🎉</span>
-            ) : (
-              <span>לא בדיוק... התשובה הנכונה מסומנת בירוק</span>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div aria-live="polite" aria-atomic="true">
+        <AnimatePresence>
+          {answered && showFeedback && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              role="alert"
+              className={`
+                px-6 py-3 rounded-xl font-bold text-lg
+                ${selectedIndex === correctIndex
+                  ? 'bg-green-500/20 border border-green-500/50 text-green-400'
+                  : 'bg-red-500/20 border border-red-500/50 text-red-400'
+                }
+              `}
+            >
+              {selectedIndex === correctIndex ? (
+                <span>מעולה! תשובה נכונה! 🎉</span>
+              ) : (
+                <span>לא בדיוק... התשובה הנכונה מסומנת בירוק</span>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };

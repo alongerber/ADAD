@@ -1,8 +1,11 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Award, RotateCcw, ChevronLeft, Check, X, BookOpen, Home } from 'lucide-react';
+import { Award, RotateCcw, ChevronLeft, Check, X, BookOpen, Home, Pause } from 'lucide-react';
 import { PracticeQuestion } from '../../types/curriculum';
 import { PracticeRouter } from './PracticeRouter';
+import { PauseOverlay } from '../ui/PauseOverlay';
+import { SaveIndicator } from '../ui/SaveIndicator';
+import { useAutoSave } from '../../hooks/useSessionSave';
 
 // =============================================
 // קומפוננטת מבחן שליטה
@@ -14,6 +17,9 @@ interface MasteryTestProps {
   onComplete: (passed: boolean, score: number, attempts: number) => void;
   onReview: () => void; // חזרה ללמוד
   onBack?: () => void; // חזרה הביתה
+  moduleType?: string;
+  unitId?: string;
+  stepIndex?: number;
 }
 
 export const MasteryTest: React.FC<MasteryTestProps> = ({
@@ -22,20 +28,58 @@ export const MasteryTest: React.FC<MasteryTestProps> = ({
   passingScore = 80,
   onComplete,
   onReview,
-  onBack
+  onBack,
+  moduleType,
+  unitId,
+  stepIndex
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<boolean[]>([]);
   const [showResult, setShowResult] = useState(false);
   const [isQuestionAnswered, setIsQuestionAnswered] = useState(false);
   const [attempts, setAttempts] = useState(1);
+  const [isPaused, setIsPaused] = useState(false);
+  const [sessionTime, setSessionTime] = useState(0);
+  const sessionStartRef = useRef<number>(Date.now());
 
   const totalQuestions = questions.length;
   const correctAnswers = answers.filter(a => a).length;
   const score = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
   const passed = score >= passingScore;
 
+  // שמירה אוטומטית
+  const { lastSaved, isSaving, clearSession } = useAutoSave({
+    moduleType,
+    unitId,
+    stepIndex,
+    questionIndex: currentIndex,
+    answers,
+    enabled: !showResult, // לא לשמור כשמוצגות תוצאות
+  });
+
+  // מעקב זמן סשן (עוצר כשמושהה)
+  useEffect(() => {
+    if (isPaused || showResult) return;
+    const interval = setInterval(() => {
+      setSessionTime(Math.floor((Date.now() - sessionStartRef.current) / 1000));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [isPaused, showResult]);
+
+  // תמיכה בלחיצת Escape להשהייה
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !isQuestionAnswered && !showResult) {
+        setIsPaused(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isQuestionAnswered, showResult]);
+
   const handleAnswer = useCallback((isCorrect: boolean) => {
+    if (isPaused) return; // לא לאפשר תשובה בזמן השהייה
+
     setAnswers(prev => [...prev, isCorrect]);
     setIsQuestionAnswered(true);
 
@@ -48,7 +92,7 @@ export const MasteryTest: React.FC<MasteryTestProps> = ({
         setShowResult(true);
       }
     }, 1500);
-  }, [currentIndex, totalQuestions]);
+  }, [currentIndex, totalQuestions, isPaused]);
 
   const handleRetry = () => {
     setCurrentIndex(0);
@@ -59,6 +103,7 @@ export const MasteryTest: React.FC<MasteryTestProps> = ({
   };
 
   const handleFinish = () => {
+    clearSession(); // מחיקת סשן שמור
     onComplete(passed, score, attempts);
   };
 
@@ -242,17 +287,37 @@ export const MasteryTest: React.FC<MasteryTestProps> = ({
         <div className="absolute bottom-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-500/10 rounded-full blur-[100px]" />
       </div>
 
-      {/* כפתור חזרה */}
-      {onBack && (
-        <div className="absolute top-6 left-6 z-50">
+      {/* PauseOverlay */}
+      <PauseOverlay
+        isOpen={isPaused}
+        onResume={() => setIsPaused(false)}
+        onQuit={onBack || (() => {})}
+        sessionTime={sessionTime}
+        showBreakSuggestion={sessionTime >= 900} // 15 דקות
+      />
+
+      {/* כפתורי ניווט */}
+      <div className="absolute top-6 left-6 z-50 flex gap-2">
+        {/* כפתור השהייה */}
+        <button
+          onClick={() => setIsPaused(true)}
+          className="p-3 rounded-full bg-white/5 border border-white/10 text-white/50 hover:bg-white/10 hover:text-white transition-all"
+          aria-label="השהה"
+          title="השהה (Escape)"
+        >
+          <Pause size={24} />
+        </button>
+        {/* כפתור בית */}
+        {onBack && (
           <button
             onClick={onBack}
             className="p-3 rounded-full bg-white/5 border border-white/10 text-white/50 hover:bg-white/10 hover:text-white transition-all"
+            aria-label="חזרה הביתה"
           >
             <Home size={24} />
           </button>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* כותרת */}
       <header className="relative z-10 w-full p-4 md:p-6 flex items-center justify-between">
@@ -266,9 +331,17 @@ export const MasteryTest: React.FC<MasteryTestProps> = ({
           </div>
         </div>
 
-        {/* התקדמות */}
-        <div className="text-white/60 text-sm">
-          שאלה {currentIndex + 1} מתוך {totalQuestions}
+        {/* התקדמות + זמן + שמירה */}
+        <div className="text-left flex flex-col items-end gap-1">
+          <div className="text-white/60 text-sm">
+            שאלה {currentIndex + 1} מתוך {totalQuestions}
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-white/40 text-xs">
+              {Math.floor(sessionTime / 60)}:{(sessionTime % 60).toString().padStart(2, '0')}
+            </span>
+            <SaveIndicator lastSaved={lastSaved} isSaving={isSaving} />
+          </div>
         </div>
       </header>
 
@@ -314,7 +387,7 @@ export const MasteryTest: React.FC<MasteryTestProps> = ({
             <PracticeRouter
               question={currentQuestion}
               onAnswer={handleAnswer}
-              disabled={isQuestionAnswered}
+              disabled={isQuestionAnswered || isPaused}
             />
           </motion.div>
         </AnimatePresence>
