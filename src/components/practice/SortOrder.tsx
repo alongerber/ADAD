@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence, Reorder } from 'framer-motion';
 import { Check, X, GripVertical, ArrowUp, ArrowDown } from 'lucide-react';
+import { useSound } from '../../hooks/useSound';
 
 // =============================================
 // טיפוס לפריט לסידור
@@ -40,10 +41,10 @@ const SortableItem: React.FC<SortableItemProps> = ({
     if (item.fraction) {
       const { n, d } = item.fraction;
       if (d === 1) {
-        return <span className="text-2xl font-mono font-black">{n}</span>;
+        return <span className="text-2xl font-mono font-black ltr-nums">{n}</span>;
       }
       return (
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center ltr-nums">
           <span className="text-xl font-mono font-black leading-none">{n}</span>
           <div className="w-6 h-0.5 bg-current my-0.5 rounded-full" />
           <span className="text-xl font-mono font-black leading-none">{d}</span>
@@ -140,6 +141,8 @@ export const SortOrder: React.FC<SortOrderProps> = ({
   onAnswer,
   disabled = false
 }) => {
+  const { playSuccess, playError, playClick, playTick } = useSound();
+
   // ערבוב התחלתי של הפריטים
   const [items, setItems] = useState<SortItem[]>(() => {
     const shuffled = [...initialItems];
@@ -163,12 +166,21 @@ export const SortOrder: React.FC<SortOrderProps> = ({
 
   // בדיקת תשובה
   const checkAnswer = () => {
+    playClick();
     const correctOrder = getCorrectOrder();
     const positions = items.map((item, idx) => item.id === correctOrder[idx].id);
     setCorrectPositions(positions);
     setShowResult(true);
 
     const isAllCorrect = positions.every(p => p);
+
+    setTimeout(() => {
+      if (isAllCorrect) {
+        playSuccess();
+      } else {
+        playError();
+      }
+    }, 200);
 
     setTimeout(() => {
       onAnswer(isAllCorrect, items);
@@ -179,6 +191,7 @@ export const SortOrder: React.FC<SortOrderProps> = ({
   const moveItem = (fromIndex: number, toIndex: number) => {
     if (toIndex < 0 || toIndex >= items.length) return;
 
+    playTick();
     setItems(prev => {
       const newItems = [...prev];
       const [moved] = newItems.splice(fromIndex, 1);
@@ -321,7 +334,7 @@ export const SortOrder: React.FC<SortOrderProps> = ({
                 >
                   <span className="text-xs text-green-400/60">{idx + 1}.</span>
                   {item.fraction ? (
-                    <span className="text-green-400 font-mono font-bold">
+                    <span className="text-green-400 font-mono font-bold ltr-nums">
                       {item.fraction.d === 1 ? item.fraction.n : `${item.fraction.n}/${item.fraction.d}`}
                     </span>
                   ) : (

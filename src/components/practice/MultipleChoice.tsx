@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, X } from 'lucide-react';
 import { ChoiceOption, VisualContent } from '../../types/curriculum';
+import { useSound } from '../../hooks/useSound';
 
 // =============================================
 // קומפוננטת ויזואל לשבר (פיצה/כוסית)
@@ -137,11 +138,11 @@ const FractionDisplay: React.FC<FractionDisplayProps> = ({
   const s = sizes[size];
 
   if (denominator === 1) {
-    return <span className={`${s.text} font-mono font-black text-white`}>{numerator}</span>;
+    return <span className={`${s.text} font-mono font-black text-white ltr-nums`}>{numerator}</span>;
   }
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center ltr-nums">
       <span className={`${s.text} font-mono font-black text-white leading-none`}>{numerator}</span>
       <div className={`${s.line} bg-white/70 rounded-full my-0.5`} />
       <span className={`${s.text} font-mono font-black text-white leading-none`}>{denominator}</span>
@@ -173,14 +174,25 @@ export const MultipleChoice: React.FC<MultipleChoiceProps> = ({
 }) => {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [answered, setAnswered] = useState(false);
+  const { playSuccess, playError, playClick } = useSound();
 
   const handleSelect = (index: number) => {
     if (disabled || answered) return;
 
+    playClick();
     setSelectedIndex(index);
     setAnswered(true);
 
     const isCorrect = index === correctIndex;
+
+    // Play sound after short delay for feedback
+    setTimeout(() => {
+      if (isCorrect) {
+        playSuccess();
+      } else {
+        playError();
+      }
+    }, 200);
 
     // Delay callback to show feedback animation
     setTimeout(() => {

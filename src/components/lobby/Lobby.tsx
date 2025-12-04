@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '../../contexts/UserContext';
 import { RoomType } from '../../types';
-import { Beaker, Lock, Calculator, Component, LogOut, Star, Flame, Trophy, Volume2, VolumeX, BarChart3, GraduationCap } from 'lucide-react';
+import { Beaker, Lock, Calculator, Component, LogOut, Star, Flame, Trophy, Volume2, VolumeX, BarChart3, GraduationCap, MessageCircle } from 'lucide-react';
 import { getTimeGreeting } from '../../utils/messages';
 import { VAULT_CURRICULUM, VAULT_TOPICS, LAB_TOPICS, LAB_CURRICULUM } from '../../data/curriculum';
 import { fractionsModule, getModuleStats } from '../../data/curriculum/fractions';
@@ -106,6 +106,15 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
         >
           <LogOut size={20} />
         </button>
+
+        {/* Feedback Button */}
+        <a
+          href="mailto:feedback@matemati-bis.co.il?subject=פידבק על מתמטי-ביס"
+          className="p-3 bg-white/5 rounded-full hover:bg-amber-500/20 text-white/40 hover:text-amber-400 transition-all border border-white/5 hover:border-amber-500/30"
+          title="שלח פידבק"
+        >
+          <MessageCircle size={20} />
+        </a>
       </div>
 
       {/* Header */}

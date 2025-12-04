@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, RotateCcw } from 'lucide-react';
+import { useSound } from '../../hooks/useSound';
 
 // =============================================
 // קומפוננטת חלק בודד (פרוסה/חתיכה)
@@ -114,6 +115,7 @@ export const TapToCount: React.FC<TapToCountProps> = ({
   const [selectedParts, setSelectedParts] = useState<Set<number>>(new Set());
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showResult, setShowResult] = useState(false);
+  const { playSuccess, playError, playClick, playTick } = useSound();
 
   const selectedCount = selectedParts.size;
   const isCorrect = selectedCount === targetCount;
@@ -121,6 +123,7 @@ export const TapToCount: React.FC<TapToCountProps> = ({
   const handleTap = useCallback((index: number) => {
     if (disabled || isSubmitted) return;
 
+    playTick();
     setSelectedParts(prev => {
       const next = new Set(prev);
       if (next.has(index)) {
@@ -130,13 +133,22 @@ export const TapToCount: React.FC<TapToCountProps> = ({
       }
       return next;
     });
-  }, [disabled, isSubmitted]);
+  }, [disabled, isSubmitted, playTick]);
 
   const handleSubmit = () => {
     if (disabled || isSubmitted) return;
 
+    playClick();
     setIsSubmitted(true);
     setShowResult(true);
+
+    setTimeout(() => {
+      if (isCorrect) {
+        playSuccess();
+      } else {
+        playError();
+      }
+    }, 200);
 
     setTimeout(() => {
       onAnswer(isCorrect, selectedCount);
