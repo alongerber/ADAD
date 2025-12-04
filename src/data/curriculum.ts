@@ -184,10 +184,10 @@ export const LAB_CURRICULUM: FractionLevel[] = [
     targetNumerator: 1,
     targetDenominator: 2,
     title: 'רבע + רבע',
-    narrative: '🧃 יש לך שני כוסות עם רבע כל אחת. כמה יהיה ביחד?',
-    explanation: 'חלק אחד + עוד חלק = שני חלקים!',
-    tip: '1 + 1 = 2. שני רבעים = חצי!',
-    notebookHint: 'רבע + רבע = שני רבעים = חצי!'
+    narrative: '🍕 לקחת משולש פיצה. החבר נתן לך עוד אחד. כמה יש לך?',
+    explanation: 'ספור: משולש אחד + עוד משולש = 2 משולשים מתוך 4.',
+    tip: 'כמו לספור אצבעות: 1 + 1 = 2. ו-2 מתוך 4 זה חצי!',
+    notebookHint: 'ספור את המשולשים: 1 + 1 = 2 = חצי פיצה!'
   },
   {
     id: 'frac_add_2',
@@ -196,10 +196,10 @@ export const LAB_CURRICULUM: FractionLevel[] = [
     targetNumerator: 3,
     targetDenominator: 4,
     title: 'חצי + רבע',
-    narrative: '🧃 יש לך חצי כוס ועוד רבע. כמה ביחד?',
-    explanation: 'חצי = שני רבעים. 2 + 1 = 3 רבעים!',
-    tip: 'חצי = 2 רבעים. ואז 2 + 1 = 3!',
-    notebookHint: 'שני רבעים + רבע = שלושה רבעים!'
+    narrative: '🧃 יש לך חצי כוס מיץ. מזגת עוד רבע. כמה יש עכשיו?',
+    explanation: 'חצי = 2 חלקים. עוד 1 = סך הכל 3 חלקים מתוך 4!',
+    tip: 'קודם תחשוב: חצי זה כמה רבעים? (2!) ואז 2 + 1 = 3',
+    notebookHint: 'חצי = 2 רבעים. 2 + 1 = 3 רבעים!'
   },
   {
     id: 'frac_add_3',
@@ -208,10 +208,10 @@ export const LAB_CURRICULUM: FractionLevel[] = [
     targetNumerator: 1,
     targetDenominator: 1,
     title: 'חצי + חצי',
-    narrative: '🥤 שופכים שני חצאים לבקבוק אחד. כמה יהיה?',
-    explanation: 'שני חצאים = בקבוק מלא!',
-    tip: 'חצי + חצי = אחד שלם!',
-    notebookHint: 'שני חצאים = בקבוק מלא!'
+    narrative: '🥤 יש שני כוסות חצי מלאות. שופכים את שתיהן לבקבוק.',
+    explanation: 'חצי + חצי = שני חצאים = בקבוק שלם מלא!',
+    tip: 'תחשוב על תפוח: חצי + חצי = תפוח שלם!',
+    notebookHint: 'שני חצאים תמיד עושים שלם אחד!'
   },
   {
     id: 'frac_add_4',
@@ -220,10 +220,10 @@ export const LAB_CURRICULUM: FractionLevel[] = [
     targetNumerator: 1,
     targetDenominator: 1,
     title: 'ארבעה רבעים',
-    narrative: '🍕 יש לך 4 משולשי פיצה. כמה פיצות שלמות יש לך?',
-    explanation: 'ארבעה רבעים = פיצה שלמה אחת!',
-    tip: '4 חלקים מתוך 4 = שלם!',
-    notebookHint: '¼ + ¼ + ¼ + ¼ = אחד שלם!'
+    narrative: '🍕 יש 4 משולשי פיצה על השולחן. כמה פיצות שלמות זה?',
+    explanation: 'פיצה שלמה = 4 משולשים. אז 4 משולשים = פיצה אחת!',
+    tip: 'אם חתכנו ל-4 והכל פה, זה שלם!',
+    notebookHint: '4 חלקים מתוך 4 = הכל = אחד שלם!'
   },
   {
     id: 'frac_add_5',
@@ -232,10 +232,10 @@ export const LAB_CURRICULUM: FractionLevel[] = [
     targetNumerator: 3,
     targetDenominator: 4,
     title: 'רבע + חצי',
-    narrative: '🧃 יש לך רבע כוס ועוד חצי כוס. כמה ביחד?',
-    explanation: 'חצי = 2 רבעים. 1 + 2 = 3 רבעים!',
-    tip: 'רבע + שני רבעים = שלושה רבעים!',
-    notebookHint: 'רבע אחד + שני רבעים = שלושה רבעים!'
+    narrative: '🎂 לקחת חתיכת עוגה. אחר כך לקחת עוד חצי עוגה. כמה יש לך?',
+    explanation: 'חצי = 2 חתיכות. עוד 1 חתיכה = 3 חתיכות מתוך 4!',
+    tip: 'חצי עוגה = 2 חתיכות. 1 + 2 = 3 חתיכות!',
+    notebookHint: 'רבע (1) + חצי (2) = 3 רבעים!'
   },
   {
     id: 'frac_add_6',
@@ -244,10 +244,10 @@ export const LAB_CURRICULUM: FractionLevel[] = [
     targetNumerator: 1,
     targetDenominator: 2,
     title: 'עוד רבע + רבע',
-    narrative: '🧪 שני רבעי שיקוי. כמה יהיה ביחד?',
-    explanation: 'רבע + רבע = שני רבעים = חצי!',
-    tip: '1 + 1 = 2. שני רבעים = חצי!',
-    notebookHint: 'שני רבעים זה בדיוק חצי!'
+    narrative: '🧪 שופכים רבע שיקוי, ואז עוד רבע. כמה יש בבקבוק?',
+    explanation: 'פשוט סופרים: 1 + 1 = 2 רבעים = חצי בקבוק!',
+    tip: '2 הוא חצי מ-4, אז 2 רבעים = חצי!',
+    notebookHint: 'רבע + רבע = 2 רבעים = חצי!'
   },
 
   // ========================================
@@ -260,10 +260,10 @@ export const LAB_CURRICULUM: FractionLevel[] = [
     targetNumerator: 1,
     targetDenominator: 4,
     title: 'חצי פחות רבע',
-    narrative: '🥤 יש לך חצי כוס. שתית רבע. כמה נשאר?',
-    explanation: 'חצי = 2 רבעים. 2 - 1 = 1 רבע!',
-    tip: 'חצי = שני רבעים. 2 - 1 = 1!',
-    notebookHint: 'שני רבעים פחות רבע = רבע אחד!'
+    narrative: '🥤 היו לך 2 חתיכות עוגה. נתת אחת לחבר. כמה נשאר?',
+    explanation: 'ספור: היו 2, נתת 1, נשאר 1. רבע אחד!',
+    tip: 'חצי = 2 חתיכות. 2 - 1 = 1 חתיכה = רבע!',
+    notebookHint: 'היו 2, הלך 1, נשאר 1!'
   },
   {
     id: 'frac_challenge_2',
@@ -273,9 +273,9 @@ export const LAB_CURRICULUM: FractionLevel[] = [
     targetDenominator: 2,
     title: 'שלושה רבעים פחות רבע',
     narrative: '🍕 היו לך 3 משולשי פיצה. אכלת אחד. כמה נשאר?',
-    explanation: '3 חלקים - 1 חלק = 2 חלקים = חצי!',
-    tip: '3 - 1 = 2. שני רבעים = חצי!',
-    notebookHint: '3 - 1 = 2 רבעים = חצי!'
+    explanation: 'ספור: היו 3, אכלת 1, נשארו 2. ו-2 זה חצי!',
+    tip: '3 - 1 = 2. ו-2 מתוך 4 = חצי!',
+    notebookHint: 'היו 3, אכלת 1, נשארו 2 = חצי!'
   },
   {
     id: 'frac_challenge_3',
@@ -283,11 +283,11 @@ export const LAB_CURRICULUM: FractionLevel[] = [
     difficulty: 21,
     targetNumerator: 1,
     targetDenominator: 4,
-    title: 'מלא פחות שלושה רבעים',
-    narrative: '🧃 הבקבוק היה מלא. שפכת שלושה רבעים. כמה נשאר?',
-    explanation: 'מלא = 4 רבעים. 4 - 3 = 1 רבע!',
-    tip: 'מלא = 4/4. ואז 4 - 3 = 1!',
-    notebookHint: '4 רבעים פחות 3 = רבע אחד!'
+    title: 'שלם פחות שלושה רבעים',
+    narrative: '🎂 הייתה עוגה שלמה (4 חתיכות). אכלו 3. כמה נשאר?',
+    explanation: 'היו 4 חתיכות, אכלו 3, נשארה 1 = רבע!',
+    tip: 'עוגה שלמה = 4 חתיכות. 4 - 3 = 1',
+    notebookHint: '4 - 3 = 1. נשאר רבע אחד!'
   },
   {
     id: 'frac_challenge_4',
@@ -295,11 +295,11 @@ export const LAB_CURRICULUM: FractionLevel[] = [
     difficulty: 22,
     targetNumerator: 1,
     targetDenominator: 2,
-    title: 'מלא פחות חצי',
-    narrative: '🥤 הכוס הייתה מלאה. שתית חצי. כמה נשאר?',
-    explanation: 'שלם פחות חצי = חצי!',
-    tip: 'אם שותים חצי, נשאר חצי!',
-    notebookHint: 'מלא פחות חצי = חצי!'
+    title: 'שלם פחות חצי',
+    narrative: '🥤 הכוס הייתה מלאה. שתית חצי. כמה נשאר בכוס?',
+    explanation: 'אם שותים חצי מכוס מלאה, נשאר... חצי!',
+    tip: 'תחשוב על תפוח: אם אוכלים חצי, נשאר חצי!',
+    notebookHint: 'שלם - חצי = חצי!'
   },
   {
     id: 'frac_challenge_5',
@@ -308,10 +308,10 @@ export const LAB_CURRICULUM: FractionLevel[] = [
     targetNumerator: 3,
     targetDenominator: 4,
     title: 'שלושה רבעים ביחד',
-    narrative: '🧪 שופכים 3 רבעי שיקוי לבקבוק. כמה יהיה?',
-    explanation: 'רבע + רבע + רבע = שלושה רבעים!',
-    tip: '1 + 1 + 1 = 3 רבעים!',
-    notebookHint: '¼ + ¼ + ¼ = ¾'
+    narrative: '🧪 שופכים משולש, עוד משולש, ועוד משולש. כמה יש?',
+    explanation: 'ספור: 1 + 1 + 1 = 3 משולשים = שלושה רבעים!',
+    tip: 'כמו לספור צעצועים: 1, 2, 3!',
+    notebookHint: '1 + 1 + 1 = 3 רבעים!'
   },
   {
     id: 'frac_master',
@@ -320,10 +320,10 @@ export const LAB_CURRICULUM: FractionLevel[] = [
     targetNumerator: 1,
     targetDenominator: 1,
     title: '🎓 אלוף השברים!',
-    narrative: '🏆 האתגר הגדול! חצי + רבע + רבע = ?',
-    explanation: 'חצי = 2 רבעים. 2 + 1 + 1 = 4 רבעים = מלא!',
-    tip: 'שני רבעים + רבע + רבע = ארבעה רבעים = שלם!',
-    notebookHint: '2 + 1 + 1 = 4 רבעים = בקבוק מלא!'
+    narrative: '🏆 יש לך 2 חתיכות (חצי), ומקבל עוד 1, ועוד 1. כמה יש?',
+    explanation: 'ספור: 2 + 1 + 1 = 4 חתיכות = עוגה שלמה!',
+    tip: '2 + 1 + 1 = 4. ו-4 חתיכות מתוך 4 = שלם!',
+    notebookHint: '2 + 1 + 1 = 4 = שלם!'
   }
 ];
 

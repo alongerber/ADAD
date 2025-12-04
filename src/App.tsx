@@ -3,6 +3,7 @@ import { RoomType } from './types';
 import { LabRoom } from './rooms/LabRoom';
 import { VaultRoom } from './rooms/VaultRoom';
 import { Lobby } from './components/lobby/Lobby';
+import { CurriculumPlayer } from './components/curriculum/CurriculumPlayer';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UserProvider, useUser } from './contexts/UserContext';
 import { NotebookProvider, useNotebook } from './contexts/NotebookContext';
@@ -100,6 +101,19 @@ const GameContainer: React.FC = () => {
                     transition={{ duration: 0.5 }}
                 >
                     <VaultRoom onNavigate={setCurrentRoom} />
+                </motion.div>
+            )}
+
+            {currentRoom === RoomType.CURRICULUM && (
+                <motion.div
+                    key="curriculum"
+                    className="w-full h-full"
+                    initial={{ opacity: 0, x: 100 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 100 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <CurriculumPlayer onBack={() => setCurrentRoom(RoomType.LOBBY)} />
                 </motion.div>
             )}
 

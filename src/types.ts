@@ -2,7 +2,8 @@ export enum RoomType {
   LOBBY = 'LOBBY',
   LAB = 'LAB',
   VAULT = 'VAULT',
-  COCKPIT = 'COCKPIT'
+  COCKPIT = 'COCKPIT',
+  CURRICULUM = 'CURRICULUM'  // מסלול לימוד מובנה עם יחידות
 }
 
 export interface GameState {
