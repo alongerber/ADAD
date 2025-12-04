@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base styles */
+body {
+  font-family: 'Rubik', sans-serif;
+  overflow: hidden;
+  background-color: #0f172a;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Hide scrollbar */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Handwriting font class */
+.font-handwriting {
+  font-family: 'Indie Flower', cursive;
+}
+
+/* RTL number display - keep numbers LTR */
+.ltr-nums {
+  direction: ltr;
+  unicode-bidi: embed;
+}
