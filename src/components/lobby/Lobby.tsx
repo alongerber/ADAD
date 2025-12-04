@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '../../contexts/UserContext';
 import { RoomType } from '../../types';
-import { Beaker, Lock, Calculator, Component, LogOut, Star, Flame, Trophy, Volume2, VolumeX, BarChart3 } from 'lucide-react';
+import { Beaker, Lock, Calculator, Component, LogOut, Star, Flame, Trophy, Volume2, VolumeX, BarChart3, GraduationCap } from 'lucide-react';
 import { getTimeGreeting } from '../../utils/messages';
 import { VAULT_CURRICULUM, VAULT_TOPICS, LAB_TOPICS, LAB_CURRICULUM } from '../../data/curriculum';
+import { fractionsModule, getModuleStats } from '../../data/curriculum/fractions';
 import { ParentDashboard } from '../dashboard/ParentDashboard';
 
 interface LobbyProps {
@@ -124,12 +125,12 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
       {/* Cards Grid */}
       <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 w-full max-w-5xl">
         
-        {/* CARD 1: FRACTIONS (Active) */}
+        {/* CARD 1: FRACTIONS CURRICULUM (Active) */}
         <motion.button
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          onClick={() => onNavigate(RoomType.LAB)}
+          onClick={() => onNavigate(RoomType.CURRICULUM)}
           className={getCardStyle(true)}
         >
            <div className={`p-3 md:p-6 rounded-full bg-white/10 backdrop-blur-md border border-white/20 ${
@@ -140,18 +141,30 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
              user?.theme === 'candy' ? 'text-rose-300' :
              'text-cyan-400'
            }`}>
-              <Beaker size={28} className="md:w-12 md:h-12" strokeWidth={1.5} />
+              <GraduationCap size={28} className="md:w-12 md:h-12" strokeWidth={1.5} />
            </div>
-           <h3 className={`text-lg md:text-2xl font-bold text-white`}>מעבדת השברים</h3>
-           {/* Topic list */}
-           <div className="flex flex-wrap justify-center gap-1 md:gap-2 max-w-full px-2">
-             {LAB_TOPICS.map((topic, idx) => (
-               <span key={idx} className="text-[10px] md:text-xs px-2 py-0.5 rounded-full bg-white/10 text-white/70">
-                 {topic.icon} {topic.title}
-               </span>
-             ))}
-           </div>
-           <div className={`px-3 py-1 rounded-full text-xs font-bold bg-white/10 text-white/70`}>{LAB_CURRICULUM.length} שלבים</div>
+           <h3 className={`text-lg md:text-2xl font-bold text-white`}>{fractionsModule.title}</h3>
+           <p className="text-xs text-white/50 text-center px-2">{fractionsModule.description}</p>
+           {/* Progress bar */}
+           {(() => {
+             const completedUnits = user?.progress?.completedLevels?.filter(id => id.startsWith('unit_')) || [];
+             const stats = getModuleStats(completedUnits);
+             return (
+               <div className="w-full max-w-[180px] flex flex-col items-center gap-1">
+                 <div className="w-full h-2 bg-black/40 rounded-full overflow-hidden">
+                   <motion.div
+                     initial={{ width: 0 }}
+                     animate={{ width: `${stats.progressPercent}%` }}
+                     transition={{ delay: 0.5, duration: 0.8 }}
+                     className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"
+                   />
+                 </div>
+                 <div className="text-xs text-white/70">
+                   {stats.completedCount} / {stats.totalCount} יחידות
+                 </div>
+               </div>
+             );
+           })()}
         </motion.button>
 
         {/* CARD 2: VAULT (Now Unlocked) */}
