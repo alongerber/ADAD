@@ -8,33 +8,41 @@ import { MasteryTest } from '../practice/MasteryTest';
 import { useUser } from '../../contexts/UserContext';
 import { fractionsModule, getModuleStats as getFractionsStats, getUnitById as getFractionUnitById, isUnitAvailable as isFractionUnitAvailable } from '../../data/curriculum/fractions';
 import { numbersModule, getModuleStats as getNumbersStats, getUnitById as getNumbersUnitById, isUnitAvailable as isNumbersUnitAvailable } from '../../data/curriculum/numbers';
+import { geometryModule, getModuleStats as getGeometryStats, getUnitById as getGeometryUnitById, isUnitAvailable as isGeometryUnitAvailable } from '../../data/curriculum/geometry';
 
 // =============================================
 // Helper functions for multi-module support
 // =============================================
-type ModuleType = 'fractions' | 'numbers';
+type ModuleType = 'fractions' | 'numbers' | 'geometry';
 
 const modules = {
   fractions: fractionsModule,
-  numbers: numbersModule
+  numbers: numbersModule,
+  geometry: geometryModule
 };
 
 const getModuleStats = (moduleType: ModuleType, completedUnits: string[]) => {
-  return moduleType === 'fractions'
-    ? getFractionsStats(completedUnits)
-    : getNumbersStats(completedUnits);
+  switch (moduleType) {
+    case 'fractions': return getFractionsStats(completedUnits);
+    case 'numbers': return getNumbersStats(completedUnits);
+    case 'geometry': return getGeometryStats(completedUnits);
+  }
 };
 
 const getUnitById = (moduleType: ModuleType, unitId: string) => {
-  return moduleType === 'fractions'
-    ? getFractionUnitById(unitId)
-    : getNumbersUnitById(unitId);
+  switch (moduleType) {
+    case 'fractions': return getFractionUnitById(unitId);
+    case 'numbers': return getNumbersUnitById(unitId);
+    case 'geometry': return getGeometryUnitById(unitId);
+  }
 };
 
 const isUnitAvailable = (moduleType: ModuleType, unitId: string, completedUnits: string[]) => {
-  return moduleType === 'fractions'
-    ? isFractionUnitAvailable(unitId, completedUnits)
-    : isNumbersUnitAvailable(unitId, completedUnits);
+  switch (moduleType) {
+    case 'fractions': return isFractionUnitAvailable(unitId, completedUnits);
+    case 'numbers': return isNumbersUnitAvailable(unitId, completedUnits);
+    case 'geometry': return isGeometryUnitAvailable(unitId, completedUnits);
+  }
 };
 
 // =============================================
@@ -49,10 +57,12 @@ interface ModuleSelectProps {
 const ModuleSelect: React.FC<ModuleSelectProps> = ({ onSelectModule, completedUnits, onBack }) => {
   const fractionsStats = getFractionsStats(completedUnits);
   const numbersStats = getNumbersStats(completedUnits);
+  const geometryStats = getGeometryStats(completedUnits);
 
   const moduleOptions = [
     { type: 'fractions' as ModuleType, module: fractionsModule, stats: fractionsStats },
-    { type: 'numbers' as ModuleType, module: numbersModule, stats: numbersStats }
+    { type: 'numbers' as ModuleType, module: numbersModule, stats: numbersStats },
+    { type: 'geometry' as ModuleType, module: geometryModule, stats: geometryStats }
   ];
 
   return (

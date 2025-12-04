@@ -5,7 +5,8 @@ export enum RoomType {
   COCKPIT = 'COCKPIT',
   CURRICULUM = 'CURRICULUM',  // מסלול לימוד כללי
   FRACTIONS = 'FRACTIONS',    // מסלול שברים
-  NUMBERS = 'NUMBERS'         // מסלול מספרים וחיסור
+  NUMBERS = 'NUMBERS',        // מסלול מספרים וחשבון
+  GEOMETRY = 'GEOMETRY'       // מסלול גיאומטריה
 }
 
 export interface GameState {

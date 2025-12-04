@@ -7,6 +7,7 @@ import { getTimeGreeting } from '../../utils/messages';
 import { VAULT_CURRICULUM, VAULT_TOPICS, LAB_TOPICS, LAB_CURRICULUM } from '../../data/curriculum';
 import { fractionsModule, getModuleStats as getFractionsStats } from '../../data/curriculum/fractions';
 import { numbersModule, getModuleStats as getNumbersStats } from '../../data/curriculum/numbers';
+import { geometryModule, getModuleStats as getGeometryStats } from '../../data/curriculum/geometry';
 import { ParentDashboard } from '../dashboard/ParentDashboard';
 
 interface LobbyProps {
@@ -212,19 +213,47 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
            })()}
         </motion.button>
 
-        {/* CARD 3: GEOMETRY (Coming Soon) */}
-        <motion.div
+        {/* CARD 3: GEOMETRY (Active) */}
+        <motion.button
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className={getCardStyle(false)}
+          onClick={() => onNavigate(RoomType.GEOMETRY)}
+          className={getCardStyle(true)}
         >
-           <div className="p-4 md:p-6 rounded-full bg-black/20 border border-white/5 text-white/20">
-              <span className="text-3xl md:text-5xl opacity-40">📐</span>
+           <div className={`p-3 md:p-6 rounded-full bg-white/10 backdrop-blur-md border border-white/20 ${
+             user?.theme === 'pop' ? 'text-yellow-300' :
+             user?.theme === 'sports' ? 'text-white' :
+             user?.theme === 'nature' ? 'text-lime-300' :
+             user?.theme === 'ocean' ? 'text-sky-300' :
+             user?.theme === 'candy' ? 'text-rose-300' :
+             'text-cyan-400'
+           }`}>
+              <span className="text-3xl md:text-5xl">{geometryModule.icon}</span>
            </div>
-           <h3 className="text-lg md:text-2xl font-bold text-white/40">גיאומטריה</h3>
-           <div className="px-3 py-1 rounded-full text-xs font-bold bg-black/20 text-white/30">בקרוב</div>
-        </motion.div>
+           <h3 className={`text-lg md:text-2xl font-bold text-white`}>{geometryModule.title}</h3>
+           <p className="text-xs text-white/50 text-center px-2">{geometryModule.description}</p>
+           {/* Progress bar */}
+           {(() => {
+             const completedUnits = user?.progress?.completedLevels?.filter(id => id.startsWith('unit_')) || [];
+             const stats = getGeometryStats(completedUnits);
+             return (
+               <div className="w-full max-w-[180px] flex flex-col items-center gap-1">
+                 <div className="w-full h-2 bg-black/40 rounded-full overflow-hidden">
+                   <motion.div
+                     initial={{ width: 0 }}
+                     animate={{ width: `${stats.progressPercent}%` }}
+                     transition={{ delay: 0.5, duration: 0.8 }}
+                     className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full"
+                   />
+                 </div>
+                 <div className="text-xs text-white/70">
+                   {stats.completedCount} / {stats.totalCount} יחידות
+                 </div>
+               </div>
+             );
+           })()}
+        </motion.button>
 
       </div>
 
