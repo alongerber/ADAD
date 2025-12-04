@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, X, RotateCcw } from 'lucide-react';
+import { useSound } from '../../hooks/useSound';
 
 // =============================================
 // טיפוסים
@@ -75,6 +76,8 @@ export const DragMatch: React.FC<DragMatchProps> = ({
   onAnswer,
   disabled = false
 }) => {
+  const { playSuccess, playError, playClick, playTick } = useSound();
+
   // מערבבים את הצד הימני
   const [shuffledRight] = useState<MatchPair[]>(() => {
     const shuffled = [...pairs];
@@ -92,6 +95,7 @@ export const DragMatch: React.FC<DragMatchProps> = ({
 
   const handleLeftClick = (leftId: string) => {
     if (disabled || showResult || matches[leftId]) return;
+    playClick();
     setSelectedLeft(leftId === selectedLeft ? null : leftId);
   };
 
@@ -101,6 +105,7 @@ export const DragMatch: React.FC<DragMatchProps> = ({
     // בדיקה אם הימני כבר תפוס
     if (Object.values(matches).includes(rightId)) return;
 
+    playTick();
     setMatches(prev => ({ ...prev, [selectedLeft]: rightId }));
     setSelectedLeft(null);
   };
@@ -112,6 +117,7 @@ export const DragMatch: React.FC<DragMatchProps> = ({
   };
 
   const checkAnswer = useCallback(() => {
+    playClick();
     const resultMap: Record<string, boolean> = {};
     let allCorrect = true;
 
@@ -126,9 +132,17 @@ export const DragMatch: React.FC<DragMatchProps> = ({
     setShowResult(true);
 
     setTimeout(() => {
+      if (allCorrect) {
+        playSuccess();
+      } else {
+        playError();
+      }
+    }, 200);
+
+    setTimeout(() => {
       onAnswer(allCorrect, matches);
     }, 1500);
-  }, [pairs, matches, onAnswer]);
+  }, [pairs, matches, onAnswer, playClick, playSuccess, playError]);
 
   const allMatched = Object.keys(matches).length === pairs.length;
 
@@ -160,7 +174,7 @@ export const DragMatch: React.FC<DragMatchProps> = ({
         `}
       >
         {pair.left.type === 'fraction' && pair.left.fraction && (
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center ltr-nums">
             {pair.left.fraction.d === 1 ? (
               <span className="text-2xl font-mono font-black">{pair.left.fraction.n}</span>
             ) : (

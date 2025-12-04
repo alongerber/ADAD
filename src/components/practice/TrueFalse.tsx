@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, X, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { useSound } from '../../hooks/useSound';
 
 // =============================================
 // קומפוננטת תצוגת שבר
@@ -19,11 +20,11 @@ const FractionDisplay: React.FC<FractionDisplayProps> = ({ n, d, size = 'md' }) 
   };
 
   if (d === 1) {
-    return <span className={`${sizes[size]} font-mono font-black text-white`}>{n}</span>;
+    return <span className={`${sizes[size]} font-mono font-black text-white ltr-nums`}>{n}</span>;
   }
 
   return (
-    <span className={`${sizes[size]} font-mono font-black text-white`}>
+    <span className={`${sizes[size]} font-mono font-black text-white ltr-nums`}>
       {n}/{d}
     </span>
   );
@@ -57,14 +58,24 @@ export const TrueFalse: React.FC<TrueFalseProps> = ({
 }) => {
   const [userAnswer, setUserAnswer] = useState<boolean | null>(null);
   const [showResult, setShowResult] = useState(false);
+  const { playSuccess, playError, playClick } = useSound();
 
   const handleAnswer = (answer: boolean) => {
     if (disabled || userAnswer !== null) return;
 
+    playClick();
     setUserAnswer(answer);
     setShowResult(true);
 
     const isCorrect = answer === isTrue;
+
+    setTimeout(() => {
+      if (isCorrect) {
+        playSuccess();
+      } else {
+        playError();
+      }
+    }, 200);
 
     setTimeout(() => {
       onAnswer(isCorrect, answer);
