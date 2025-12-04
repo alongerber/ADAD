@@ -345,6 +345,7 @@ export interface VerticalMathLevel extends BaseLevel {
   top: number[];    // e.g., [4, 5, 2]
   bottom: number[]; // e.g., [1, 3, 8]
   notebookHint: string;
+  title?: string;
 }
 
 export interface NumberInputLevel extends BaseLevel {
@@ -352,6 +353,7 @@ export interface NumberInputLevel extends BaseLevel {
   instruction: string; // "Three thousand and fifty"
   target: number[];    // [3, 0, 5, 0]
   notebookHint: string;
+  title?: string;
 }
 
 export type Level = VerticalMathLevel | NumberInputLevel;

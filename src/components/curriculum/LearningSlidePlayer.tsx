@@ -123,9 +123,9 @@ export const LearningSlidePlayer: React.FC<LearningSlidePlayerProps> = ({
   const getSlideIcon = () => {
     switch (currentSlide.type) {
       case 'story': return '📖';
-      case 'discovery': return <HelpCircle className="text-amber-400\" size={28} />;
+      case 'discovery': return <HelpCircle className="text-amber-400" size={28} />;
       case 'visual': return <Sparkles className="text-purple-400" size={28} />;
-      case 'rule': return <Lightbulb className="text-yellow-400" size={28} />;
+      case 'summary': return <Lightbulb className="text-yellow-400" size={28} />;
       default: return '📝';
     }
   };

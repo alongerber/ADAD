@@ -13,26 +13,29 @@ interface State {
 }
 
 export class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
-    hasError: false,
-    error: null,
-    errorInfo: null,
-  };
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      hasError: false,
+      error: null,
+      errorInfo: null,
+    };
+  }
 
-  public static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error, errorInfo: null };
   }
 
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
     this.setState({ errorInfo });
   }
 
-  private handleRefresh = () => {
+  handleRefresh = () => {
     window.location.reload();
   };
 
-  private handleGoHome = () => {
+  handleGoHome = () => {
     // Clear any problematic state and go home
     try {
       // Don't clear user profile, just reload
@@ -42,7 +45,7 @@ export class ErrorBoundary extends Component<Props, State> {
     }
   };
 
-  private handleReset = () => {
+  handleReset = () => {
     this.setState({ hasError: false, error: null, errorInfo: null });
   };
 

@@ -99,8 +99,9 @@ export type PracticeAnswer =
 
 export interface BeakerAnswer {
   type: 'beaker';
-  numerator: number;
-  denominator: number;
+  numerator?: number;
+  denominator?: number;
+  targetFill?: { n: number; d: number };
 }
 
 export interface ChoiceAnswer {
@@ -129,7 +130,7 @@ export interface MatchAnswer {
 
 export interface MatchPair {
   left: string | { n: number; d: number };   // צד שמאל (שבר או טקסט)
-  right: VisualContent | string;              // צד ימין (ויזואל או טקסט)
+  right: VisualContent | string | { n: number; d: number };  // צד ימין (ויזואל, טקסט או שבר)
 }
 
 export interface TrueFalseAnswer {
@@ -138,10 +139,18 @@ export interface TrueFalseAnswer {
   statement: string;         // הטענה
 }
 
+export interface SortItem {
+  id: string;
+  fraction: { n: number; d: number };
+  value: number;
+  text?: string;  // תווית טקסט אופציונלית
+}
+
 export interface SortAnswer {
   type: 'sort';
-  correctOrder: (string | { n: number; d: number })[]; // הסדר הנכון
-  items: (string | { n: number; d: number })[];        // פריטים לסידור (מבולגנים)
+  correctOrder?: (string | { n: number; d: number })[]; // הסדר הנכון (deprecated)
+  items: SortItem[] | (string | { n: number; d: number })[];  // פריטים לסידור
+  direction?: 'ascending' | 'descending';  // כיוון המיון
 }
 
 // =============================================

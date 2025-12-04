@@ -228,7 +228,9 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ onClose }) => 
               {nextVaultLevel && (
                 <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
                   <div className="text-xs text-amber-300 font-bold mb-1">השלב הבא:</div>
-                  <div className="text-sm text-white">{nextVaultLevel.title}</div>
+                  <div className="text-sm text-white">
+                    {nextVaultLevel.title || (nextVaultLevel.mode === 'number_input' ? nextVaultLevel.instruction : `שלב ${nextVaultLevel.difficulty}`)}
+                  </div>
                 </div>
               )}
             </div>
