@@ -335,6 +335,7 @@ export const unitAddition: LearningUnit = {
       type: 'mastery',
       title: 'מבחן שליטה - חיבור במאונך',
       passingScore: 80,
+      onFail: 'review',
       questions: [
         {
           id: 'q_add_5_1',

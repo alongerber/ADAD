@@ -185,6 +185,7 @@ export const unit4Angles: LearningUnit = {
       type: 'mastery',
       title: 'מבחן שליטה - זוויות',
       passingScore: 80,
+      onFail: 'review',
       questions: [
         {
           id: 'q_ang_m_1',

@@ -20,6 +20,12 @@ export const unit5Borrowing: LearningUnit = {
 
   prerequisites: ['unit_4_subtraction'],
 
+  masterySkills: [
+    'זיהוי מתי צריך פריטה',
+    'ביצוע פריטה מעשרות',
+    'ביצוע פריטה ממאות'
+  ],
+
   steps: [
     // ========================================
     // שלב 1: למידה - מה זה פריטה?
@@ -237,6 +243,7 @@ export const unit5Borrowing: LearningUnit = {
       type: 'mastery',
       title: 'מבחן שליטה - פריטה',
       passingScore: 80,
+      onFail: 'review',
       questions: [
         {
           id: 'q_5_4_1',

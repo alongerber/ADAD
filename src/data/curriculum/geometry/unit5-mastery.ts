@@ -112,6 +112,7 @@ export const unit5Mastery: LearningUnit = {
       type: 'mastery',
       title: 'מבחן סיכום - גיאומטריה',
       passingScore: 80,
+      onFail: 'review',
       questions: [
         // צורות
         {

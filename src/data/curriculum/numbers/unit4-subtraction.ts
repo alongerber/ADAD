@@ -19,6 +19,12 @@ export const unit4Subtraction: LearningUnit = {
 
   prerequisites: ['unit_1_place_value'],
 
+  masterySkills: [
+    'סידור תרגיל חיסור במאונך',
+    'חיסור מספרים דו-ספרתיים',
+    'חיסור מספרים תלת-ספרתיים'
+  ],
+
   steps: [
     // ========================================
     // שלב 1: למידה - חיסור במאונך
@@ -233,6 +239,7 @@ export const unit4Subtraction: LearningUnit = {
       type: 'mastery',
       title: 'מבחן שליטה - חיסור במאונך',
       passingScore: 80,
+      onFail: 'review',
       questions: [
         {
           id: 'q_4_4_1',

@@ -82,7 +82,7 @@ export const unit3Area: LearningUnit = {
         },
         {
           id: 'slide_difference',
-          type: 'rule',
+          type: 'discovery',
           title: 'היקף ≠ שטח',
           content: {
             emoji: '⚠️',
@@ -230,6 +230,7 @@ export const unit3Area: LearningUnit = {
       type: 'mastery',
       title: 'מבחן שליטה - שטח',
       passingScore: 80,
+      onFail: 'review',
       questions: [
         {
           id: 'q_area_m_1',

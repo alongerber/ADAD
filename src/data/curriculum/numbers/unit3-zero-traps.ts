@@ -20,6 +20,12 @@ export const unit3ZeroTraps: LearningUnit = {
 
   prerequisites: ['unit_2_thousands'],
 
+  masterySkills: [
+    'זיהוי מתי צריך אפס שומר מקום',
+    'כתיבת מספרים עם אפסים באמצע',
+    'הימנעות ממלכודות האפס'
+  ],
+
   steps: [
     // ========================================
     // שלב 1: למידה - מה תפקיד האפס?
@@ -248,6 +254,7 @@ export const unit3ZeroTraps: LearningUnit = {
       type: 'mastery',
       title: 'מבחן שליטה - מלכודות האפס',
       passingScore: 80,
+      onFail: 'review',
       questions: [
         {
           id: 'q_3_4_1',

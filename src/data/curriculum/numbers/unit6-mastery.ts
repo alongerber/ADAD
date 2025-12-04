@@ -20,6 +20,12 @@ export const unit6Mastery: LearningUnit = {
 
   prerequisites: ['unit_5_borrowing'],
 
+  masterySkills: [
+    'שליטה מלאה במספרים',
+    'שליטה בחיסור במאונך',
+    'שליטה בפריטה'
+  ],
+
   steps: [
     // ========================================
     // שלב 1: חזרה קצרה
@@ -96,6 +102,7 @@ export const unit6Mastery: LearningUnit = {
       type: 'mastery',
       title: 'מבחן סיכום - מספרים וחיסור',
       passingScore: 80,
+      onFail: 'review',
       questions: [
         // שאלות על כתיבת מספרים
         {

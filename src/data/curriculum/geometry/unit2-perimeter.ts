@@ -224,6 +224,7 @@ export const unit2Perimeter: LearningUnit = {
       type: 'mastery',
       title: 'מבחן שליטה - היקף',
       passingScore: 80,
+      onFail: 'review',
       questions: [
         {
           id: 'q_per_m_1',

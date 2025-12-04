@@ -20,6 +20,12 @@ export const unit1PlaceValue: LearningUnit = {
 
   prerequisites: [],
 
+  masterySkills: [
+    'זיהוי ספרות במקום מאות, עשרות, יחידות',
+    'פירוק מספרים לערכי מקום',
+    'כתיבת מספרים במילים ובספרות'
+  ],
+
   steps: [
     // ========================================
     // שלב 1: למידה - מהו ערך המקום?
@@ -273,6 +279,7 @@ export const unit1PlaceValue: LearningUnit = {
       type: 'mastery',
       title: 'מבחן שליטה - ערך המקום',
       passingScore: 80,
+      onFail: 'review',
       questions: [
         {
           id: 'q_1_5_1',

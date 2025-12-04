@@ -19,6 +19,12 @@ export const unit2Thousands: LearningUnit = {
 
   prerequisites: ['unit_1_place_value'],
 
+  masterySkills: [
+    'קריאת מספרים בני 4 ספרות',
+    'כתיבת מספרים באלפים',
+    'זיהוי ערך ספרה במקום האלפים'
+  ],
+
   steps: [
     // ========================================
     // שלב 1: למידה - מקום האלפים
@@ -233,6 +239,7 @@ export const unit2Thousands: LearningUnit = {
       type: 'mastery',
       title: 'מבחן שליטה - אלפים',
       passingScore: 80,
+      onFail: 'review',
       questions: [
         {
           id: 'q_2_4_1',

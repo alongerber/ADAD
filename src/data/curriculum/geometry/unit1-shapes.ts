@@ -168,6 +168,7 @@ export const unit1Shapes: LearningUnit = {
       type: 'mastery',
       title: 'מבחן שליטה - צורות',
       passingScore: 80,
+      onFail: 'review',
       questions: [
         {
           id: 'q_geo_m_1',
