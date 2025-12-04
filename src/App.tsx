@@ -1,9 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { RoomType } from './types';
-import { LabRoom } from './rooms/LabRoom';
-import { VaultRoom } from './rooms/VaultRoom';
 import { Lobby } from './components/lobby/Lobby';
-import { CurriculumPlayer } from './components/curriculum/CurriculumPlayer';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UserProvider, useUser } from './contexts/UserContext';
 import { NotebookProvider, useNotebook } from './contexts/NotebookContext';
@@ -14,6 +11,21 @@ import { AchievementToast } from './components/ui/AchievementToast';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { Analytics } from '@vercel/analytics/react';
 import { initAudio } from './hooks/useSound';
+
+// Lazy load heavy components for better initial load time
+const LabRoom = lazy(() => import('./rooms/LabRoom').then(m => ({ default: m.LabRoom })));
+const VaultRoom = lazy(() => import('./rooms/VaultRoom').then(m => ({ default: m.VaultRoom })));
+const CurriculumPlayer = lazy(() => import('./components/curriculum/CurriculumPlayer').then(m => ({ default: m.CurriculumPlayer })));
+
+// Loading spinner for lazy-loaded components
+const LoadingSpinner = () => (
+  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="flex flex-col items-center gap-4">
+      <div className="w-16 h-16 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+      <p className="text-white/60 text-sm" dir="rtl">טוען...</p>
+    </div>
+  </div>
+);
 
 const GameContainer: React.FC = () => {
   const { user, theme } = useUser();
@@ -87,7 +99,9 @@ const GameContainer: React.FC = () => {
                     exit={{ opacity: 0, x: 100 }}
                     transition={{ duration: 0.5 }}
                 >
-                    <LabRoom onNavigate={setCurrentRoom} />
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <LabRoom onNavigate={setCurrentRoom} />
+                    </Suspense>
                 </motion.div>
             )}
 
@@ -100,7 +114,9 @@ const GameContainer: React.FC = () => {
                     exit={{ opacity: 0, x: 100 }}
                     transition={{ duration: 0.5 }}
                 >
-                    <VaultRoom onNavigate={setCurrentRoom} />
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <VaultRoom onNavigate={setCurrentRoom} />
+                    </Suspense>
                 </motion.div>
             )}
 
@@ -113,7 +129,9 @@ const GameContainer: React.FC = () => {
                     exit={{ opacity: 0, x: 100 }}
                     transition={{ duration: 0.5 }}
                 >
-                    <CurriculumPlayer onBack={() => setCurrentRoom(RoomType.LOBBY)} />
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <CurriculumPlayer onBack={() => setCurrentRoom(RoomType.LOBBY)} />
+                    </Suspense>
                 </motion.div>
             )}
 
@@ -126,7 +144,9 @@ const GameContainer: React.FC = () => {
                     exit={{ opacity: 0, x: 100 }}
                     transition={{ duration: 0.5 }}
                 >
-                    <CurriculumPlayer onBack={() => setCurrentRoom(RoomType.LOBBY)} initialModule="fractions" />
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <CurriculumPlayer onBack={() => setCurrentRoom(RoomType.LOBBY)} initialModule="fractions" />
+                    </Suspense>
                 </motion.div>
             )}
 
@@ -139,7 +159,9 @@ const GameContainer: React.FC = () => {
                     exit={{ opacity: 0, x: 100 }}
                     transition={{ duration: 0.5 }}
                 >
-                    <CurriculumPlayer onBack={() => setCurrentRoom(RoomType.LOBBY)} initialModule="numbers" />
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <CurriculumPlayer onBack={() => setCurrentRoom(RoomType.LOBBY)} initialModule="numbers" />
+                    </Suspense>
                 </motion.div>
             )}
 
@@ -152,7 +174,9 @@ const GameContainer: React.FC = () => {
                     exit={{ opacity: 0, x: 100 }}
                     transition={{ duration: 0.5 }}
                 >
-                    <CurriculumPlayer onBack={() => setCurrentRoom(RoomType.LOBBY)} initialModule="geometry" />
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <CurriculumPlayer onBack={() => setCurrentRoom(RoomType.LOBBY)} initialModule="geometry" />
+                    </Suspense>
                 </motion.div>
             )}
 

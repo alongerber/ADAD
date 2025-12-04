@@ -18,6 +18,26 @@ export default defineConfig(({ mode }) => {
         alias: {
           '@': path.resolve(__dirname, '.'),
         }
-      }
+      },
+      build: {
+        // Code splitting configuration
+        rollupOptions: {
+          output: {
+            manualChunks: {
+              // React core
+              'vendor-react': ['react', 'react-dom'],
+              // Animation library (large)
+              'vendor-framer': ['framer-motion'],
+              // Icons (can be loaded lazily)
+              'vendor-icons': ['lucide-react'],
+            },
+          },
+        },
+        // Increase chunk size warning limit (framer-motion is large)
+        chunkSizeWarningLimit: 600,
+        // Optimize dependencies - use esbuild (built-in)
+        target: 'esnext',
+        minify: 'esbuild',
+      },
     };
 });
