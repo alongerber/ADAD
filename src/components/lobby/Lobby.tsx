@@ -9,6 +9,7 @@ import { fractionsModule, getModuleStats as getFractionsStats } from '../../data
 import { numbersModule, getModuleStats as getNumbersStats } from '../../data/curriculum/numbers';
 import { geometryModule, getModuleStats as getGeometryStats } from '../../data/curriculum/geometry';
 import { ParentDashboard } from '../dashboard/ParentDashboard';
+import { FeedbackForm } from '../ui/FeedbackForm';
 
 interface LobbyProps {
   onNavigate: (room: RoomType) => void;
@@ -17,6 +18,7 @@ interface LobbyProps {
 export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
   const { user, theme, clearUser, isMuted, toggleMute } = useUser();
   const [showDashboard, setShowDashboard] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
 
   // Dynamic Styles based on theme
   const getHeaderStyle = () => {
@@ -110,13 +112,13 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
         </button>
 
         {/* Feedback Button */}
-        <a
-          href="mailto:feedback@matemati-bis.co.il?subject=פידבק על מתמטי-ביס"
+        <button
+          onClick={() => setShowFeedback(true)}
           className="p-3 bg-white/5 rounded-full hover:bg-amber-500/20 text-white/40 hover:text-amber-400 transition-all border border-white/5 hover:border-amber-500/30"
           title="שלח פידבק"
         >
           <MessageCircle size={20} />
-        </a>
+        </button>
       </div>
 
       {/* Header */}
@@ -312,6 +314,12 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
           <ParentDashboard onClose={() => setShowDashboard(false)} />
         )}
       </AnimatePresence>
+
+      {/* Feedback Form Modal */}
+      <FeedbackForm
+        isOpen={showFeedback}
+        onClose={() => setShowFeedback(false)}
+      />
 
     </div>
   );
