@@ -29,6 +29,7 @@ export const PracticeRouter: React.FC<PracticeRouterProps> = ({
         <MultipleChoice
           question={question.question}
           narrative={question.narrative}
+          visual={question.visual}
           options={answer.options}
           correctIndex={answer.correctIndex}
           onAnswer={(isCorrect) => onAnswer(isCorrect)}

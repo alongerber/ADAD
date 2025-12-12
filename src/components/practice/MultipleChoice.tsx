@@ -156,6 +156,7 @@ const FractionDisplay: React.FC<FractionDisplayProps> = ({
 interface MultipleChoiceProps {
   question: string;
   narrative?: string;
+  visual?: VisualContent;  // ויזואל לשאלה (כמו פיצה לשאלת "מה השבר בתמונה?")
   options: ChoiceOption[];
   correctIndex: number;
   onAnswer: (isCorrect: boolean, selectedIndex: number) => void;
@@ -166,6 +167,7 @@ interface MultipleChoiceProps {
 export const MultipleChoice: React.FC<MultipleChoiceProps> = ({
   question,
   narrative,
+  visual,
   options,
   correctIndex,
   onAnswer,
@@ -300,6 +302,36 @@ export const MultipleChoice: React.FC<MultipleChoiceProps> = ({
     return null;
   };
 
+  // רינדור ויזואל השאלה (אם יש)
+  const renderQuestionVisual = () => {
+    if (!visual) return null;
+
+    const visualType = visual.type as 'pizza' | 'beaker' | 'chocolate';
+    const slices = visual.props?.slices || 4;
+    const filled = visual.props?.filled || 0;
+
+    if (visualType === 'pizza' || visualType === 'beaker' || visualType === 'chocolate') {
+      return (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.1 }}
+          className="p-4 bg-white/5 rounded-2xl border border-white/10"
+        >
+          <FractionVisual
+            type={visualType}
+            slices={slices}
+            filled={filled}
+            size="lg"
+            animate={!answered}
+          />
+        </motion.div>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <div className="w-full max-w-2xl mx-auto flex flex-col items-center gap-6" dir="rtl">
       {/* שאלה */}
@@ -321,6 +353,9 @@ export const MultipleChoice: React.FC<MultipleChoiceProps> = ({
           {question}
         </motion.h2>
       </div>
+
+      {/* ויזואל השאלה (אם יש) */}
+      {renderQuestionVisual()}
 
       {/* אפשרויות */}
       <div
