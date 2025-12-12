@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, ChevronLeft, Lock, CheckCircle, BookOpen, Award, Play, Pause } from 'lucide-react';
+import { Home, ChevronLeft, Lock, CheckCircle, BookOpen, Award, Play, Pause, FastForward } from 'lucide-react';
 import { PauseOverlay } from '../ui/PauseOverlay';
 import { SaveIndicator } from '../ui/SaveIndicator';
 import { useAutoSave, clearSessionState } from '../../hooks/useSessionSave';
@@ -163,9 +163,10 @@ interface UnitSelectProps {
   onSelectUnit: (unitId: string) => void;
   completedUnits: string[];
   onBack: () => void;
+  onSkipTest?: (unitId: string) => void;
 }
 
-const UnitSelect: React.FC<UnitSelectProps> = ({ moduleType, onSelectUnit, completedUnits, onBack }) => {
+const UnitSelect: React.FC<UnitSelectProps> = ({ moduleType, onSelectUnit, completedUnits, onBack, onSkipTest }) => {
   const currentModule = modules[moduleType];
   const stats = getModuleStats(moduleType, completedUnits);
 
@@ -227,81 +228,103 @@ const UnitSelect: React.FC<UnitSelectProps> = ({ moduleType, onSelectUnit, compl
             const isCompleted = completedUnits.includes(unit.id);
             const isAvailable = isUnitAvailable(moduleType, unit.id, completedUnits);
             const isNext = !isCompleted && isAvailable;
+            const canSkip = !isAvailable && !isCompleted && onSkipTest;
 
             return (
-              <motion.button
+              <motion.div
                 key={unit.id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: idx * 0.1 }}
-                onClick={() => isAvailable && onSelectUnit(unit.id)}
-                disabled={!isAvailable}
-                className={`relative flex items-center gap-4 p-4 md:p-6 rounded-2xl border-2 transition-all text-right ${
-                  isCompleted
-                    ? 'bg-green-900/20 border-green-500/50'
-                    : !isAvailable
-                    ? 'bg-white/5 border-white/10 opacity-50 cursor-not-allowed'
-                    : isNext
-                    ? 'bg-purple-900/30 border-purple-500 shadow-lg shadow-purple-500/20 hover:scale-[1.02] cursor-pointer'
-                    : 'bg-white/5 border-white/20 hover:bg-white/10 cursor-pointer'
-                }`}
+                className="relative"
               >
-                {/* מספר/אייקון */}
-                <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-2xl shrink-0 ${
-                  isCompleted
-                    ? 'bg-green-500/20 text-green-400'
-                    : !isAvailable
-                    ? 'bg-white/5 text-white/30'
-                    : 'bg-purple-500/20 text-purple-400'
-                }`}>
-                  {isCompleted ? (
-                    <CheckCircle size={28} />
-                  ) : !isAvailable ? (
-                    <Lock size={24} />
-                  ) : (
-                    unit.icon
-                  )}
-                </div>
-
-                {/* פרטים */}
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-white/40">יחידה {unit.number}</span>
-                    {isNext && (
-                      <span className="px-2 py-0.5 bg-purple-500/30 rounded-full text-[10px] text-purple-300 font-bold">
-                        הבא
-                      </span>
+                <button
+                  onClick={() => isAvailable && onSelectUnit(unit.id)}
+                  disabled={!isAvailable}
+                  className={`w-full relative flex items-center gap-4 p-4 md:p-6 rounded-2xl border-2 transition-all text-right ${
+                    isCompleted
+                      ? 'bg-green-900/20 border-green-500/50'
+                      : !isAvailable
+                      ? 'bg-white/5 border-white/10 opacity-60'
+                      : isNext
+                      ? 'bg-purple-900/30 border-purple-500 shadow-lg shadow-purple-500/20 hover:scale-[1.02] cursor-pointer'
+                      : 'bg-white/5 border-white/20 hover:bg-white/10 cursor-pointer'
+                  }`}
+                >
+                  {/* מספר/אייקון */}
+                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-2xl shrink-0 ${
+                    isCompleted
+                      ? 'bg-green-500/20 text-green-400'
+                      : !isAvailable
+                      ? 'bg-white/5 text-white/30'
+                      : 'bg-purple-500/20 text-purple-400'
+                  }`}>
+                    {isCompleted ? (
+                      <CheckCircle size={28} />
+                    ) : !isAvailable ? (
+                      <Lock size={24} />
+                    ) : (
+                      unit.icon
                     )}
                   </div>
-                  <h3 className={`text-lg md:text-xl font-bold ${
-                    isCompleted ? 'text-green-400' : !isAvailable ? 'text-white/40' : 'text-white'
-                  }`}>
-                    {unit.title}
-                  </h3>
-                  <p className="text-sm text-white/50 mt-1">{unit.description}</p>
 
-                  {/* מטרות */}
-                  <div className="flex gap-2 mt-2 flex-wrap">
-                    <span className="text-xs px-2 py-1 bg-white/10 rounded text-white/50">
-                      {unit.steps.length} שלבים
-                    </span>
+                  {/* פרטים */}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-white/40">יחידה {unit.number}</span>
+                      {isNext && (
+                        <span className="px-2 py-0.5 bg-purple-500/30 rounded-full text-[10px] text-purple-300 font-bold">
+                          הבא
+                        </span>
+                      )}
+                    </div>
+                    <h3 className={`text-lg md:text-xl font-bold ${
+                      isCompleted ? 'text-green-400' : !isAvailable ? 'text-white/40' : 'text-white'
+                    }`}>
+                      {unit.title}
+                    </h3>
+                    <p className="text-sm text-white/50 mt-1">{unit.description}</p>
+
+                    {/* מטרות */}
+                    <div className="flex gap-2 mt-2 flex-wrap">
+                      <span className="text-xs px-2 py-1 bg-white/10 rounded text-white/50">
+                        {unit.steps.length} שלבים
+                      </span>
+                    </div>
                   </div>
-                </div>
 
-                {/* חץ */}
-                {isAvailable && (
-                  <ChevronLeft className={`shrink-0 ${isCompleted ? 'text-green-400' : 'text-white/40'}`} size={24} />
-                )}
+                  {/* חץ */}
+                  {isAvailable && (
+                    <ChevronLeft className={`shrink-0 ${isCompleted ? 'text-green-400' : 'text-white/40'}`} size={24} />
+                  )}
 
-                {/* אינדיקטור הבא */}
-                {isNext && (
-                  <motion.div
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
-                    className="absolute -top-1 -right-1 w-4 h-4 bg-purple-400 rounded-full"
-                  />
+                  {/* אינדיקטור הבא */}
+                  {isNext && (
+                    <motion.div
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                      className="absolute -top-1 -right-1 w-4 h-4 bg-purple-400 rounded-full"
+                    />
+                  )}
+                </button>
+
+                {/* כפתור דילוג - ליחידות נעולות */}
+                {canSkip && (
+                  <motion.button
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: idx * 0.1 + 0.3 }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSkipTest(unit.id);
+                    }}
+                    className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 rounded-full text-xs font-bold text-white shadow-lg shadow-amber-500/30 flex items-center gap-1.5 transition-all hover:scale-105"
+                  >
+                    <FastForward size={14} />
+                    <span>כבר יודע? נסה לדלג</span>
+                  </motion.button>
                 )}
-              </motion.button>
+              </motion.div>
             );
           })}
         </div>
@@ -618,7 +641,8 @@ type ViewState =
   | { type: 'practice'; moduleType: ModuleType; unitId: string; stepIndex: number }
   | { type: 'mastery'; moduleType: ModuleType; unitId: string; stepIndex: number }
   | { type: 'step-complete'; moduleType: ModuleType; unitId: string; stepIndex: number }
-  | { type: 'unit-complete'; moduleType: ModuleType; unitId: string };
+  | { type: 'unit-complete'; moduleType: ModuleType; unitId: string }
+  | { type: 'skip-test'; moduleType: ModuleType; unitId: string };
 
 export const CurriculumPlayer: React.FC<CurriculumPlayerProps> = ({ onBack, initialModule }) => {
   const { user, completeLevel } = useUser();
@@ -707,6 +731,41 @@ export const CurriculumPlayer: React.FC<CurriculumPlayerProps> = ({ onBack, init
     setViewState({ type: 'unit-select', moduleType });
   };
 
+  // מתחיל מבחן דילוג ליחידה נעולה
+  const handleStartSkipTest = (moduleType: ModuleType, unitId: string) => {
+    setViewState({ type: 'skip-test', moduleType, unitId });
+  };
+
+  // מטפל בסיום מבחן דילוג
+  const handleSkipTestComplete = (moduleType: ModuleType, unitId: string, passed: boolean, score: number) => {
+    if (passed) {
+      // עבר את מבחן הדילוג - מסמן את היחידה וכל הדרישות המקדימות כהושלמו
+      const unit = getUnitById(moduleType, unitId);
+      if (unit) {
+        // מסמן את כל הדרישות המקדימות כהושלמו (רקורסיבי)
+        const markPrerequisitesComplete = (prereqs: string[] | undefined) => {
+          if (!prereqs) return;
+          prereqs.forEach(prereqId => {
+            if (!completedUnits.includes(prereqId)) {
+              completeLevel(prereqId, 100);
+              const prereqUnit = getUnitById(moduleType, prereqId);
+              if (prereqUnit?.prerequisites) {
+                markPrerequisitesComplete(prereqUnit.prerequisites);
+              }
+            }
+          });
+        };
+        markPrerequisitesComplete(unit.prerequisites);
+        // מסמן את היחידה עצמה
+        completeLevel(unitId, score);
+      }
+      setViewState({ type: 'unit-select', moduleType });
+    } else {
+      // נכשל - חוזר לבחירת יחידות
+      setViewState({ type: 'unit-select', moduleType });
+    }
+  };
+
   // --- Render ---
 
   const renderView = () => {
@@ -727,6 +786,7 @@ export const CurriculumPlayer: React.FC<CurriculumPlayerProps> = ({ onBack, init
             completedUnits={completedUnits}
             onSelectUnit={(unitId) => handleSelectUnit(viewState.moduleType, unitId)}
             onBack={initialModule ? onBack : () => setViewState({ type: 'module-select' })}
+            onSkipTest={(unitId) => handleStartSkipTest(viewState.moduleType, unitId)}
           />
         );
 
@@ -838,6 +898,34 @@ export const CurriculumPlayer: React.FC<CurriculumPlayerProps> = ({ onBack, init
               <ChevronLeft size={24} />
             </motion.button>
           </motion.div>
+        );
+      }
+
+      case 'skip-test': {
+        const unit = getUnitById(viewState.moduleType, viewState.unitId);
+        if (!unit) return null;
+
+        // מחפש את שלב ה-mastery של היחידה כדי לקחת ממנו שאלות
+        const masteryStep = unit.steps.find(s => s.type === 'mastery') as MasteryStep | undefined;
+
+        // אם אין שלב mastery, יוצר שאלות מהתרגולים
+        const questions: PracticeQuestion[] = masteryStep?.questions ||
+          unit.steps
+            .filter(s => s.type === 'practice')
+            .flatMap(s => (s as PracticeStep).questions)
+            .slice(0, 5);
+
+        return (
+          <MasteryTest
+            title={`מבחן דילוג: ${unit.title}`}
+            questions={questions}
+            passingScore={80}
+            onComplete={(passed, score) =>
+              handleSkipTestComplete(viewState.moduleType, viewState.unitId, passed, score)
+            }
+            onReview={() => setViewState({ type: 'unit-select', moduleType: viewState.moduleType })}
+            onBack={() => setViewState({ type: 'unit-select', moduleType: viewState.moduleType })}
+          />
         );
       }
 
