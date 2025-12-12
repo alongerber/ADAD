@@ -131,7 +131,7 @@ export const Lobby: React.FC<LobbyProps> = ({ onNavigate }) => {
           {user ? getTimeGreeting(user.gender, user.name) : 'שלום!'}
         </h2>
         <h1 className={`text-3xl md:text-6xl font-bold ${getHeaderStyle()}`}>
-          לאן ממשיכים?
+          {user?.progress?.completedLevels?.length > 0 ? 'לאן ממשיכים?' : 'מה נלמד היום?'}
         </h1>
       </motion.div>
 
