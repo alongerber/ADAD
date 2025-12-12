@@ -726,7 +726,7 @@ export const CurriculumPlayer: React.FC<CurriculumPlayerProps> = ({ onBack, init
             moduleType={viewState.moduleType}
             completedUnits={completedUnits}
             onSelectUnit={(unitId) => handleSelectUnit(viewState.moduleType, unitId)}
-            onBack={() => setViewState({ type: 'module-select' })}
+            onBack={initialModule ? onBack : () => setViewState({ type: 'module-select' })}
           />
         );
 
