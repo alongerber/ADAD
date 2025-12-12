@@ -8,8 +8,8 @@ import { useUser } from '../../contexts/UserContext';
 // =============================================
 const EMAILJS_CONFIG = {
   serviceId: 'service_apf7xlf',
-  templateId: 'template_XXXXXX', // TODO: Replace with your Template ID from EmailJS
-  publicKey: 'XXXXXXXXXXXXXX',   // TODO: Replace with your Public Key from EmailJS
+  templateId: 'template_84gn66z',
+  publicKey: 'Mbpc2jdRMvy0qir-3',
 };
 
 // =============================================
