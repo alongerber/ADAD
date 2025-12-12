@@ -419,6 +419,7 @@ interface PracticeSessionProps {
 }
 
 const PracticeSession: React.FC<PracticeSessionProps> = ({ step, onComplete, onBack, moduleType, unitId, stepIndex }) => {
+  const { user } = useUser();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<boolean[]>([]);
   const [isAnswered, setIsAnswered] = useState(false);
@@ -499,6 +500,7 @@ const PracticeSession: React.FC<PracticeSessionProps> = ({ step, onComplete, onB
         onQuit={onBack}
         sessionTime={sessionTime}
         showBreakSuggestion={sessionTime >= 900} // 15 דקות
+        gender={user?.gender || 'boy'}
       />
 
       {/* כפתורי ניווט */}

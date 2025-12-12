@@ -6,6 +6,7 @@ import { PracticeRouter } from './PracticeRouter';
 import { PauseOverlay } from '../ui/PauseOverlay';
 import { SaveIndicator } from '../ui/SaveIndicator';
 import { useAutoSave } from '../../hooks/useSessionSave';
+import { useUser } from '../../contexts/UserContext';
 
 // =============================================
 // קומפוננטת מבחן שליטה
@@ -33,6 +34,7 @@ export const MasteryTest: React.FC<MasteryTestProps> = ({
   unitId,
   stepIndex
 }) => {
+  const { user } = useUser();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<boolean[]>([]);
   const [showResult, setShowResult] = useState(false);
@@ -294,6 +296,7 @@ export const MasteryTest: React.FC<MasteryTestProps> = ({
         onQuit={onBack || (() => {})}
         sessionTime={sessionTime}
         showBreakSuggestion={sessionTime >= 900} // 15 דקות
+        gender={user?.gender || 'boy'}
       />
 
       {/* כפתורי ניווט */}

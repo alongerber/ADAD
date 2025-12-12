@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Home, Clock, Coffee, Sparkles } from 'lucide-react';
+import { GenderType } from '../../types';
 
 // =============================================
 // קומפוננטת השהייה - מותאמת ל-ADHD
@@ -11,15 +12,16 @@ interface PauseOverlayProps {
   onQuit: () => void;
   sessionTime?: number; // זמן בשניות
   showBreakSuggestion?: boolean;
+  gender?: GenderType; // מגדר לשפה מותאמת
 }
 
-// טיפים מעודדים בזמן הפסקה
-const pauseTips = [
+// טיפים מעודדים בזמן הפסקה - מותאמים מגדרית
+const getPauseTips = (gender: GenderType) => [
   { emoji: '💧', text: 'שתה קצת מים!' },
-  { emoji: '🧘', text: 'קח נשימה עמוקה' },
-  { emoji: '👀', text: 'הסתכל לרחוק לרגע' },
-  { emoji: '🙆', text: 'מתח קצת את הגוף' },
-  { emoji: '😊', text: 'אתה עושה עבודה מעולה!' },
+  { emoji: '🧘', text: gender === 'boy' ? 'קח נשימה עמוקה' : 'קחי נשימה עמוקה' },
+  { emoji: '👀', text: gender === 'boy' ? 'הסתכל לרחוק לרגע' : 'הסתכלי לרחוק לרגע' },
+  { emoji: '🙆', text: gender === 'boy' ? 'מתח קצת את הגוף' : 'מתחי קצת את הגוף' },
+  { emoji: '😊', text: gender === 'boy' ? 'אתה עושה עבודה מעולה!' : 'את עושה עבודה מעולה!' },
 ];
 
 export const PauseOverlay: React.FC<PauseOverlayProps> = ({
@@ -27,10 +29,12 @@ export const PauseOverlay: React.FC<PauseOverlayProps> = ({
   onResume,
   onQuit,
   sessionTime = 0,
-  showBreakSuggestion = false
+  showBreakSuggestion = false,
+  gender = 'boy'
 }) => {
-  // בחר טיפ רנדומלי
-  const randomTip = pauseTips[Math.floor(Math.random() * pauseTips.length)];
+  // בחר טיפ רנדומלי מותאם מגדרית
+  const tips = getPauseTips(gender);
+  const randomTip = tips[Math.floor(Math.random() * tips.length)];
 
   // המרת זמן לדקות
   const minutes = Math.floor(sessionTime / 60);
@@ -117,7 +121,10 @@ export const PauseOverlay: React.FC<PauseOverlayProps> = ({
                   🎉 עבדת כבר {minutes} דקות!
                 </p>
                 <p className="text-amber-200/70 text-xs">
-                  מומלץ לקחת הפסקה קצרה. המשך כשתרגיש מוכן!
+                  {gender === 'boy'
+                    ? 'מומלץ לקחת הפסקה קצרה. המשך כשתרגיש מוכן!'
+                    : 'מומלץ לקחת הפסקה קצרה. המשיכי כשתרגישי מוכנה!'
+                  }
                 </p>
               </motion.div>
             )}
